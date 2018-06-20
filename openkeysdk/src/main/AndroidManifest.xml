@@ -1,0 +1,54 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.openkey.sdk">
+
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+
+        <!-- NFC service, disable if not needed -->
+        <service
+            android:name="com.assaabloy.mobilekeys.api.hce.HceService"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.nfc.cardemulation.host_apdu_service"
+                android:resource="@xml/seos_hce_service" />
+        </service>
+
+        <!-- Bluetooth service, disable if not needed -->
+        <service android:name="com.assaabloy.mobilekeys.api.ble.BleScanService" />
+
+        <!-- Disable Mixpanel features -->
+        <meta-data
+            android:name="com.mixpanel.android.MPConfig.DisableDecideChecker"
+            android:value="true" />
+        <meta-data
+            android:name="com.mixpanel.android.MPConfig.DisableViewCrawler"
+            android:value="true" />
+
+        <service
+            android:name="com.saltosystems.justinkey.sdk.ble.BluetoothLeService"
+            android:enabled="true" />
+
+    </application>
+
+</manifest>

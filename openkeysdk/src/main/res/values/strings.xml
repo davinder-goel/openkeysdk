@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">OpenKey SDK</string>
+    <string name="seos_hce_aid_description">Access Control</string>
+    <string name="seos_hce_description" translateable="false">Seos</string>
+
+
+    //KeyActive
+    <string name="wrong_door">Wrong door</string>
+</resources>
