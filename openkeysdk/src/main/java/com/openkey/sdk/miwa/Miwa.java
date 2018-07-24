@@ -44,7 +44,6 @@ public class Miwa {
         this.openKeyCallBack = OpenKeyCallBack;
         this.mContext = mContext;
         setUpMiwa();
-
     }
 
     private BroadcastReceiver receiverMiwa = new BroadcastReceiver() {

@@ -3,6 +3,7 @@ package com.openkey.sdk.kaba;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.helixion.lokplatform.persistence.PersistentStoreException;
 import com.helixion.secureelement.SeConnectionException;
 import com.helixion.utilities.ByteArray;
@@ -31,13 +32,12 @@ import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
-import com.openkey.sdk.api.service.Services;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
-import com.openkey.sdk.kaba.model.PrepareDirectWalletRegistrationRequest;
-import com.openkey.sdk.kaba.model.Token;
-import com.openkey.sdk.kaba.response.KabaTokenResponse;
+import com.openkey.sdk.kaba.response.invitationcode.KabaInvitationCodeResponse;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -57,7 +57,6 @@ public class Kaba {
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
     private String kabaRegistrationToken;
-    private String uniqueNumber;
 
     //KABA REQUIREMENTS
     private List<ProfileIDs> profileIDs = new ArrayList<>();
@@ -78,42 +77,51 @@ public class Kaba {
         }
     };
 
-    public Kaba(Context mContext, OpenKeyCallBack OpenKeyCallBack, String uniqueNumber) {
-        this.openKeyCallBack = OpenKeyCallBack;
-        this.mContext = mContext;
-        this.uniqueNumber = uniqueNumber;
-        setupKaba();
-        startKabaProcessing();
-    }
+    private Callback<Object> statusCall = new Callback<Object>() {
+        @Override
+        public void onResponse(Call<Object> call, Response<Object> response) {
+            if (response.isSuccessful()) {
 
-    /**
-     * setup device for kaba lock
-     */
-    private void setupKaba() {
-        // Add the type of SE Supported to the list of ProfileIds
-        profileIDs.add(ProfileIDs.BLE);
-        // Create the instance of IDConnectManager
-        if (manager == null) {
-            manager = IDConnectFactory.createIDConnectManager(mContext,
-                    getSynchroniseListener(), walletId, "",
-                    PushTypes.GCM, profileIDs, bleListener, getSeUIListener());
-            // Once we have our instance of IDConnectManager then lets set slide_up the
-            // server configuration. To run this application, please change the below values
-            try {
-                manager.getPersistentStore().saveServerURL(Constants.KABA_SERVER_URL);
-            } catch (PersistentStoreException e) {
-                e.printStackTrace();
-            }
-            manager.setUsername(Constants.KABA_SERVER_USER_NAME);
-            manager.setPassword(Constants.KABA_SERVER_PASSWORD);
-            try {
-                manager.setConfigParam(BLEConfigParams.FILESELECTIONMODE.getParamKey(), BLEFileSelectionModes.PRESELECT_FILE.getMode());
-            } catch (SETypeNotSupportedException e) {
-                e.printStackTrace();
+                Gson gson = new Gson();
+                KabaInvitationCodeResponse responseModel = gson
+                        .fromJson(response.body().toString(),
+                                KabaInvitationCodeResponse.class);
+                Log.e("Response", ":" + response.body().toString());
+                Log.e("CODE", ":" + responseModel.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken());
+
+
+                Log.e("Res", ":" + response.body().toString());
+                KabaInvitationCodeResponse kabaTokenResponse = responseModel;
+                if (kabaTokenResponse != null && kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse()
+                        != null && kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken() != null
+                        && kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken().length() > 0) {
+                    Log.e(TAG, "Token From KABA : " + kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken());
+                    kabaRegistrationToken = kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken();
+                    // save token and start the process again
+                    Utilities.getInstance().saveValue(Constants.KABA_REGISTRATION_TOKEN, kabaRegistrationToken, mContext);
+                    startKabaProcessing();
+                }
+
+
+            } else {
+                // Show the message  from the error body if response is not successful
+                Utilities.getInstance().handleApiError(response.errorBody(), mContext);
+                openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
             }
         }
-        // This simply prints to the log the current version of the OpenKeyCallBack
-        Log.e(TAG, "onCreate: IDConnectManager version = " + manager.getSKDVersion());
+
+        @Override
+        public void onFailure(Call<Object> call, Throwable t) {
+            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+
+        }
+    };
+
+    public Kaba(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
+        this.openKeyCallBack = OpenKeyCallBack;
+        this.mContext = mContext;
+        setupKaba();
+        startKabaProcessing();
     }
 
 
@@ -442,10 +450,43 @@ public class Kaba {
     }
 
     /**
+     * setup device for kaba lock
+     */
+    private void setupKaba() {
+        // Add the type of SE Supported to the list of ProfileIds
+        profileIDs.add(ProfileIDs.BLE);
+        // Create the instance of IDConnectManager
+        if (manager == null) {
+            manager = IDConnectFactory.createIDConnectManager(mContext,
+                    getSynchroniseListener(), walletId, "",
+                    PushTypes.GCM, profileIDs, bleListener, getSeUIListener());
+            // Once we have our instance of IDConnectManager then lets set slide_up the
+            // server configuration. To run this application, please change the below values
+            try {
+                manager.getPersistentStore().saveServerURL(Constants.KABA_SERVER_URL);
+            } catch (PersistentStoreException e) {
+                e.printStackTrace();
+            }
+            manager.setUsername(Constants.KABA_SERVER_USER_NAME);
+            manager.setPassword(Constants.KABA_SERVER_PASSWORD);
+            try {
+                manager.setConfigParam(BLEConfigParams.FILESELECTIONMODE.getParamKey(), BLEFileSelectionModes.PRESELECT_FILE.getMode());
+
+            } catch (SETypeNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+        // This simply prints to the log the current version of the OpenKeyCallBack
+        Log.e(TAG, "onCreate: IDConnectManager version = " + manager.getSKDVersion());
+    }
+
+    /**
      * Get registration token from the kaba id-connect server
      */
     private void getKabaRegistrationToken() {
-        final String publicSEId = getPublicSEId();
+
+        Api.setInitializePersonalization(mContext, statusCall);
+       /* final String publicSEId = getPublicSEId();
 
         Log.e(TAG, "requesting token to kaba : " + publicSEId);
         PrepareDirectWalletRegistrationRequest request = new PrepareDirectWalletRegistrationRequest(publicSEId, walletId);
@@ -480,7 +521,7 @@ public class Kaba {
             public void onFailure(Call<KabaTokenResponse> call, Throwable t) {
                 openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
             }
-        });
+        });*/
     }
 
 
@@ -488,7 +529,7 @@ public class Kaba {
      * Create publicSEId for KABA registration process
      */
     private String getPublicSEId() {
-        String phoneNumber = uniqueNumber.replace("+", "");
+        String phoneNumber = "919803446768".replace("+", "");
         return "custom#" + walletId + "-" + phoneNumber;
 
     }

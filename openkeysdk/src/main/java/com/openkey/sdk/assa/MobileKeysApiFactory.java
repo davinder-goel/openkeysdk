@@ -12,7 +12,7 @@ import com.assaabloy.mobilekeys.api.MobileKeys;
 import com.assaabloy.mobilekeys.api.ReaderConnectionController;
 import com.assaabloy.mobilekeys.api.ble.ScanConfiguration;
 
-interface MobileKeysApiFactory {
+public interface MobileKeysApiFactory {
     /**
      * Get the a mobile keys api instance
      */

@@ -308,28 +308,28 @@ public class Utilities {
      * <p>
      * return retrofit;
      */
-    public Retrofit getRetrofitForASSA(Context context) {
-        Retrofit retrofit;
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        // set your desired log level
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        httpClient.addInterceptor(logging);
-
-        String url=Constants.ASSA_DEV_URL;
-
-        if (context!=null)
-        {
-           url=Utilities.getInstance().getValue(Constants.ASSA_BASE_URL,Constants.ASSA_DEV_URL,context);
-        }
-
-        retrofit = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(url)
-                .client(httpClient.build())
-                .build();
-        return retrofit;
-    }
+//    public Retrofit getRetrofitForASSA(Context context) {
+//        Retrofit retrofit;
+//        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+//        // set your desired log level
+//        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+//        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+//        httpClient.addInterceptor(logging);
+//
+//        String url=Constants.ASSA_DEV_URL;
+//
+//        if (context!=null)
+//        {
+//           url=Utilities.getInstance().getValue(Constants.ASSA_BASE_URL,Constants.ASSA_DEV_URL,context);
+//        }
+//
+//        retrofit = new Retrofit.Builder()
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .baseUrl(url)
+//                .client(httpClient.build())
+//                .build();
+//        return retrofit;
+//    }
 
 
     /**

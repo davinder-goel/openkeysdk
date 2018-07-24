@@ -42,20 +42,25 @@ public class Constants {
     public static final String ASSA_TOKEN = "assa_token";
     public static final String ASSA_BASE_URL = "assa_base_url";
     public static final String BASE_URL = "base_url";
+    public static final String TOKEN = "Token ";
 
     //LIVE BASE URL
      public static final String BASE_URL_LIVE = "https://developer.openkey.co/";
     // public static final String BASE_URL_LIVE = "https://betadeveloper.openkey.co/";
 
      //DEV BASE URL
-     public static  String BASE_URL_DEV = "https://partner.openkey.co/";
+     //public static  String BASE_URL_DEV = "https://partner.openkey.co/";
+     public static String BASE_URL_DEV = "https://apidev.openkey.co/";
+/*
+    https://apidev.openkey.co/sdk/v5
+*/
+//     //ASSA LIVE
+//     public static final String ASSA_LIVE_URL = "https://credential-services.sci.assaabloy.com/";
+//     public static final String ASSA_LIVE_TOKEN = "Basic b3BlbmtleS10bm50OmtoU1NDeVY3cjlGRzl2U1Q0cTVx";
+//
+//     //ASSA DEV
+//     public static final String ASSA_DEV_URL = "https://demo.credential-services.sci.assaabloy.net";
+//     public static final String ASSA_DEV_TOKEN = "Basic b3BlbmtleS1kZW1vLXRubnQ6eFpKTGM1aHNTcTdKcDJ2d1FGMjU=";
 
-     //ASSA LIVE
-     public static final String ASSA_LIVE_URL = "https://credential-services.sci.assaabloy.com/";
-     public static final String ASSA_LIVE_TOKEN = "Basic b3BlbmtleS10bm50OmtoU1NDeVY3cjlGRzl2U1Q0cTVx";
-
-     //ASSA DEV
-     public static final String ASSA_DEV_URL = "https://demo.credential-services.sci.assaabloy.net";
-     public static final String ASSA_DEV_TOKEN = "Basic b3BlbmtleS1kZW1vLXRubnQ6eFpKTGM1aHNTcTdKcDJ2d1FGMjU=";
 
 }

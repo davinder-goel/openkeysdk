@@ -32,22 +32,22 @@ import com.assaabloy.mobilekeys.api.ble.ScanConfiguration;
 import com.assaabloy.mobilekeys.api.ble.ScanMode;
 import com.assaabloy.mobilekeys.api.ble.SeamlessOpeningTrigger;
 import com.assaabloy.mobilekeys.api.ble.TapOpeningTrigger;
+import com.google.gson.Gson;
 import com.openkey.sdk.BuildConfig;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
-import com.openkey.sdk.api.model.CreateEndPoint;
 import com.openkey.sdk.api.request.Api;
-import com.openkey.sdk.api.response.EndPointResponse;
-import com.openkey.sdk.api.service.Services;
 import com.openkey.sdk.assa.PayloadHelper.ByteArrayHelper;
+import com.openkey.sdk.assa.inviationcode.AssaInvitationCode;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+
 
 
 public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListener {
@@ -57,7 +57,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     private OpenKeyCallBack openKeyCallBack;
     private MobileKeysApi mobileKeysFactory;
     private Context mContext;
-    private String mEndpoint;
     private ReaderConnectionCallback readerConnectionCallback;
     private Handler mHandlerStopScanning;
 
@@ -69,12 +68,72 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         }
     };
 
-    public ASSA(Context mContext, OpenKeyCallBack OpenKeyCallBack, String mEndpoint) {
+    private Callback<Object> statusCall = new Callback<Object>() {
+        @Override
+        public void onResponse(Call<Object> call, retrofit2.Response<Object> response) {
+            if (response.isSuccessful()) {
+
+                if (response.body() != null) {
+                    //   openKeyCallBack.initializationSuccess();
+                    Log.e("createEndPoint", "startSetup");
+
+                    Gson gson = new Gson();
+                    AssaInvitationCode responseModel = gson
+                            .fromJson(response.body().toString(),
+                                    AssaInvitationCode.class);
+                    Log.e("Response", ":" + responseModel.getData().getCode().getInvitationCode());
+
+                    Utilities.getInstance().saveValue(Constants.INVITATION_CODE,
+                            responseModel.getData().getCode().getInvitationCode(), mContext);
+                    startSetup();
+
+//                    EndPointResponse endPointResponse=response.body();
+//
+//                    if (endPointResponse!=null&&endPointResponse.getInvitationCode()!=null
+//                            &&endPointResponse.getInvitationCode().length()>0)
+//                    {
+//                        Utilities.getInstance().saveValue(Constants.INVITATION_CODE,
+//                                endPointResponse.getInvitationCode(), mContext);
+//                        Log.e("createEndPoint", "startSetup");
+//                        // if endpoint created successfully then start personalizing
+//                        startSetup();
+//                    }
+                }
+
+            } else {
+                // Show the message  from the error body if response is not successful
+                Utilities.getInstance().handleApiError(response.errorBody(), mContext);
+                openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+            }
+        }
+
+        @Override
+        public void onFailure(Call<Object> call, Throwable t) {
+            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+
+        }
+    };
+
+    public ASSA(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
         this.openKeyCallBack = OpenKeyCallBack;
-        this.mEndpoint = mEndpoint;
         this.mContext = mContext;
         initializeMobileKeysApi();
         startSetup();
+    }
+
+    @Override
+    public MobileKeys getMobileKeys() {
+        return mobileKeysFactory.getMobileKeys();
+    }
+
+    @Override
+    public ReaderConnectionController getReaderConnectionController() {
+        return mobileKeysFactory.getReaderConnectionController();
+    }
+
+    @Override
+    public ScanConfiguration getScanConfiguration() {
+        return getReaderConnectionController().getScanConfiguration();
     }
 
     /**
@@ -98,6 +157,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             scanConfiguration.setRssiSensitivity(RssiSensitivity.NORMAL);
             mobileKeysFactory = MobileKeysApi.getInstance();
             if (!mobileKeysFactory.isInitialized()) {
+                Log.e(TAG, "isInitialized:");
+
                 mobileKeysFactory.initialize(mContext, apiConfiguration, scanConfiguration);
             }
 
@@ -109,19 +170,25 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         }
     }
 
-    @Override
-    public MobileKeys getMobileKeys() {
-        return mobileKeysFactory.getMobileKeys();
-    }
+    /**
+     * Personalize the device for ASSA
+     *
+     * @param personalizationCode invitation code that is returned by the createEndPoint
+     */
+    private void personalize(String personalizationCode) {
+        getMobileKeys().endpointSetup(new MobileKeysCallback() {
+            @Override
+            public void handleMobileKeysTransactionCompleted() {
+                Api.setPeronalizationComplete(mContext, openKeyCallBack);
+            }
 
-    @Override
-    public ReaderConnectionController getReaderConnectionController() {
-        return mobileKeysFactory.getReaderConnectionController();
-    }
-
-    @Override
-    public ScanConfiguration getScanConfiguration() {
-        return getReaderConnectionController().getScanConfiguration();
+            @Override
+            public void handleMobileKeysTransactionFailed(MobileKeysException e) {
+                Log.e("personalize", "failed");
+                // tell user , startSetup is failure
+                openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+            }
+        }, personalizationCode);
     }
 
     /**
@@ -140,38 +207,19 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             } else {
                 // Generate a endpoint on ASSA server for personalizing the device with
                 //the returned code.
-                createEndPoint(mEndpoint);
+                Api.setInitializePersonalization(mContext, statusCall);
+                // createEndPoint(mEndpoint);
             }
         }
     }
 
-    /**
-     * Personalize the device for ASSA
-     *
-     * @param personalizationCode invitation code that is returned by the createEndPoint
-     */
-    private void personalize(String personalizationCode) {
-        getMobileKeys().endpointSetup(new MobileKeysCallback() {
-            @Override
-            public void handleMobileKeysTransactionCompleted() {
-                Api.setPeronalizationComplete(mContext,openKeyCallBack);
-            }
-
-            @Override
-            public void handleMobileKeysTransactionFailed(MobileKeysException e) {
-                Log.e("personalize", "failed");
-                // tell user , startSetup is failure
-                openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
-            }
-        }, personalizationCode);
-    }
 
 
-    /**
+    /* *//**
      * this method is used to get Invitation Code
      *
      * @param endPointId phone Number that uses as a Endpoint ID
-     */
+     *//*
     private synchronized void createEndPoint(final String endPointId) {
         Services services = Utilities.getInstance().getRetrofitForASSA(mContext).create(Services.class);
         final CreateEndPoint createEndPoint = new CreateEndPoint(endPointId);
@@ -210,10 +258,11 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             }
         });
     }
+*/
 
     /**
      * Delete end point, if endpoint is already exist
-     */
+     *//*
     private synchronized void deleteEndPoint(final String endpointID) {
         Services services = Utilities.getInstance().getRetrofitForASSA(mContext).create(Services.class);
         String authorization=Utilities.getInstance().getValue(Constants.ASSA_TOKEN,Constants.ASSA_DEV_TOKEN,mContext);
@@ -233,7 +282,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                 openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             }
         });
-    }
+    }*/
 
 
     @Override
@@ -247,6 +296,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
     @Override
     public synchronized void onReaderConnectionClosed(Reader reader, OpeningResult openingResult) {
+        Log.e(TAG, "onReaderConnectionClosed");
+
         final boolean isReaderOpened = openingResult.getOpeningStatus().equals(OpeningStatus.SUCCESS);
         final boolean isLockOpened = isLockOpened(openingResult);
         if (reader != null && isReaderOpened) {
@@ -285,6 +336,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      * reader(Locks) and communicate with them if found one
      */
     public void startScanning() {
+        Log.e("Assa", " scanning started");
         getReaderConnectionController().startScanning();
         mHandlerStopScanning = new Handler();
         mHandlerStopScanning.postDelayed(scanningStopCallBack, 12000);
@@ -348,8 +400,13 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      */
     public boolean isSetupComplete() {
         try {
+            Log.e("isSetupComplete", ":");
+            Log.e("Resule", ":" + getMobileKeys().isEndpointSetupComplete());
+
             return getMobileKeys().isEndpointSetupComplete();
         } catch (MobileKeysException e) {
+
+            Log.e("MobileKeysException", ":" + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -363,6 +420,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         getMobileKeys().endpointUpdate(new MobileKeysCallback() {
             @Override
             public void handleMobileKeysTransactionCompleted() {
+                Log.e("COMEPELTE", "handleMobileKeysTransactionCompleted");
+
                 boolean haveKey = haveKey();
                 OpenKeyManager.getInstance(mContext).updateKeyStatus(haveKey);
                  if (haveKey) {

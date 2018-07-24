@@ -12,6 +12,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Base64;
+
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
@@ -38,13 +39,11 @@ public final class Salto {
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
     private MasterDeviceManagerApi api;
-    private String mUniqueNumber;
 
 
-    public Salto(Context mContext, OpenKeyCallBack openKeyCallBack, String mUniqueNumber) {
+    public Salto(Context mContext, OpenKeyCallBack openKeyCallBack) {
         this.mContext = mContext;
         this.openKeyCallBack = openKeyCallBack;
-        this.mUniqueNumber = mUniqueNumber;
         startSetup();
     }
 

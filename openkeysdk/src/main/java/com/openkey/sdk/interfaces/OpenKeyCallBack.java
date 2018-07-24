@@ -1,5 +1,7 @@
 package com.openkey.sdk.interfaces;
 
+import com.openkey.sdk.api.response.session.SessionResponse;
+
 /**
  * @author OpenKey Inc.
  *         <p>
@@ -17,6 +19,13 @@ public interface OpenKeyCallBack {
      * @param description     description of the response
      */
     void authenticated(boolean isAuthenticated, String description);
+
+
+    /**
+     * @param sessionResponse Provide booking response to user if user is authorized
+     *                        to use SDK
+     */
+    void session(SessionResponse sessionResponse);
 
     /**
      * If setting up device has been successful
