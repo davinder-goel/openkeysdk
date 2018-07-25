@@ -11,7 +11,6 @@ package com.openkey.sdk;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.openkey.sdk.Utilities.Constants;
@@ -38,7 +37,6 @@ import retrofit2.Callback;
  */
 public final class OpenKeyManager {
 
-
     @SuppressLint("StaticFieldLeak")
     private static volatile OpenKeyManager instance;
     private Context context;
@@ -51,27 +49,6 @@ public final class OpenKeyManager {
     private OpenKeyCallBack mOpenKeyCallBack;
 
 
-    /*
-     * Getting mobile key from server, If the key is issued from backend then start syncing
-     * process
-     * */
-    private Callback getKeyCallback = new Callback() {
-        @Override
-        public void onResponse(Call call, retrofit2.Response response) {
-            //   if (response.isSuccessful()) {
-            if (true) {
-                startSync();
-            } else {
-                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-            }
-        }
-
-        @Override
-        public void onFailure(Call call, Throwable t) {
-            if (mOpenKeyCallBack != null)
-                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-        }
-    };
 
     /**
      * Access to this class can only be provided by this class
@@ -102,59 +79,68 @@ public final class OpenKeyManager {
         return instance;
     }
 
+//
+//    /**
+//     * Authorize the user(Third party developer) to use the SDK. This will
+//     * call OpenKey server to authenticate, response will be provided via @{@link OpenKeyCallBack}
+//     *
+//     * @param authSignature   Secret key that is provided by OpenKey to the user(Third party developer)
+//     * @param openKeyCallBack Call back for  response
+//     */
+//    public synchronized void authenticate(@NonNull String authSignature,
+//                                          @NonNull OpenKeyCallBack openKeyCallBack) {
+//        if (checkContext()) {
+//            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
+//            return;
+//        }
+//
+//        // if key is empty or small then return callback with error
+//        if (TextUtils.isEmpty(authSignature)) {
+//            openKeyCallBack.authenticated(false, Response.INVALID_AUTH_SIGNATURE);
+//            return;
+//        }
+//
+//
+//        //If the user is already authenticated then it will return callback with authenticate successful
+//        boolean isAuthenticated = Utilities.getInstance().getValue(Constants.IS_AUTHENTICATED, false, this.context);
+//        if (isAuthenticated) {
+//            openKeyCallBack.authenticated(true, Response.AUTHENTICATION_SUCCESSFUL);
+//        } else {
+//            Api.authenticate(context, authSignature, openKeyCallBack);
+//        }
+//    }
+
+
+    /*
+     * Getting mobile key from server, If the key is issued from backend then start syncing
+     * process
+     * */
+    private Callback getKeyCallback = new Callback() {
+        @Override
+        public void onResponse(Call call, retrofit2.Response response) {
+            if (response.isSuccessful()) {
+                startSync();
+            } else {
+                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+            }
+        }
+
+        @Override
+        public void onFailure(Call call, Throwable t) {
+            if (mOpenKeyCallBack != null)
+                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+        }
+    };
+
     /**
-     * Authorize the user(Third party developer) to use the SDK. This will
-     * call OpenKey server to authenticate, response will be provided via @{@link OpenKeyCallBack}
-     *
-     * @param authSignature   Secret key that is provided by OpenKey to the user(Third party developer)
-     * @param openKeyCallBack Call back for  response
-     * @param isLiveEnvironment Check either authenciate with dev or live url
+     * @param authToken
+     * @param openKeyCallBack Call back for response purpose
      */
-    public synchronized void authenticate(@NonNull String authSignature,
-                                          @NonNull OpenKeyCallBack openKeyCallBack,
-                                          boolean isLiveEnvironment) {
-        if (checkContext()) {
-            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
-            return;
-        }
-
-        //Set configuration
-        setConfiguration(isLiveEnvironment);
-
-        // if key is empty or small then return callback with error
-        if (TextUtils.isEmpty(authSignature)) {
-            openKeyCallBack.authenticated(false, Response.INVALID_AUTH_SIGNATURE);
-            return;
-        }
-
-
-        //If the user is already authenticated then it will return callback with authenticate successful
-        boolean isAuthenticated = Utilities.getInstance().getValue(Constants.IS_AUTHENTICATED, false, this.context);
-        if (isAuthenticated) {
-            openKeyCallBack.authenticated(true, Response.AUTHENTICATION_SUCCESSFUL);
-        } else {
-            Api.authenticate(context, authSignature, openKeyCallBack);
-        }
-    }
-
-    /**
-     * Set configuration for app either it will run on dev or aws server.
-     *
-     * @param isLiveEnvironment specification for environment.
-     */
-
-    private void setConfiguration(boolean isLiveEnvironment) {
-        if (isLiveEnvironment) {
-            Utilities.getInstance().saveValue(Constants.IS_LIVE_ENVIRONMENT, true, context);
-//            Utilities.getInstance().saveValue(Constants.ASSA_TOKEN,Constants.ASSA_LIVE_TOKEN,context);
-//            Utilities.getInstance().saveValue(Constants.ASSA_BASE_URL,Constants.ASSA_LIVE_URL,context);
-            Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_LIVE, context);
-        } else {
-            Utilities.getInstance().saveValue(Constants.IS_LIVE_ENVIRONMENT, false, context);
-            // Utilities.getInstance().saveValue(Constants.ASSA_TOKEN,Constants.ASSA_DEV_TOKEN,context);
-            Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_DEV, context);
-            //   Utilities.getInstance().saveValue(Constants.ASSA_BASE_URL,Constants.ASSA_DEV_URL,context);
-        }
+    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
+        if (authToken != null && authToken.length() > 0 && context != null)
+            Api.getSession(context, authToken, openKeyCallBack);
+        else
+            openKeyCallBack.initializationFailure(Response.INVALID_AUTH_SIGNATURE);
     }
 
     /**
@@ -173,7 +159,7 @@ public final class OpenKeyManager {
                 "", context);
         Log.e("manufacturerStr", ":" + manufacturerStr);
         if (manufacturerStr.isEmpty()) {
-            openKeyCallBack.authenticated(false, Response.UNKNOWN);
+            openKeyCallBack.sessionFailure();
             return;
         }
 
@@ -262,13 +248,7 @@ public final class OpenKeyManager {
         }
     }
 
-    /**
-     * @param authToken
-     * @param openKeyCallBack Call back for response purpose
-     */
-    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
-        Api.getSession(context, authToken, openKeyCallBack);
-    }
+
 
     /**
      *  If device has a key available
@@ -402,11 +382,11 @@ public final class OpenKeyManager {
 
         if (haveKey)
         {
-            Api.setKeyStatus(context,1);
+            Api.setKeyStatus(context, Constants.KEY_DELIVERED);
         }
         else
         {
-            Api.setKeyStatus(context,0);
+            Api.setKeyStatus(context, Constants.PENDING_KEY_SERVER_REQUEST);
         }
     }
 

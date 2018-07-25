@@ -22,6 +22,7 @@
 -keep public class com.openkey.sdk.api.model.CreateEndPoint { *;}
 -keep public class com.openkey.sdk.api.model.Token { *;}
 -keep public interface com.openkey.sdk.interfaces.OpenKeyCallBack { *;}
+-keep public class com.openkey.sdk.assa.ASSA { *;}
 
 
 

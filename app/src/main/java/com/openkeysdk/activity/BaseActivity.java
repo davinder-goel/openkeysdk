@@ -13,8 +13,10 @@ public abstract class BaseActivity extends AppCompatActivity implements OpenKeyC
         super.onCreate(savedInstanceState);
     }
 
+
     @Override
-    public void authenticated(boolean isAuthenticated, String description) {
+    public void sessionFailure() {
+
     }
 
     @Override

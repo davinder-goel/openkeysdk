@@ -359,7 +359,7 @@ public class Utilities {
     public MANUFACTURER getManufacturer(Context context, OpenKeyCallBack openKeyCallBack) {
         final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", context);
         if (TextUtils.isEmpty(manufacturerStr)) {
-            openKeyCallBack.authenticated(false, Response.UNKNOWN);
+            openKeyCallBack.sessionFailure();
             // throw new IllegalStateException(Response.UNKNOWN);
         }
         return MANUFACTURER.valueOf(manufacturerStr);

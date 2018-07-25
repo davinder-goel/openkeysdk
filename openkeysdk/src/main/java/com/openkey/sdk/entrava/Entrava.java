@@ -13,11 +13,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
+
 import java.util.ArrayList;
+
 import kr.co.chahoo.sdk.DoorLockSdk;
 import kr.co.chahoo.sdk.IssueCallback;
 
@@ -72,9 +75,9 @@ public class Entrava {
                     Log.e("TAG", "onResult : " + result);
                     //IF the result is 0 then key issued successfully and update the status on server
                     if (result == 0) {
-                        Api.setKeyStatus(mContext,1);
+                        Api.setKeyStatus(mContext, Constants.KEY_DELIVERED);
                     } else {
-                        Api.setKeyStatus(mContext,0);
+                        Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
                     }
                 }
             });

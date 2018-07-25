@@ -11,14 +11,7 @@ import com.openkey.sdk.api.response.session.SessionResponse;
 
 public interface OpenKeyCallBack {
 
-    /**
-     * Provide web service response to user if user
-     * is authorized to use SDK
-     *
-     * @param isAuthenticated return true/false depend upon response
-     * @param description     description of the response
-     */
-    void authenticated(boolean isAuthenticated, String description);
+
 
 
     /**
@@ -31,6 +24,8 @@ public interface OpenKeyCallBack {
      * If setting up device has been successful
      */
     void initializationSuccess();
+
+    void sessionFailure();
 
     /**
      * If setting up the device has been failed

@@ -44,6 +44,13 @@ public class Constants {
     public static final String BASE_URL = "base_url";
     public static final String TOKEN = "Token ";
 
+    // KEY_DELIVERED=0;
+    //  PENDING_KEY_SERVER_REQUEST=1;
+    //  KEY_SERVER_REQUESTED=2;
+    public static final String KEY_DELIVERED = "KEY DELIVERED";
+    public static final String PENDING_KEY_SERVER_REQUEST = "PENDING KEY SERVER REQUEST";
+    public static final String KEY_SERVER_REQUESTED = "KEY SERVER REQUESTED";
+
     //LIVE BASE URL
      public static final String BASE_URL_LIVE = "https://developer.openkey.co/";
     // public static final String BASE_URL_LIVE = "https://betadeveloper.openkey.co/";

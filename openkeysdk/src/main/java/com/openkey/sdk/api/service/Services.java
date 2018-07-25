@@ -65,7 +65,6 @@ public interface Services {
             "Cache-Control: no-cache"})
     @POST("sdk/v5/sessions/setMobileKeyStatus")
     Call<KeyStatusResponse> setKeyStatus(@Header("Authorization") String Authorization,
-                                         @Path("session_id") String session_id,
                                          @Body KeyStatusRequest keyStatusRequest);
 
     String type = "application/vnd.assaabloy-com.credential-2.3+json";

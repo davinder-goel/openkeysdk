@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
@@ -30,6 +31,11 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean isScanning;
     private Handler handler;
+
+    private int MOBILE_KEY_STATUES = 0;
+
+
+
     private Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -45,11 +51,10 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     //private String mToken = "nbdcefbadslr7ezvlxp464rfkjrdrmkkpyh3767drd4a4hs3jaqmlv4cgxpl72tv";
 
     //ASSA
-    private String mToken = "gnaccifv5snt2nucvtcoalc3jzkpcix55y3j64v7xtgv6ekfrshkfy3v46sacefn";
+    // private String mToken = "ohpw6g45h67ajor4ejrtsi3u7naojiqmwcfbc43kwogmmeagi7ja2345ueet4ko2";
 
     //SALTO
-    //  private String mToken = "ds7v4gfvw24att7ykobnxyanvm6tgxr4g7ko2v3balxxsl7yoetnjlljqyc5t3sk";
-
+    private String mToken = "gzqc2swylev6aqxiqzpe62leruin7vua6nqdplu6aovfraahbpgqb6mhrt462z43";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +72,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
         mBtnScan = findViewById(R.id.buttonOpenDoor);
         mEdtTextToken = findViewById(R.id.editTextSdkToken);
         mTextStatus = findViewById(R.id.textViewStatus);
+
     }
 
     public void listners() {
@@ -106,32 +112,63 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
         mTextStatus.setVisibility(View.INVISIBLE);
     }
 
-
     @Override
-    public void authenticated(boolean isAuthenticated, String description) {
-        mTextStatus.setVisibility(View.INVISIBLE);
-
-//        if (isAuthenticated)
-//        {
-//            showMessage("Initializing...");
-//            OpenKeyManager.getInstance(Dashboard.this).initialize(this);
-//        }
+    protected void onResume() {
+        super.onResume();
+        OpenKeyManager.getInstance(Dashboard.this).getSession(mToken,
+                this);
     }
+
+    public void keyStatus() {
+
+//    PENDING_KEY_SERVER_REQUEST=1;
+//    KEY_SERVER_REQUESTED=2;
+//    KEY_DELIVERED=3;
+
+        switch (MOBILE_KEY_STATUES) {
+            case 1:
+                OpenKeyManager.getInstance(this).initialize(this);
+                break;
+
+            case 2:
+                OpenKeyManager.getInstance(this).initialize(this);
+                break;
+
+            case 3:
+                if (!OpenKeyManager.getInstance(this).isKeyAvailable(this)) {
+                    OpenKeyManager.getInstance(this).initialize(this);
+                }
+                break;
+        }
+    }
+
 
     @Override
     public void session(SessionResponse sessionResponse) {
-        OpenKeyManager.getInstance(this).getSession(mToken, this);
+        hideMessage();
+        if (sessionResponse != null && sessionResponse.getData() != null) {
+            MOBILE_KEY_STATUES = sessionResponse.getData().getMobileKeyStatusId();
+            keyStatus();
+        }
     }
 
+
+    @Override
+    public void sessionFailure() {
+        hideMessage();
+        showToast("Booking not found");
+    }
 
     @Override
     public void initializationSuccess() {
         hideMessage();
+        OpenKeyManager.getInstance(this).getKey(this);
     }
 
     @Override
     public void initializationFailure(String errorDescription) {
         hideMessage();
+        showToast("initializationFailure");
     }
 
     @Override
@@ -148,8 +185,14 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     @Override
     public void isKeyAvailable(boolean haveKey, String description) {
         hideMessage();
+        showToast("DEVICE HAVE KEY " + haveKey);
 
     }
+
+    public void showToast(String message) {
+        Toast.makeText(Dashboard.this, message, Toast.LENGTH_LONG).show();
+    }
+
 
     public void openDoor() {
         // Required for SDK
@@ -181,12 +224,11 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-//                mToken = mEdtTextToken.getText().toString().trim();
-//                mToken = "nbdcefbadslr7ezvlxp464rfkjrdrmkkpyh3767drd4a4hs3jaqmlv4cgxpl72tv";
+                mEdtTextToken.setText(mToken);
+                mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    showMessage("Authenticating...");
-                    OpenKeyManager.getInstance(Dashboard.this).authenticate(mToken,
-                            this, false);
+                    OpenKeyManager.getInstance(Dashboard.this).getSession(mToken,
+                            this);
                 }
                 break;
 
