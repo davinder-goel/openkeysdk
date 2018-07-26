@@ -1,17 +1,13 @@
 
 /*
- *
  *  Copyright 2018 OpenKey. All Rights Reserved
- *
  *  @author OpenKey Inc.
- *
  */
 package com.openkey.sdk;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
@@ -48,8 +44,6 @@ public final class OpenKeyManager {
     private Miwa miwa;
     private OpenKeyCallBack mOpenKeyCallBack;
 
-
-
     /**
      * Access to this class can only be provided by this class
      * so object creation is limited to this only.
@@ -79,38 +73,6 @@ public final class OpenKeyManager {
         return instance;
     }
 
-//
-//    /**
-//     * Authorize the user(Third party developer) to use the SDK. This will
-//     * call OpenKey server to authenticate, response will be provided via @{@link OpenKeyCallBack}
-//     *
-//     * @param authSignature   Secret key that is provided by OpenKey to the user(Third party developer)
-//     * @param openKeyCallBack Call back for  response
-//     */
-//    public synchronized void authenticate(@NonNull String authSignature,
-//                                          @NonNull OpenKeyCallBack openKeyCallBack) {
-//        if (checkContext()) {
-//            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
-//            return;
-//        }
-//
-//        // if key is empty or small then return callback with error
-//        if (TextUtils.isEmpty(authSignature)) {
-//            openKeyCallBack.authenticated(false, Response.INVALID_AUTH_SIGNATURE);
-//            return;
-//        }
-//
-//
-//        //If the user is already authenticated then it will return callback with authenticate successful
-//        boolean isAuthenticated = Utilities.getInstance().getValue(Constants.IS_AUTHENTICATED, false, this.context);
-//        if (isAuthenticated) {
-//            openKeyCallBack.authenticated(true, Response.AUTHENTICATION_SUCCESSFUL);
-//        } else {
-//            Api.authenticate(context, authSignature, openKeyCallBack);
-//        }
-//    }
-
-
     /*
      * Getting mobile key from server, If the key is issued from backend then start syncing
      * process
@@ -121,7 +83,8 @@ public final class OpenKeyManager {
             if (response.isSuccessful()) {
                 startSync();
             } else {
-                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+                if (mOpenKeyCallBack != null)
+                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             }
         }
 
@@ -140,7 +103,7 @@ public final class OpenKeyManager {
         if (authToken != null && authToken.length() > 0 && context != null)
             Api.getSession(context, authToken, openKeyCallBack);
         else
-            openKeyCallBack.initializationFailure(Response.INVALID_AUTH_SIGNATURE);
+            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE);
     }
 
     /**
@@ -152,14 +115,15 @@ public final class OpenKeyManager {
      */
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
 
-        if (context == null)
+        if (context == null) {
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
+        }
 
         final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER,
                 "", context);
-        Log.e("manufacturerStr", ":" + manufacturerStr);
         if (manufacturerStr.isEmpty()) {
-            openKeyCallBack.sessionFailure();
+            openKeyCallBack.initializationFailure(Response.BOOKING_NOT_FOUNT);
             return;
         }
 
@@ -196,11 +160,17 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void getKey(@NonNull final OpenKeyCallBack openKeyCallBack) {
-        if (assa == null && salto == null && kaba == null && miwa==null&& entrava==null) {
-            openKeyCallBack.isKeyAvailable(false, Response.INITIALIZATION_FAILED);
+        if (context == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null) {
+            openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
         }
         mOpenKeyCallBack = openKeyCallBack;
+
+        //if context null then it returned callback with null context description
+        if (context == null)
+            openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
+
+        //Getting key from server
         Api.getMobileKey(context, getKeyCallback);
     }
 
@@ -209,17 +179,13 @@ public final class OpenKeyManager {
      * get keys then start sync process via this method
      */
     private void startSync() {
-        if (mOpenKeyCallBack == null)
+        if (mOpenKeyCallBack == null || context == null)
             return;
 
         manufacturer = Utilities.getInstance().getManufacturer(context, mOpenKeyCallBack);
-        Log.e("COMEPELTE", "manufacturer" + manufacturer);
-
-
         switch (manufacturer) {
             case ASSA:
                 if (assa.isSetupComplete()) {
-                    Log.e("COMEPELTE", "GET KEY");
                     assa.getKey();
                 } else {
                     mOpenKeyCallBack.initializationFailure(Response.NOT_INITIALIZED);
@@ -247,8 +213,6 @@ public final class OpenKeyManager {
                 break;
         }
     }
-
-
 
     /**
      *  If device has a key available
@@ -292,20 +256,13 @@ public final class OpenKeyManager {
      */
     public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack) {
 
-        Log.e("Assa", " startScanning");
+        if (context == null)
+            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
 
-        // if (!performInitialCheck(openKeyCallBack)) return;
-        //checkKeyStatus();
         if (isKeyAvailable(openKeyCallBack)) {
-            Log.e("Assa", " isKeyAvailable");
-
             manufacturer = Utilities.getInstance().getManufacturer(context, openKeyCallBack);
-            Log.e("Assa", " manufacturer" + manufacturer);
-
             switch (manufacturer) {
                 case ASSA:
-                    Log.e("Assa", " ASSA");
-
                     if (assa.isSetupComplete()) {
                         assa.startScanning();
                     } else {
@@ -334,38 +291,6 @@ public final class OpenKeyManager {
         }
     }
 
-    private void scanningStart()
-    {
-        if (isKeyAvailable(mOpenKeyCallBack)) {
-            manufacturer = Utilities.getInstance().getManufacturer(context, mOpenKeyCallBack);
-            switch (manufacturer) {
-                case ASSA:
-                    if (assa.isSetupComplete()) {
-                        assa.startScanning();
-                    } else {
-                        mOpenKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
-                    }
-                    break;
-                case SALTO:
-                    salto.startScanning();
-                    break;
-
-                case KABA:
-                    kaba.startScanning();
-                    break;
-
-                case MIWA:
-                    break;
-
-                case ENTRAVATOUCH:
-                case ENTRAVA:
-                    break;
-            }
-        } else {
-            mOpenKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
-        }
-    }
-
     /**
      * * This method is used to update the key status on server.
      * 1 identify the device have key
@@ -375,55 +300,9 @@ public final class OpenKeyManager {
      */
     public void updateKeyStatus(boolean haveKey)
     {
-        //If the key status is already updated on server then it returns.
-        boolean isKeyStatusUpdated=Utilities.getInstance().getValue(Constants.IS_KEY_STATUS_UPDATED,false,context);
-        if (isKeyStatusUpdated)
-            return;
-
         if (haveKey)
-        {
             Api.setKeyStatus(context, Constants.KEY_DELIVERED);
-        }
         else
-        {
             Api.setKeyStatus(context, Constants.PENDING_KEY_SERVER_REQUEST);
-        }
     }
-
-    /**
-     * To check context every time ,if its reference goes to null
-     * throw a {@link NullPointerException}
-     */
-    private synchronized boolean checkContext() {
-        // if context is null throw a NullPointerException
-        return context == null;
-    }
-
-    /**
-     * Check user is authorize to use SDK,
-     * if not the throw exception
-     */
-    private synchronized boolean checkAuthorization() {
-        return Utilities.getInstance(context).getValue(Constants.IS_AUTHENTICATED, false, context);
-    }
-
-    /**
-     * Check all things before providing a call to method
-     * exp:
-     * (context!=null, isAuthenticated==true)
-     */
-    private boolean performInitialCheck(OpenKeyCallBack openKeyCallBack) {
-        return checkContext();
-        /*if (checkContext()) {
-            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
-            return false;
-        }
-        if (!checkAuthorization()) {
-            openKeyCallBack.authenticated(false, Response.AUTHENTICATION_FAILED);
-            return false;
-        }
-        return false;*/
-    }
-
-
 }

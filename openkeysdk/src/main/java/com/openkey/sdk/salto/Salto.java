@@ -64,7 +64,8 @@ public final class Salto {
      * @return true/false
      */
     public boolean haveKey() {
-        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
+        // String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
+        String key = "C0020100C130C9E595071EE1874869DFA7A15A2B04061BED55985D6AE514B97369FD315D0270D71F212E15189129EB2BAD872A8A6396C2109F29205A704C8B40340A7A84217966F5";
         return !TextUtils.isEmpty(key);
     }
 

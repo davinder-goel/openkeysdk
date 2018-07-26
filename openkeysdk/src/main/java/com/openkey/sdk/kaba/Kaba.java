@@ -484,8 +484,7 @@ public class Kaba {
      * Get registration token from the kaba id-connect server
      */
     private void getKabaRegistrationToken() {
-
-        Api.setInitializePersonalization(mContext, statusCall);
+        Api.setInitializePersonalization(mContext, statusCall, openKeyCallBack);
        /* final String publicSEId = getPublicSEId();
 
         Log.e(TAG, "requesting token to kaba : " + publicSEId);

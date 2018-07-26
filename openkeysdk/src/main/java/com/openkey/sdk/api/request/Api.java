@@ -43,111 +43,6 @@ import static com.openkey.sdk.Utilities.Constants.TOKEN;
 
 public class Api {
 
-//    /**
-//     * Token the user(Third party developer) to use the SDK. This will
-//     * call OpenKey server to authenticate, response will be provided via @{@link OpenKeyCallBack}
-//     *
-//     * @param authSignature   Secret key that is provided by OpenKey to the user
-//     * @param openKeyCallBack Call back for  response
-//     */
-//    public static void authenticate(final Context context, final String authSignature,
-//                                    final OpenKeyCallBack openKeyCallBack) {
-//        // Get the retrofit instance
-//        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
-//        services.authenticateGuest(TOKEN + authSignature).enqueue(new Callback<SessionResponse>() {
-//            @Override
-//            public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse>
-//                    response) {
-//                if (response.isSuccessful()) {
-//                    Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, authSignature, context);
-//
-//
-//                    SessionResponse bookingResponse = response.body();
-//
-//                    if (bookingResponse != null && bookingResponse.getData() != null) {
-//                        Log.e("onResponse", ":1:" + bookingResponse.getData().getHotel().getLockVendor().getTitle());
-//                        if (bookingResponse.getData().getHotel() != null &&
-//                                bookingResponse.getData().getHotel().getLockVendor() != null &&
-//                                bookingResponse.getData().getHotel().getLockVendor().getTitle() != null)
-//                        {
-//
-//                            String manufacturer = bookingResponse.getData().getHotel().getLockVendor().getTitle().toUpperCase();
-//                            Utilities.getInstance().saveValue(Constants.MANUFACTURER, manufacturer, context);
-//                        }
-//
-//                        if (bookingResponse.getData().getGuest() != null &&
-//                                    bookingResponse.getData().getGuest().getPhone()!=null)
-//                            {
-//                                // save it locally
-//                                String phoneNumber=bookingResponse.getData().getGuest().getPhone();
-//                                Utilities.getInstance().saveValue(Constants.UNIQUE_NUMBER,phoneNumber, context);
-//                            }
-//
-//                    }
-//                    Log.e("onResponse",":"+response.body().toString());
-//                    // save user if authenticated successfully
-//                    Utilities.getInstance().saveValue(Constants.IS_AUTHENTICATED, true, context);
-//
-//                    if (response.body()!=null)
-//                    {
-//                        SessionResponse bookingResponse=response.body();
-//                        if (bookingResponse!=null&&bookingResponse.getData()!=null)
-//                        {
-//                            GetBooking.getInstance().setBooking(response.body());
-//                            Utilities.getInstance().saveBookingToLocal(context, response.body());
-//
-//                            // get the booking_id returned from the server and save it locally
-//                            String bookingID=""+bookingResponse.getData().getBookingId();
-//                            Utilities.getInstance().saveValue(Constants.BOOKING_ID,bookingID, context);
-//
-//
-//                            // get the phone_number returned from the server
-//                            if (bookingResponse.getData().getGuest()!=null&&
-//                                    bookingResponse.getData().getGuest().getPhone()!=null)
-//                            {
-//                                // save it locally
-//                                String phoneNumber=bookingResponse.getData().getGuest().getPhone();
-//                                Utilities.getInstance().saveValue(Constants.UNIQUE_NUMBER,phoneNumber, context);
-//                            }
-//
-//                             /*
-//                             * get the manufacturer returned from the server
-//                             * */
-//
-//                            Utilities.getInstance().saveValue(Constants.MANUFACTURER, "KABA", context);
-//
-//                            if (bookingResponse.getData().getHotel()!=null&&
-//                                    bookingResponse.getData().getHotel().getManufacturerSetting()!=null
-//                                    &&bookingResponse.getData().getHotel().getManufacturerSetting().getManufacturer()!=null)
-//                            {
-//                                String manufacturer = bookingResponse.getData().getHotel()
-//                                        .getManufacturerSetting().getManufacturer();
-//
-//                                // save it locally
-//                                Utilities.getInstance().saveValue(Constants.MANUFACTURER, manufacturer, context);
-//                            }
-//                        }
-//
-//                    }
-//
-//                    Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, authSignature, context);
-//                    openKeyCallBack.authenticated(true, Response.AUTHENTICATION_SUCCESSFUL);
-//                } else {
-//                    // get the error message from the response and return it to the callback
-//                    openKeyCallBack.authenticated(false, Response.AUTHENTICATION_FAILED);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<SessionResponse> call, Throwable t) {
-//                Log.e("onFailure", ":" + t.getMessage());
-//
-//                openKeyCallBack.authenticated(false, Response.AUTHENTICATION_FAILED);
-//            }
-//        });
-//    }
-
-
     /**
      * Token the user(Third party developer) to use the SDK. This will
      * call OpenKey server to get booking, response will be provided via @{@link OpenKeyCallBack}
@@ -169,13 +64,13 @@ public class Api {
                     openKeyCallBack.session(response.body());
                 } else {
                     // get the error message from the response and return it to the callback
-                    openKeyCallBack.sessionFailure();
+                    openKeyCallBack.sessionFailure(Response.BOOKING_NOT_FOUNT);
                 }
             }
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
-                openKeyCallBack.initializationFailure(Response.UNKNOWN);
+                openKeyCallBack.sessionFailure(Response.UNKNOWN);
             }
         });
     }
@@ -184,12 +79,10 @@ public class Api {
     private static void saveData(SessionResponse bookingResponse, Context context) {
         if (bookingResponse != null && bookingResponse.getData() != null) {
 
-
-            Log.e("onResponse", ":1:" + bookingResponse.getData().getHotel().getLockVendor().getTitle());
+            //Saved manufacturer in locally
             if (bookingResponse.getData().getHotel() != null &&
                     bookingResponse.getData().getHotel().getLockVendor() != null &&
                     bookingResponse.getData().getHotel().getLockVendor().getTitle() != null) {
-
                 String manufacturer = bookingResponse.getData().getHotel().getLockVendor().getTitle().toUpperCase();
                 Utilities.getInstance().saveValue(Constants.MANUFACTURER, manufacturer, context);
             }
@@ -214,38 +107,22 @@ public class Api {
         services.getMobileKey(TOKEN + tokenStr).enqueue(new Callback<MobileKeyResponse>() {
             @Override
             public void onResponse(Call<MobileKeyResponse> call, retrofit2.Response<MobileKeyResponse> response) {
-                Utilities.getInstance().saveValue(Constants.MOBILE_KEY, "", context);
-                Log.e("onResponse", ":");
-//
-//                    /*
-//                    * This is used only in case of salto
-//                    * */
-//                if (response.isSuccessful()) {
-//                    BinaryKey binaryKey=response.body();
-//                    if (binaryKey!=null && binaryKey.getData()!=null)
-//                    {
-//                        final String key = binaryKey.getData().getData().getKey();
-//                        Utilities.getInstance().saveValue(Constants.MOBILE_KEY, key, context);
-//                    }
-//                } else {
-//                    try {
-//                        JSONObject jObjError = new JSONObject(response.errorBody().string());
-//                        String message = jObjError.optString("message");
-//                        if (message != null && message.length() > 0) {
-//                            Utilities.getInstance().clearValueOfKey(context, Constants.BOOKING);
-//                            if (message.equals("Unauthorized"))
-//                                Utilities.getInstance().saveValue(Constants.IS_AUTHENTICATED, false, context);
-//                        }
-//                    } catch (Exception e) {
-//                        Log.e("Exception",":"+e.getMessage());
-//                    }
-//                }
+
+                if (response != null && response.body() != null && response.body().getData() != null
+                        && response.body().getData().get(0).getMobileKey() != null) {
+                    String key = response.body().getData().get(0).getMobileKey();
+                    Utilities.getInstance().saveValue(Constants.MOBILE_KEY, key, context);
+                } else {
+                    Utilities.getInstance().saveValue(Constants.MOBILE_KEY, "", context);
+                }
+
+                Log.e("onResponse", ":MobileKey");
                 callback.onResponse(call, response);
             }
 
             @Override
             public void onFailure(Call<MobileKeyResponse> call, Throwable t) {
-                Log.e("onFailure", ":" + t.getMessage());
+                Log.e("onFailure", ":MobileKey: " + t.getMessage());
 
                 Utilities.getInstance().saveValue(Constants.MOBILE_KEY, "", context);
                 callback.onFailure(call, t);
@@ -257,6 +134,7 @@ public class Api {
     /*
     * Getting the key status either key issued from backend or not
     * */
+    @SuppressWarnings("unchecked")
     public static void getKeyStatus(final Context context, final Callback callback) {
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
@@ -330,7 +208,6 @@ public class Api {
                 if (response.isSuccessful()) {
                     // tell user, startSetup is success
                     openKeyCallBack.initializationSuccess();
-                    Utilities.getInstance().saveValue(Constants.IS_PERSONLIZATION_STATUS_UPDATED, true, mContext);
                     Log.e(TAG, "Personalization Status updated on server");
                 } else {
                     // tell user, startSetup is success
@@ -350,19 +227,29 @@ public class Api {
 
     /**
      *
+     * @param context
+     * @param callback
      */
-    public static void setInitializePersonalization(final Context mContext, final Callback callback) {
-        Services services = Utilities.getInstance().getRetrofit(mContext).create(Services.class);
-        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
+    @SuppressWarnings("unchecked")
+    public static void setInitializePersonalization(final Context context, final Callback callback
+            , OpenKeyCallBack openKeyCallBack) {
+        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
+
+        if (context == null || tokenStr == null)
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+
+        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.initializePersonalization(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
 
 
+    /**
+     * Update status on server once device get key.
+     *
+     * @param context
+     * @param status
+     */
 
-
-    /*
-    * Update status on server once device get key.
-    * */
     public static void setKeyStatus(final Context context, String status) {
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
@@ -370,13 +257,11 @@ public class Api {
             @Override
             public void onResponse(Call<KeyStatusResponse> call, retrofit2.Response<KeyStatusResponse> response) {
                 Log.e("onResponse", "onResponse");
-                Utilities.getInstance().saveValue(Constants.IS_KEY_STATUS_UPDATED, true, context);
             }
 
             @Override
             public void onFailure(Call<KeyStatusResponse> call, Throwable t) {
                 Log.e("onFailure", "onFailure" + t.getMessage());
-                Utilities.getInstance().saveValue(Constants.IS_KEY_STATUS_UPDATED, false, context);
             }
         });
     }

@@ -5,7 +5,6 @@
  *  @author OpenKey Inc.
  *
  */
-
 package com.openkey.sdk.assa;
 
 import android.content.Context;
@@ -32,7 +31,6 @@ import com.assaabloy.mobilekeys.api.ble.ScanConfiguration;
 import com.assaabloy.mobilekeys.api.ble.ScanMode;
 import com.assaabloy.mobilekeys.api.ble.SeamlessOpeningTrigger;
 import com.assaabloy.mobilekeys.api.ble.TapOpeningTrigger;
-import com.google.gson.Gson;
 import com.openkey.sdk.BuildConfig;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
@@ -42,62 +40,63 @@ import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.assa.PayloadHelper.ByteArrayHelper;
 import com.openkey.sdk.assa.inviationcode.AssaInvitationCode;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
+import com.openkey.sdk.singleton.GetGson;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 
+import static com.openkey.sdk.Utilities.Constants.SCANNING_TIME;
 
 
 public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListener {
 
     private final String TAG = getClass().getSimpleName();
-    //ASSA NEW openKeyCallBack IMPLEMENTATION 6.1.3
+
+    //ASSA NEW openKeyCallBack IMPLEMENTATION 6.5.1
     private OpenKeyCallBack openKeyCallBack;
     private MobileKeysApi mobileKeysFactory;
     private Context mContext;
     private ReaderConnectionCallback readerConnectionCallback;
     private Handler mHandlerStopScanning;
 
-    //Callback run after 12 seconds to stop scanning if its already started
-    private Runnable scanningStopCallBack = new Runnable() {
-        @Override
-        public void run() {
-            stopScanning();
-        }
-    };
+    public ASSA(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
+        this.openKeyCallBack = OpenKeyCallBack;
+        this.mContext = mContext;
+        initializeMobileKeysApi();
+        startSetup();
+    }
 
-    private Callback<Object> statusCall = new Callback<Object>() {
+    private Callback<Object> invitationCodeCallback = new Callback<Object>() {
         @Override
         public void onResponse(Call<Object> call, retrofit2.Response<Object> response) {
             if (response.isSuccessful()) {
 
                 if (response.body() != null) {
-                    //   openKeyCallBack.initializationSuccess();
-                    Log.e("createEndPoint", "startSetup");
 
-                    Gson gson = new Gson();
-                    AssaInvitationCode responseModel = gson
-                            .fromJson(response.body().toString(),
+                    //Check if the response is not null
+                    String codeKey = response.body().toString();
+
+                    if (!(codeKey != null && codeKey.length() > 0))
+                        openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+
+
+                    AssaInvitationCode responseModel = GetGson.getInstance()
+                            .fromJson(codeKey,
                                     AssaInvitationCode.class);
-                    Log.e("Response", ":" + responseModel.getData().getCode().getInvitationCode());
+
+                    //If the invitation code is null then call back return with initialization failed
+                    if (!(responseModel != null && responseModel.getData() != null && responseModel.getData().getCode() != null
+                            && responseModel.getData().getCode().getInvitationCode() != null))
+                        openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+
+                    String invitationCode = responseModel.getData().getCode().getInvitationCode();
+                    Log.e("InvitationCode", ":" + invitationCode);
 
                     Utilities.getInstance().saveValue(Constants.INVITATION_CODE,
-                            responseModel.getData().getCode().getInvitationCode(), mContext);
+                            invitationCode, mContext);
                     startSetup();
-
-//                    EndPointResponse endPointResponse=response.body();
-//
-//                    if (endPointResponse!=null&&endPointResponse.getInvitationCode()!=null
-//                            &&endPointResponse.getInvitationCode().length()>0)
-//                    {
-//                        Utilities.getInstance().saveValue(Constants.INVITATION_CODE,
-//                                endPointResponse.getInvitationCode(), mContext);
-//                        Log.e("createEndPoint", "startSetup");
-//                        // if endpoint created successfully then start personalizing
-//                        startSetup();
-//                    }
                 }
 
             } else {
@@ -113,12 +112,84 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
         }
     };
+    //Callback run after 12 seconds to stop scanning if its already started
+    private Runnable scanningStopCallBack = new Runnable() {
+        @Override
+        public void run() {
+            stopScanning();
+        }
+    };
 
-    public ASSA(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
-        this.openKeyCallBack = OpenKeyCallBack;
-        this.mContext = mContext;
-        initializeMobileKeysApi();
-        startSetup();
+    /**
+     * Configure and initialize the ASSA SDK
+     */
+    private void initializeMobileKeysApi() {
+        if (mobileKeysFactory == null) {
+            // 1 is testing lock service code , but we never use it to open locks
+            // we always get service code from the keys.
+            final int LOCK_SERVICE_CODE = 1;
+
+            ScanConfiguration scanConfiguration = new ScanConfiguration.Builder(new OpeningTrigger[]{
+                    new TapOpeningTrigger(mContext),
+                    new OpeningTriggerMediator(),
+                    new SeamlessOpeningTrigger()}, LOCK_SERVICE_CODE).build();
+
+            ApiConfiguration apiConfiguration = new ApiConfiguration.Builder()
+                    .setApplicationId(BuildConfig.APPLICATION_ID)
+                    .setApplicationDescription(BuildConfig.VERSION_NAME)
+                    .build();
+            scanConfiguration.setScanMode(ScanMode.OPTIMIZE_PERFORMANCE);
+            scanConfiguration.setRssiSensitivity(RssiSensitivity.NORMAL);
+            mobileKeysFactory = MobileKeysApi.getInstance();
+            if (!mobileKeysFactory.isInitialized()) {
+                Log.e(TAG, "isInitialized:");
+                mobileKeysFactory.initialize(mContext, apiConfiguration, scanConfiguration);
+            }
+
+            if (readerConnectionCallback == null) {
+                Log.e(TAG, "ReaderConnectionCallback : Registered");
+                readerConnectionCallback = new ReaderConnectionCallback(mContext);
+                readerConnectionCallback.registerReceiver(this);
+            }
+        }
+    }
+
+    /**
+     * This will handle all the process of setting up the device, it will return
+     * immediately if already startSetup  completed
+     */
+    private void startSetup() {
+        // if already personalized then return success
+        if (isSetupComplete()) {
+            Api.setPeronalizationComplete(mContext,openKeyCallBack);
+        } else {
+            String invitationCode = Utilities.getInstance().getValue(Constants.INVITATION_CODE, "", mContext);
+            if (invitationCode.length() > 0) {
+                // personalised the device for ASSA
+                personalize(invitationCode);
+            } else {
+                // Generate a endpoint on ASSA server for personalizing the device with
+                //the returned code.
+                Api.setInitializePersonalization(mContext, invitationCodeCallback, openKeyCallBack);
+            }
+        }
+    }
+
+    /**
+     * To get the current startSetup status
+     *
+     * @return true if startSetup is completed false otherwise
+     */
+    public boolean isSetupComplete() {
+        try {
+            Log.e("ASSA", " :SetupCompleted");
+            return getMobileKeys().isEndpointSetupComplete();
+        } catch (MobileKeysException e) {
+
+            Log.e("MobileKeysException", ":" + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -134,40 +205,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     @Override
     public ScanConfiguration getScanConfiguration() {
         return getReaderConnectionController().getScanConfiguration();
-    }
-
-    /**
-     * Configure and initialize the ASSA SDK
-     */
-    private void initializeMobileKeysApi() {
-        if (mobileKeysFactory == null) {
-            // 1 is testing lock service code , but we never use it to open locks
-            // we always get service code from the keys.
-            final int LOCK_SERVICE_CODE = 1;
-            ScanConfiguration scanConfiguration = new ScanConfiguration.Builder(new OpeningTrigger[]{
-                    new TapOpeningTrigger(mContext),
-                    new OpeningTriggerMediator(),
-                    new SeamlessOpeningTrigger()}, LOCK_SERVICE_CODE).build();
-
-            ApiConfiguration apiConfiguration = new ApiConfiguration.Builder()
-                    .setApplicationId(BuildConfig.APPLICATION_ID)
-                    .setApplicationDescription(BuildConfig.VERSION_NAME)
-                    .build();
-            scanConfiguration.setScanMode(ScanMode.OPTIMIZE_PERFORMANCE);
-            scanConfiguration.setRssiSensitivity(RssiSensitivity.NORMAL);
-            mobileKeysFactory = MobileKeysApi.getInstance();
-            if (!mobileKeysFactory.isInitialized()) {
-                Log.e(TAG, "isInitialized:");
-
-                mobileKeysFactory.initialize(mContext, apiConfiguration, scanConfiguration);
-            }
-
-            if (readerConnectionCallback == null) {
-                Log.e(TAG, "ReaderConnectionCallback : Registered");
-                readerConnectionCallback = new ReaderConnectionCallback(mContext);
-                readerConnectionCallback.registerReceiver(this);
-            }
-        }
     }
 
     /**
@@ -191,27 +228,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         }, personalizationCode);
     }
 
-    /**
-     * This will handle all the process of setting up the device, it will return
-     * immediately if already startSetup  completed
-     */
-    private void startSetup() {
-        // if already personalized then return success
-        if (isSetupComplete()) {
-            Api.setPeronalizationComplete(mContext,openKeyCallBack);
-        } else {
-            String invitationCode = Utilities.getInstance().getValue(Constants.INVITATION_CODE, "", mContext);
-            if (invitationCode.length() > 0) {
-                // personalised the device for ASSA
-                personalize(invitationCode);
-            } else {
-                // Generate a endpoint on ASSA server for personalizing the device with
-                //the returned code.
-                Api.setInitializePersonalization(mContext, statusCall);
-                // createEndPoint(mEndpoint);
-            }
-        }
-    }
+
 
 
 
@@ -336,10 +353,9 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      * reader(Locks) and communicate with them if found one
      */
     public void startScanning() {
-        Log.e("Assa", " scanning started");
         getReaderConnectionController().startScanning();
         mHandlerStopScanning = new Handler();
-        mHandlerStopScanning.postDelayed(scanningStopCallBack, 12000);
+        mHandlerStopScanning.postDelayed(scanningStopCallBack, SCANNING_TIME);
     }
 
     /**
@@ -363,7 +379,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             if (keys.size() > 0) {
                 final String cardNumber = keys.get(0).getCardNumber();
                 int lockServiceCode = Integer.valueOf(cardNumber.split("-")[0]);
-                Log.e(TAG, "Service Code : " + lockServiceCode);
+
                 // change the lock service code for scanning so that scanning can
                 // be performed for the lock that can opened by the existing key
                 getScanConfiguration().setLockServiceCodes(lockServiceCode);
@@ -393,24 +409,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     }
 
 
-    /**
-     * To get the current startSetup status
-     *
-     * @return true if startSetup is completed false otherwise
-     */
-    public boolean isSetupComplete() {
-        try {
-            Log.e("isSetupComplete", ":");
-            Log.e("Resule", ":" + getMobileKeys().isEndpointSetupComplete());
-
-            return getMobileKeys().isEndpointSetupComplete();
-        } catch (MobileKeysException e) {
-
-            Log.e("MobileKeysException", ":" + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
 
 
     /**
@@ -420,7 +418,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         getMobileKeys().endpointUpdate(new MobileKeysCallback() {
             @Override
             public void handleMobileKeysTransactionCompleted() {
-                Log.e("COMEPELTE", "handleMobileKeysTransactionCompleted");
+                if (mContext == null)
+                    openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
 
                 boolean haveKey = haveKey();
                 OpenKeyManager.getInstance(mContext).updateKeyStatus(haveKey);

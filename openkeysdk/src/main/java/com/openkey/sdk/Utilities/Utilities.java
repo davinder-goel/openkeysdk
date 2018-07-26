@@ -344,6 +344,7 @@ public class Utilities {
     }
 
 
+
     /**
      * Get booking from the saved shared preference
      */
@@ -359,8 +360,8 @@ public class Utilities {
     public MANUFACTURER getManufacturer(Context context, OpenKeyCallBack openKeyCallBack) {
         final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", context);
         if (TextUtils.isEmpty(manufacturerStr)) {
-            openKeyCallBack.sessionFailure();
-            // throw new IllegalStateException(Response.UNKNOWN);
+            openKeyCallBack.initializationFailure(Response.UNKNOWN);
+            throw new IllegalStateException(Response.UNKNOWN);
         }
         return MANUFACTURER.valueOf(manufacturerStr);
     }

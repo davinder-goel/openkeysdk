@@ -54,7 +54,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     // private String mToken = "ohpw6g45h67ajor4ejrtsi3u7naojiqmwcfbc43kwogmmeagi7ja2345ueet4ko2";
 
     //SALTO
-    private String mToken = "gzqc2swylev6aqxiqzpe62leruin7vua6nqdplu6aovfraahbpgqb6mhrt462z43";
+    private String mToken = "qsbvrczt4hsnkyocyrpezaf77osvt3cb2d3ltbw3nne2ch5idyhzifqmi24brwc7";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -126,18 +126,14 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
 //    KEY_DELIVERED=3;
 
         switch (MOBILE_KEY_STATUES) {
-            case 1:
-                OpenKeyManager.getInstance(this).initialize(this);
-                break;
-
-            case 2:
-                OpenKeyManager.getInstance(this).initialize(this);
-                break;
-
             case 3:
-                if (!OpenKeyManager.getInstance(this).isKeyAvailable(this)) {
+                //If the key status is delivered and device have key then it will not call initialize
+                if (!OpenKeyManager.getInstance(this).isKeyAvailable(this))
                     OpenKeyManager.getInstance(this).initialize(this);
-                }
+                break;
+
+            default:
+                    OpenKeyManager.getInstance(this).initialize(this);
                 break;
         }
     }
@@ -154,7 +150,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
 
 
     @Override
-    public void sessionFailure() {
+    public void sessionFailure(String errorDescription) {
         hideMessage();
         showToast("Booking not found");
     }
@@ -199,7 +195,6 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_PERMISSIONS_REQUEST);
@@ -215,7 +210,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
                 startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
             }
         } else {
-            //Utilities.getInstance().showToast(this, getString(R.string.no_key));
+            showToast("No key found");
         }
     }
 

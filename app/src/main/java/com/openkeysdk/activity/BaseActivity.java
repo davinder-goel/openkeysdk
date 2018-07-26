@@ -14,10 +14,6 @@ public abstract class BaseActivity extends AppCompatActivity implements OpenKeyC
     }
 
 
-    @Override
-    public void sessionFailure() {
-
-    }
 
     @Override
     public void session(SessionResponse sessionResponse) {
