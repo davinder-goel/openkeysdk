@@ -20,6 +20,7 @@ import com.openkey.sdk.api.response.Mobile_key_status.KeyStatusResp;
 import com.openkey.sdk.api.response.Status;
 import com.openkey.sdk.api.response.key_status.KeyStatusResponse;
 import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
+import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.api.service.Services;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
@@ -76,6 +77,7 @@ public class Api {
     }
 
 
+
     private static void saveData(SessionResponse bookingResponse, Context context) {
         if (bookingResponse != null && bookingResponse.getData() != null) {
 
@@ -93,6 +95,11 @@ public class Api {
                 String phoneNumber = bookingResponse.getData().getGuest().getPhone();
                 Utilities.getInstance().saveValue(Constants.UNIQUE_NUMBER, phoneNumber, context);
             }
+
+            if (bookingResponse.getData().getMobileKeyStatus() != null)
+                Utilities.getInstance().saveValue(Constants.MOBILE_KEY_STATUS,
+                        bookingResponse.getData().getMobileKeyStatusId(), context);
+
         }
     }
 
@@ -109,7 +116,8 @@ public class Api {
             public void onResponse(Call<MobileKeyResponse> call, retrofit2.Response<MobileKeyResponse> response) {
 
                 if (response != null && response.body() != null && response.body().getData() != null
-                        && response.body().getData().get(0).getMobileKey() != null) {
+                        && response.body().getData().size() > 0 &&
+                        response.body().getData().get(0).getMobileKey() != null) {
                     String key = response.body().getData().get(0).getMobileKey();
                     Utilities.getInstance().saveValue(Constants.MOBILE_KEY, key, context);
                 } else {
@@ -202,12 +210,18 @@ public class Api {
     public static void setPeronalizationComplete(final Context mContext, final OpenKeyCallBack openKeyCallBack) {
         Services services = Utilities.getInstance().getRetrofit(mContext).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
-        services.setPeronalizationComplete(TOKEN + tokenStr).enqueue(new Callback<Status>() {
+        services.setPeronalizationComplete(TOKEN + tokenStr).enqueue(new Callback<PersonlizationResponse>() {
             @Override
-            public void onResponse(Call<Status> call, retrofit2.Response<Status> response) {
+            public void onResponse(Call<PersonlizationResponse> call, retrofit2.Response<PersonlizationResponse> response) {
                 if (response.isSuccessful()) {
-                    // tell user, startSetup is success
-                    openKeyCallBack.initializationSuccess();
+
+                    PersonlizationResponse personlizationResponse = response.body();
+                    if (personlizationResponse != null && personlizationResponse.getData() != null
+                            && personlizationResponse.getData().getKeyIssued())
+                        openKeyCallBack.initializationSuccess();
+                    else
+                        openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+
                     Log.e(TAG, "Personalization Status updated on server");
                 } else {
                     // tell user, startSetup is success
@@ -217,7 +231,7 @@ public class Api {
             }
 
             @Override
-            public void onFailure(Call<Status> call, Throwable t) {
+            public void onFailure(Call<PersonlizationResponse> call, Throwable t) {
                 openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
                 Log.e(TAG, "Personalization Status failed to update on server");
             }
@@ -242,6 +256,33 @@ public class Api {
         services.initializePersonalization(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
 
+
+    /**
+     * @param context
+     * @param callback
+     */
+    @SuppressWarnings("unchecked")
+    public static void setInitializePersonalizationForKaba(final Context context, final Callback callback
+            , OpenKeyCallBack openKeyCallBack) {
+        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
+
+        if (context == null || tokenStr == null && openKeyCallBack != null)
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+
+        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
+        services.initializePersonalizationForKaba(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
+    }
+
+
+    /**
+     * @param context
+     * @param callback
+     */
+    @SuppressWarnings("unchecked")
+    public static void getBooking(final Context context, String tokenStr, final Callback callback) {
+        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
+        services.getSession(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
+    }
 
     /**
      * Update status on server once device get key.

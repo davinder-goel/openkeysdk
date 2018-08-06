@@ -9,17 +9,12 @@
 package com.openkey.sdk.salto;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
-import com.openkey.sdk.cryptography.AES256JNCryptor;
-import com.openkey.sdk.cryptography.CryptorException;
-import com.openkey.sdk.cryptography.JNCryptor;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerApi;
 import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerResultAndDiscoverCallback;
@@ -64,8 +59,7 @@ public final class Salto {
      * @return true/false
      */
     public boolean haveKey() {
-        // String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
-        String key = "C0020100C130C9E595071EE1874869DFA7A15A2B04061BED55985D6AE514B97369FD315D0270D71F212E15189129EB2BAD872A8A6396C2109F29205A704C8B40340A7A84217966F5";
+        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
         return !TextUtils.isEmpty(key);
     }
 
@@ -83,28 +77,31 @@ public final class Salto {
     private void decryptSaltoKey() {
         // Get encrypted key from shared preference
         final String encryptedKey = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
-        class BackgroundDecryptor extends AsyncTask<String, Void, String> {
+        openLock(encryptedKey);
 
-            @Override
-            protected String doInBackground(String... strings) {
-                JNCryptor cryptor = new AES256JNCryptor();
-                final byte[] encodedKey = Base64.decode(strings[0], Base64.DEFAULT);
-                try {
-                    byte[] cipherText = cryptor.decryptData(encodedKey, SECRET_KEY.toCharArray());
-                    return new String(cipherText);
-                } catch (CryptorException e) {
-                    e.printStackTrace();
-                }
-                return "";
-            }
-
-            @Override
-            protected void onPostExecute(String decryptedKey) {
-                super.onPostExecute(decryptedKey);
-                openLock(decryptedKey);
-            }
-        }
-        new BackgroundDecryptor().execute(encryptedKey);
+//        final String encryptedKey = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
+//        class BackgroundDecryptor extends AsyncTask<String, Void, String> {
+//
+//            @Override
+//            protected String doInBackground(String... strings) {
+//                JNCryptor cryptor = new AES256JNCryptor();
+//                final byte[] encodedKey = Base64.decode(strings[0], Base64.DEFAULT);
+//                try {
+//                    byte[] cipherText = cryptor.decryptData(encodedKey, SECRET_KEY.toCharArray());
+//                    return new String(cipherText);
+//                } catch (CryptorException e) {
+//                    e.printStackTrace();
+//                }
+//                return "";
+//            }
+//
+//            @Override
+//            protected void onPostExecute(String decryptedKey) {
+//                super.onPostExecute(decryptedKey);
+//                openLock(decryptedKey);
+//            }
+//        }
+//        new BackgroundDecryptor().execute(encryptedKey);
     }
 
     /**

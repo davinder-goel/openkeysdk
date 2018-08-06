@@ -1,9 +1,9 @@
-package com.openkey.sdk.kaba.model;
+package com.openkey.sdk.api.response.personlization;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class KabaInvitationCodeResponse {
+public class PersonlizationResponse {
 
     @SerializedName("success")
     @Expose

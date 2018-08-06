@@ -4,9 +4,12 @@ import com.openkey.sdk.api.model.KeyStatusRequest;
 import com.openkey.sdk.api.model.SdkLogRequest;
 import com.openkey.sdk.api.response.Mobile_key_status.KeyStatusResp;
 import com.openkey.sdk.api.response.Status;
+import com.openkey.sdk.api.response.invitation_code.InvitationCode;
 import com.openkey.sdk.api.response.key_status.KeyStatusResponse;
 import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
+import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
+import com.openkey.sdk.kaba.response.KabaTokenResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -44,8 +47,14 @@ public interface Services {
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/initializePersonalization.json")
-    Call<Object> initializePersonalization(@Header("Authorization") String Authorization);
+    Call<InvitationCode> initializePersonalization(@Header("Authorization") String Authorization);
 
+
+    @Headers({"Accept: application/json",
+            "x-openkey-app: " + key,
+            "Cache-Control: no-cache"})
+    @GET("sdk/v5/sessions/initializePersonalization.json")
+    Call<KabaTokenResponse> initializePersonalizationForKaba(@Header("Authorization") String Authorization);
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
@@ -57,7 +66,7 @@ public interface Services {
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/setPersonalization.json")
-    Call<Status> setPeronalizationComplete(@Header("Authorization") String Authorization);
+    Call<PersonlizationResponse> setPeronalizationComplete(@Header("Authorization") String Authorization);
 
 
     @Headers({"Accept: application/json",

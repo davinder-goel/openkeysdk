@@ -1,18 +1,11 @@
-package com.openkeysdk.activity;
+package com.openkeysdk.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
-public abstract class BaseActivity extends AppCompatActivity implements OpenKeyCallBack {
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+public class BaseFragment extends Fragment implements OpenKeyCallBack {
 
 
     @Override
@@ -21,12 +14,12 @@ public abstract class BaseActivity extends AppCompatActivity implements OpenKeyC
     }
 
     @Override
-    public void sessionFailure(String errorDescription) {
+    public void initializationSuccess() {
 
     }
 
     @Override
-    public void initializationSuccess() {
+    public void sessionFailure(String errorDescription) {
 
     }
 

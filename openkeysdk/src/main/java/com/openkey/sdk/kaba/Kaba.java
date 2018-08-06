@@ -1,535 +1,490 @@
 package com.openkey.sdk.kaba;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.helixion.lokplatform.persistence.PersistentStoreException;
-import com.helixion.secureelement.SeConnectionException;
-import com.helixion.utilities.ByteArray;
-import com.idconnect.core.api.IDConnectFactory;
-import com.idconnect.core.api.IDConnectManager;
-import com.idconnect.params.ConfirmationMethod;
-import com.idconnect.params.ProfileIDs;
-import com.idconnect.params.Property;
-import com.idconnect.params.PropertyKeys;
-import com.idconnect.params.PushTypes;
-import com.idconnect.params.WalletApplication;
-import com.idconnect.sdk.ble.BLEConfigParams;
-import com.idconnect.sdk.ble.BLEFileSelectionModes;
-import com.idconnect.sdk.enums.BLEPluginTypes;
-import com.idconnect.sdk.enums.PluginMessageTypes;
-import com.idconnect.sdk.exceptions.DataIncompatibleException;
-import com.idconnect.sdk.exceptions.SETypeNotSupportedException;
-import com.idconnect.sdk.exceptions.UserNotRegisteredException;
-import com.idconnect.sdk.exceptions.WalletApplicationNotFoundException;
-import com.idconnect.sdk.listeners.BLEListener;
-import com.idconnect.sdk.listeners.RegistrationListener;
-import com.idconnect.sdk.listeners.SeUIListener;
-import com.idconnect.sdk.listeners.SynchroniseListener;
-import com.idconnect.server.exceptions.ServerParamException;
-import com.openkey.sdk.OpenKeyManager;
-import com.openkey.sdk.Utilities.Constants;
-import com.openkey.sdk.Utilities.Utilities;
-import com.openkey.sdk.api.request.Api;
+import com.legic.mobile.sdk.api.LegicMobileSdkManager;
+import com.legic.mobile.sdk.api.exception.LegicMobileSdkException;
+import com.legic.mobile.sdk.api.listener.LegicMobileSdkEventListener;
+import com.legic.mobile.sdk.api.listener.LegicMobileSdkPasswordEventListener;
+import com.legic.mobile.sdk.api.listener.LegicMobileSdkRegistrationEventListener;
+import com.legic.mobile.sdk.api.listener.LegicMobileSdkSynchronizeEventListener;
+import com.legic.mobile.sdk.api.listener.LegicNeonFileEventListener;
+import com.legic.mobile.sdk.api.listener.LegicReaderEventListener;
+import com.legic.mobile.sdk.api.types.LcMessageMode;
+import com.legic.mobile.sdk.api.types.LegicMobileSdkErrorReason;
+import com.legic.mobile.sdk.api.types.LegicMobileSdkFileAddressingMode;
+import com.legic.mobile.sdk.api.types.LegicMobileSdkPushType;
+import com.legic.mobile.sdk.api.types.LegicMobileSdkStatus;
+import com.legic.mobile.sdk.api.types.LegicNeonFile;
+import com.legic.mobile.sdk.api.types.LegicNeonFileDefaultMode;
+import com.legic.mobile.sdk.api.types.RfInterface;
+import com.legic.mobile.sdk.api.types.RfInterfaceState;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
-import com.openkey.sdk.kaba.response.invitationcode.KabaInvitationCodeResponse;
+import com.openkey.sdk.kaba.util.Settings;
+import com.openkey.sdk.kaba.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import static android.content.Context.MODE_PRIVATE;
 
-import static android.content.ContentValues.TAG;
-
-/**
- * @author OpenKey Inc.
- *         <p>
- *         This will handle all things about KABA lock manufacturer
- */
-
-public class Kaba {
-
-    //This walletId used to get the registration token from the kaba id-connect server
-    private final String walletId = "10008";
-    private OpenKeyCallBack openKeyCallBack;
+public class Kaba implements LegicMobileSdkSynchronizeEventListener,
+        LegicMobileSdkRegistrationEventListener, LegicReaderEventListener,
+        LegicNeonFileEventListener, LegicMobileSdkPasswordEventListener,
+        LegicMobileSdkEventListener {
+    private static final String LOG = "LEGIC-SDK-QUICKSTART";
+    private LegicMobileSdkManager mManager;
     private Context mContext;
-    private String kabaRegistrationToken;
+    private OpenKeyCallBack mOpenKeyCallBack;
 
-    //KABA REQUIREMENTS
-    private List<ProfileIDs> profileIDs = new ArrayList<>();
-    private IDConnectManager manager = null;
-    /**
-     * Ble listener that listens the ble operation on Kaba Lock
-     */
-    private BLEListener bleListener = new BLEListener() {
+    public Kaba(Context context, OpenKeyCallBack openKeyCallBack) {
+        mOpenKeyCallBack = openKeyCallBack;
+        mContext = context;
 
-        @Override
-        public void success() {
-            Log.e(TAG, "BLEListener: success");
-        }
-
-        @Override
-        public void failure(SeConnectionException arg0) {
-            Log.e(TAG, "BLEListener: failure");
-        }
-    };
-
-    private Callback<Object> statusCall = new Callback<Object>() {
-        @Override
-        public void onResponse(Call<Object> call, Response<Object> response) {
-            if (response.isSuccessful()) {
-
-                Gson gson = new Gson();
-                KabaInvitationCodeResponse responseModel = gson
-                        .fromJson(response.body().toString(),
-                                KabaInvitationCodeResponse.class);
-                Log.e("Response", ":" + response.body().toString());
-                Log.e("CODE", ":" + responseModel.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken());
-
-
-                Log.e("Res", ":" + response.body().toString());
-                KabaInvitationCodeResponse kabaTokenResponse = responseModel;
-                if (kabaTokenResponse != null && kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse()
-                        != null && kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken() != null
-                        && kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken().length() > 0) {
-                    Log.e(TAG, "Token From KABA : " + kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken());
-                    kabaRegistrationToken = kabaTokenResponse.getData().getCode().getPrepareDirectWalletRegistrationResponse().getToken();
-                    // save token and start the process again
-                    Utilities.getInstance().saveValue(Constants.KABA_REGISTRATION_TOKEN, kabaRegistrationToken, mContext);
-                    startKabaProcessing();
-                }
-
-
-            } else {
-                // Show the message  from the error body if response is not successful
-                Utilities.getInstance().handleApiError(response.errorBody(), mContext);
-                openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-            }
-        }
-
-        @Override
-        public void onFailure(Call<Object> call, Throwable t) {
-            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-
-        }
-    };
-
-    public Kaba(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
-        this.openKeyCallBack = OpenKeyCallBack;
-        this.mContext = mContext;
         setupKaba();
-        startKabaProcessing();
+        register();
     }
 
 
-    /**
-     * SeUiListener for Kaba OpenKeyCallBack
-     *
-     */
-    private SeUIListener getSeUIListener() {
-        return new SeUIListener() {
-
-            @Override
-            public void onReceiveMessageFromReader(int code, byte[] message) {
-                Log.d(TAG, "BLE Message fromk reader - Code: " + code);
-                if (message != null)
-                    Log.d(TAG, "BLE Message from reader - Message: " + ByteArray.bytesToHexString(message));
-
-                PluginMessageTypes type = PluginMessageTypes.getTypeFromState(code);
-                switch (type) {
-                    case BLUETOOTH_STATE:
-                        int typeState=0;
-                         if (message!=null&&message.length>0)
-                         {
-                             typeState =message[0];
-                         }
-                        BLEPluginTypes stateCode = BLEPluginTypes.getTypeFromState(typeState);
-                        if (stateCode == BLEPluginTypes.PLUGIN_BLESTATE_ERROR ||
-                                stateCode == BLEPluginTypes.PLUGIN_BLESTATE_NOT_ACTIVATED) {
-                            //inform user BLE is disabled
-                            Log.w(TAG, "BLE is disabled PLUGIN_BLESTATE_NOT_ACTIVATED");
-                        } else if (stateCode == BLEPluginTypes.PLUGIN_BLESTATE_NOT_SUPPORTED) {
-                            //inform user BLE is not supported
-                            Log.w(TAG, "BLE is disabled PLUGIN_BLESTATE_NOT_SUPPORTED");
-                        }
-                        break;
-                    case IDC_FILE_WAS_READ:
-                        //inform user to do something
-                        byte[] messageData = new byte[]{0, 1, 1};
-                        try {
-                            manager.sendMessageToBleReader(0, messageData);
-                        } catch (SETypeNotSupportedException e) {
-                            Log.w(TAG, "No BLE Support requested" + e);
-                        }
-                        break;
-                    case IDC_MESSAGE:
-                        final BLEDataHandler dataHandler = new BLEDataHandler(message);
-                        if (dataHandler.isAccessGranted()) {
-                            Utilities.getInstance().vibrate(mContext);
-                            openKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
-                        } else {
-                            openKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.KEY_NOT_CORRECT);
-                        }
-                        stopScanning();
-                        break;
-                }
-            }
-        };
-    }
-
-    /**
-     * stop scanning
-     */
-    private void stopScanning() {
-        if (manager != null) {
-            manager.deactivateAllCards();
-        }
-    }
-
-
-    /**
-     * Synchronize listener, for providing the response of synchronize , success or failure
-     */
-    private SynchroniseListener getSynchroniseListener() {
-        return new SynchroniseListener() {
-
-            @Override
-            public void synchronisationStarted() {
-                // This will be called when synchronisation has started. This is
-                // returned when the
-                // first synchronisation command completes and the next in sequence
-                // begins
-                Log.e(TAG, "SynchroniseListener: synchronisationStarted");
-
-            }
-
-            @Override
-            public void synchronisationFailed(int code, String description) {
-                Log.e(TAG, description + code);
-                Log.e(TAG, "SynchroniseListener: synchronisationFailed");
-                OpenKeyManager.getInstance(mContext).updateKeyStatus(false);
-                openKeyCallBack.isKeyAvailable(false, com.openkey.sdk.Utilities.Response.FETCH_KEY_FAILED);
-            }
-
-            @Override
-            public void synchronisationComplete() {
-                OpenKeyManager.getInstance(mContext).updateKeyStatus(haveKey());
-                // This will be called when.synchronisation has completed
-                Log.e(TAG, "SynchroniseListener: synchronisationCompleted ");
-                openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
-            }
-
-            @Override
-            public void cardsUpdated() {
-                // This will be called when new cards that have been downloaded
-                // during synchronisation.
-                // Cards downloaded can be retrieved through getAllCards()
-                Log.e(TAG, "SynchroniseListener: cardsUpdated");
-                //  openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
-            }
-        };
-    }
-
-
-    /**
-     * Prepare application startup for KABA,Before execetuing any operation
-     * on, KABA the successful application startup is required.
-     */
-    private void startKabaProcessing() {
-        kabaRegistrationToken = Utilities.getInstance().getValue(Constants.KABA_REGISTRATION_TOKEN, "", mContext);
-        if (kabaRegistrationToken.length() > 0) {
-            startKABA();
-        } else {
-            getKabaRegistrationToken();
-        }
-    }
-
-
-    /**
-     * Get keys from the Kaba Server
-     */
-    public void getKabaKey() {
-
-         /** Synchronise communicates with the server to
-         * discover if there are any actions that the OpenKeyCallBack should perform.
-         * One action can result in Wallet Apps being downloaded to the
-         * persistent store. This would be reported through the SyncDevice
-         * Listener passed into createIDConnectManager.*/
+    public void setupKaba() {
         try {
-            manager.synchronize();
-        } catch (ServerParamException e) {
-            // This exception will be thrown if the server parameters were not
-            // set
-            // before a server operation takes place
-            OpenKeyManager.getInstance(mContext).updateKeyStatus(false);
-            openKeyCallBack.isKeyAvailable(false, com.openkey.sdk.Utilities.Response.FETCH_KEY_FAILED);
-            Log.e(TAG, "Server configuration missing");
-        } catch (UserNotRegisteredException e) {
-            // This exception will be thrown if a getKabaKey command is
-            // attempted
-            // before the user is registered
-            Log.e(TAG, "User not registered!");
-            OpenKeyManager.getInstance(mContext).updateKeyStatus(false);
-            openKeyCallBack.isKeyAvailable(false, com.openkey.sdk.Utilities.Response.FETCH_KEY_FAILED);
+            initSdk();
+            registerListeners();
+            //unregisterListeners();
+        } catch (LegicMobileSdkException e) {
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Start decrypting key
-     */
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    private void initSdk() throws LegicMobileSdkException {
+        mManager = Utils.getSdkManager(mContext);
+
+        registerListeners();
+
+        if (!mManager.isStarted()) {
+            mManager.start(Settings.mobileAppId, Settings.mobileAppTechUser, Settings.mobileAppTechPassword,
+                    Settings.serverUrl);
+        }
+
+        mManager.setLcProjectAddressingMode(true);
+
+        if (mManager.isRegisteredToBackend()) {
+            if (mManager.isRfInterfaceSupported(RfInterface.BLE) && !mManager.isRfInterfaceActive(RfInterface.BLE)) {
+                mManager.activateRfInterface(RfInterface.BLE);
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    protected void registerListeners() {
+        if (mManager == null) {
+            return;
+        }
+        try {
+            mManager.registerForSynchronizeEvents(this);
+            mManager.registerForRegistrationEvents(this);
+            mManager.registerForReaderEvents(this);
+            mManager.registerForFileEvents(this);
+            mManager.registerForPasswordEvents(this);
+            mManager.registerForSdkEvents(this);
+        } catch (LegicMobileSdkException e) {
+            Log.e("Kaba", "Could not register listener: " + e.getLocalizedMessage());
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void unregister() {
+        mManager.unregister();
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void synchronise() {
+        mManager.synchronizeWithBackend();
+    }
+
     public void startScanning() {
-        activateCards();
+        activateFile(1);
     }
 
-    /**
-     * This method is to activate the wallet cards for KABA, to open the lock.
-     */
-    private void activateCards() {
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void getAllFiles() {
+        Log.e("Kaba", "Get all files from SDK");
 
         try {
-            List<WalletApplication> walletApps = manager.getAllCards();
-            for (int i = 0; i < walletApps.size(); i++) {
-                if (walletApps.get(i).getQualifier() > 0) {
-                    Log.e(TAG, "Activating : " + walletApps.get(i).getWalletAppId() + "/" + walletApps.get(i).getQualifier());
-                    manager.activateCard(walletApps.get(i).getWalletAppId(), walletApps.get(i).getQualifier());
-                }
-            }
-        } catch (SeConnectionException e) {
-            e.printStackTrace();
-        } catch (WalletApplicationNotFoundException e) {
-            e.printStackTrace();
-        } catch (SETypeNotSupportedException e) {
-            e.printStackTrace();
-        } catch (PersistentStoreException e) {
-            e.printStackTrace();
-        } catch (DataIncompatibleException e) {
-            e.printStackTrace();
-        }
-    }
+            List<LegicNeonFile> files = mManager.getAllFiles();
+            int fileIndex = 1;
 
-    /**
-     * start kaba functionality
-     */
-    private void startKABA() {
-        try {
-            // if user is not register
-            if (!manager.getPersistentStore().isUserRegistered()) {
-                registerToKaba();
-            } else {
-                /**
-                 * Update the status on server that Registration Complete has been completed on Kaba server
-                 */
-                Api.setPeronalizationComplete(mContext,openKeyCallBack);
-            }
-        } catch (PersistentStoreException e) {
-            e.printStackTrace();
-        }
-    }
+            for (LegicNeonFile f : files) {
+                String fileInfos = "Index: " + fileIndex++;
+                fileInfos += "\nState: " + f.getFileState().toString();
 
-    /**
-     * Authenticate the device to Kaba Server.
-     */
-    private void registerToKaba() {
-
-        final String publicSEId = getPublicSEId();
-
-        Log.e(TAG, "registered  number to kaba : " + publicSEId);
-        // Any required properties for registration can be passed in a List of
-        // Properties
-        List<Property> properties = new ArrayList<>();
-        properties.add(new Property(PropertyKeys.PHONE_NUMBER.getName(), publicSEId));
-
-        // Call registration with phone number and method for receiving kabaRegistrationToken
-        try {
-            manager.registerWallet(new RegistrationListener() {
-
-                @Override
-                public void fail(int code, String description) {
-                    // If a failure occurred will performing the registerToKaba
-                    // request the
-                    // error will be reported here
-                    Log.e(TAG, "register: failure");
-                    Log.e("code : " + code, description);
-                    openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-                }
-
-                @Override
-                public void success(boolean b, String s) {
-
-                    completeRegister();
-
-                    Log.e(TAG, "register: success : " + s);
-                }
-            }, properties, publicSEId, ConfirmationMethod.NONE);
-        } catch (ServerParamException e) {
-            // This exception will be thrown if the server parameters were not
-            // set
-            // before a server operation takes place
-            Log.e(TAG, "Server configuration missing");
-            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-        }
-    }
-
-
-
-
-    /**
-     * Check if the device have a valid key for Kaba Lock
-     */
-    public boolean haveKey() {
-        try {
-
-            if (manager == null) return false;
-            // This will retrieve any cards that have been downloaded from the
-            // server
-            // and stored within the persistent store
-            List<WalletApplication> walletApps = manager.getAllCards();
-            // Once the list has been retrieved action on them how you see fit
-            if (walletApps != null && !walletApps.isEmpty()) {
-                for (int i = 0; i < walletApps.size(); i++) {
-                    Log.e(TAG, walletApps.get(i).getWalletAppId() + "/" + walletApps.get(i).getQualifier());
-                    if (walletApps.get(i).getQualifier() > 0) {
-                        Log.e(TAG, "wallet has qualifier 1 : " + walletApps.get(i).getWalletAppId());
-                        return true;
+                byte[] fileId = f.getFileId();
+                if (fileId.length > 0) {
+                    fileInfos += "\nFile Id: " + Utils.dataToByteString(f.getFileId());
+                    for (String key : f.getMetaData().keySet()) {
+                        fileInfos += "\n" + key + ": " + f.getMetaData().get(key).getStringValue();
                     }
                 }
-                return false;
-            } else {
-                Log.e(TAG, "No Wallet");
+                Log.e("Kaba", fileInfos);
             }
-        } catch (PersistentStoreException e) {
-            // If an issue occurred when loading to the persistent store
-            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.UNKNOWN);
-            Log.e(TAG, "PersistentStoreException");
-        } catch (DataIncompatibleException e) {
-            e.printStackTrace();
+
+        } catch (LegicMobileSdkException e) {
+            Log.e("Kaba", "Error getting files from sdk: " + e.getLocalizedMessage());
         }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void activateFile(int index) {
+        Log.e("Kaba", "Activate file index " + index);
+
+
+        if (index > 0) {
+            try {
+                List<LegicNeonFile> files = mManager.getAllFiles();
+
+                if (index <= files.size()) {
+                    LegicNeonFile f = files.get(index - 1);
+
+                    Log.e("Kaba", "file Id " + Utils.dataToByteString(f.getFileId()));
+
+                    try {
+                        mManager.activateFile(f);
+                        mManager.setDefault(f, LegicNeonFileDefaultMode.LC_PROJECT_DEFAULT, true);
+                    } catch (LegicMobileSdkException e) {
+                        Log.e("Kaba", e.getLocalizedMessage());
+                    }
+                } else {
+                    Log.e("Kaba", "File referenced by index does not exist");
+                }
+
+            } catch (LegicMobileSdkException e) {
+                Log.e("Kaba", e.getLocalizedMessage());
+            }
+        } else {
+            Log.e("Kaba", "Please use file Index > 0");
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    public boolean haveKey() {
+        int index = 1;
+        Log.e("Kaba", "Activate file index " + index);
+
+
+        if (index > 0) {
+            try {
+                List<LegicNeonFile> files = mManager.getAllFiles();
+
+                if (index <= files.size()) {
+                    LegicNeonFile f = files.get(index - 1);
+
+                    Log.e("Kaba", "file Id " + Utils.dataToByteString(f.getFileId()));
+
+                    try {
+                        mManager.activateFile(f);
+                        mManager.setDefault(f, LegicNeonFileDefaultMode.LC_PROJECT_DEFAULT, true);
+                        return true;
+                    } catch (LegicMobileSdkException e) {
+                        Log.e("Kaba", e.getLocalizedMessage());
+                    }
+                } else {
+                    Log.e("Kaba", "File referenced by index does not exist");
+                }
+
+            } catch (LegicMobileSdkException e) {
+                Log.e("Kaba", e.getLocalizedMessage());
+            }
+        } else {
+            Log.e("Kaba", "Please use file Index > 0");
+        }
+
         return false;
     }
 
-    /**
-     * Complete the registration on Kaba Server, by given kabaRegistrationToken, which is returned by authentication
-     * on Kaba server
-     */
-    private void completeRegister() {
-        // Complete registration with provided kabaRegistrationToken
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void register() {
+
+
+        //Get Device ID from EditText box
+        String deviceId = "10008-919988333963";
+
+        SharedPreferences.Editor editor = mContext.getSharedPreferences(Settings.MY_PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putString("DeviceID", deviceId);
+        editor.apply();
+
+        List<RfInterface> interfaces = new ArrayList<>();
         try {
-            manager.completeRegistration(new RegistrationListener() {
-                @Override
-                public void success(boolean b, String s) {
-                    Log.e(TAG, "completeRegistration : Success : " + s);
-                    try {
-                        manager.getPersistentStore().saveUserRegistered(true);
-                        // Update the status on server that Registration Complete has been completed on Kaba server
-                        Api.setPeronalizationComplete(mContext,openKeyCallBack);
-                    } catch (PersistentStoreException e) {
-                        // If an issue occurred when saving to the persistent
-                        // store
-                        Log.e(TAG, "PersistentStoreException");
-                        openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-                    }
-                }
 
-                @Override
-                public void fail(int code, String description) {
-                    Log.e(TAG, "completeRegister: failure :: description ::" + description);
-                    openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+            boolean ble = mManager.isRfInterfaceSupported(RfInterface.BLE);
 
+            if (ble) {
+                interfaces.add(RfInterface.BLE);
+            }
+        } catch (LegicMobileSdkException e) {
+            Log.e("Kaba", "Exception during registration: " + e.getLocalizedMessage());
+        }
+
+
+        mManager.initiateRegistration(
+                deviceId,
+                interfaces,
+                Settings.lcConfirmationMethod,
+                "",
+                LegicMobileSdkPushType.GCM);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void deactivateAllFiles() {
+        Log.e("Kaba", "Deactivate all files");
+
+        try {
+            List<LegicNeonFile> files = mManager.getAllFiles();
+
+            for (LegicNeonFile f : files) {
+                try {
+                    mManager.deactivateFile(f);
+                } catch (LegicMobileSdkException e) {
+                    Log.e("Kaba", e.getLocalizedMessage());
                 }
-            }, kabaRegistrationToken);
-        } catch (ServerParamException e) {
-            // This exception will be thrown if the server parameters were not
-            // set
-            // before a server operation takes place
-            Log.e(TAG, "Server configuration missing");
-            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+            }
+        } catch (LegicMobileSdkException e) {
+            Log.e("Kaba", e.getLocalizedMessage());
         }
     }
 
-    /**
-     * setup device for kaba lock
-     */
-    private void setupKaba() {
-        // Add the type of SE Supported to the list of ProfileIds
-        profileIDs.add(ProfileIDs.BLE);
-        // Create the instance of IDConnectManager
-        if (manager == null) {
-            manager = IDConnectFactory.createIDConnectManager(mContext,
-                    getSynchroniseListener(), walletId, "",
-                    PushTypes.GCM, profileIDs, bleListener, getSeUIListener());
-            // Once we have our instance of IDConnectManager then lets set slide_up the
-            // server configuration. To run this application, please change the below values
-            try {
-                manager.getPersistentStore().saveServerURL(Constants.KABA_SERVER_URL);
-            } catch (PersistentStoreException e) {
-                e.printStackTrace();
-            }
-            manager.setUsername(Constants.KABA_SERVER_USER_NAME);
-            manager.setPassword(Constants.KABA_SERVER_PASSWORD);
-            try {
-                manager.setConfigParam(BLEConfigParams.FILESELECTIONMODE.getParamKey(), BLEFileSelectionModes.PRESELECT_FILE.getMode());
+    //-----------------------------------------------------------------------------------------------------------------|
+    @Override
+    public void backendFileChangedEvent(LegicNeonFile legicFile) {
+        Log.e("Kaba", "File changed -> file " + legicFile);
+    }
 
-            } catch (SETypeNotSupportedException e) {
-                e.printStackTrace();
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void backendRequestAddFileDoneEvent(LegicMobileSdkStatus legicSdkStatus) {
+        if (legicSdkStatus.isSuccess()) {
+            Log.e("Kaba", "Backend Request add file done with status " + legicSdkStatus);
+        } else {
+            handleSdkErrors(legicSdkStatus);
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void backendRequestRemoveFileDoneEvent(LegicMobileSdkStatus status) {
+        if (status.isSuccess()) {
+            Log.e("Kaba", "Backend Request remove file done with status " + status);
+        } else {
+            handleSdkErrors(status);
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void readerReadFileEvent(LegicNeonFile legicFile, RfInterface rfInterface) {
+        Log.e("Kaba", "Reader read Event on file  " + legicFile + " on interface " + rfInterface);
+
+        byte[] messageData = new byte[]{0, 1, 1};
+        try {
+            mManager.sendLcMessage(messageData, LcMessageMode.ENCRYPTED_MACED_FILE_KEYS, rfInterface);
+        } catch (LegicMobileSdkException e) {
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void readerWriteFileEvent(LegicNeonFile legicFile, RfInterface rfInterface) {
+        Log.e("Kaba", "Reader write Event on file  " + legicFile + " on interface " + rfInterface);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void readerLcMessageEvent(byte[] data, LcMessageMode lcMessageMode, RfInterface rfInterface) {
+        Log.e("Kaba", "LC message event data: " + Utils.dataToByteString(data) + " mode: " + lcMessageMode
+                + " on interface " + rfInterface);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void readerLcMessagePollingEvent(LcMessageMode lcMessageMode, RfInterface rfInterface) {
+        Log.e("Kaba", "LC message polling event, mode: " + lcMessageMode + " on interface " + rfInterface);
+
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void readerConnectEvent(long Id, LegicMobileSdkFileAddressingMode mode, int readerType,
+                                   RfInterface rfInterface) {
+        Log.e("Kaba", "Reader connect event, id : " + Id + "/" + mode
+                + " Reader Type: " + readerType + " interface:" + rfInterface);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void backendRegistrationStartDoneEvent(LegicMobileSdkStatus status) {
+        if (status.isSuccess()) {
+            completeRegister("492660");
+            Log.e("Kaba", "Registration Step 1 done with status " + status);
+        } else {
+            handleSdkErrors(status);
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    public void completeRegister(String token) {
+        mManager.register(token);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    @Override
+    public void backendRegistrationFinishedDoneEvent(LegicMobileSdkStatus status) {
+        if (status.isSuccess()) {
+            Log.e("Kaba", "Registration Step 2 done with status " + status);
+        } else {
+            handleSdkErrors(status);
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void backendUnregisterDoneEvent(LegicMobileSdkStatus status) {
+        if (status.isSuccess()) {
+            Log.e("Kaba", "Unregister done with status " + status);
+        } else {
+            handleSdkErrors(status);
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    @Override
+    public void backendSynchronizeStartEvent() {
+        Log.e("Kaba", "Synchronize started");
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    @Override
+    public void backendSynchronizeDoneEvent(LegicMobileSdkStatus status) {
+        if (status.isSuccess()) {
+            getAllFiles();
+            Log.e("Kaba", "Synchronize done with status " + status);
+        } else {
+            handleSdkErrors(status);
+        }
+    }
+
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void readerPasswordRequestEvent(byte[] data, RfInterface rfInterface) {
+        Log.e("Kaba", "Password request with bytes " + Utils.dataToByteString(data) + " interface:" + rfInterface);
+    }
+
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void sdkActivatedEvent(long identifier, LegicMobileSdkFileAddressingMode mode,
+                                  RfInterface rfInterface) {
+        Log.e("Kaba", "Interface activated, Identifier: " + identifier + " mode: " + mode
+                + " interface:" + rfInterface);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void sdkDeactivatedEvent(long identifier, LegicMobileSdkFileAddressingMode mode,
+                                    RfInterface rfInterface) {
+        Log.e("Kaba", "Interface deactivated, Identifier: " + identifier + " mode: " + mode
+                + " interface:" + rfInterface);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------| 
+    @Override
+    public void sdkRfInterfaceChangeEvent(RfInterface rfInterface,
+                                          RfInterfaceState rfInterfaceState) {
+        Log.e("Kaba", "Interface changed interface:" + rfInterface + " new state: " + rfInterfaceState);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    private void checkPermissions() {
+
+        String[] requiredPermissions = new String[]{
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+
+        List<String> missingPermissions = new ArrayList<>();
+
+        boolean allPermissionsOk = true;
+        for (String p : requiredPermissions) {
+            Log.d(LOG, "checking Permission: " + p);
+            if (ActivityCompat.checkSelfPermission(mContext, p) != PackageManager.PERMISSION_GRANTED) {
+                Log.d(LOG, "missing Permission: " + p);
+                allPermissionsOk = false;
+                if (ActivityCompat.shouldShowRequestPermissionRationale((FragmentActivity) mContext, p)) {
+                    Log.d(LOG, "User already denied permission once, he probably needs an explanation: " + p);
+                }
+                missingPermissions.add(p);
             }
         }
-        // This simply prints to the log the current version of the OpenKeyCallBack
-        Log.e(TAG, "onCreate: IDConnectManager version = " + manager.getSKDVersion());
+
+        if (!allPermissionsOk) {
+            // request all missing permissions
+            ActivityCompat.requestPermissions((FragmentActivity) mContext, missingPermissions.toArray(new String[0]),
+                    /* unused because no callback*/ 0);
+        }
     }
 
-    /**
-     * Get registration token from the kaba id-connect server
-     */
-    private void getKabaRegistrationToken() {
-        Api.setInitializePersonalization(mContext, statusCall, openKeyCallBack);
-       /* final String publicSEId = getPublicSEId();
+    //-----------------------------------------------------------------------------------------------------------------|
+    private void handleSdkErrors(LegicMobileSdkStatus status) {
+        // this method logs only when status is not "OK"
+        if (!status.isSuccess()) {
 
-        Log.e(TAG, "requesting token to kaba : " + publicSEId);
-        PrepareDirectWalletRegistrationRequest request = new PrepareDirectWalletRegistrationRequest(publicSEId, walletId);
-        Token token = new Token(request);
-        Services services = Utilities.getInstance().getRetrofitForKaba().create(Services.class);
-        services.getRegistrationToken(token).enqueue(new Callback<KabaTokenResponse>() {
-            @Override
-            public void onResponse(Call<KabaTokenResponse> call, Response<KabaTokenResponse> response) {
-                if (response.isSuccessful()) {
-                    KabaTokenResponse kabaTokenResponse=response.body();
-                    if (kabaTokenResponse!=null&&kabaTokenResponse.getPrepareDirectWalletRegistrationResponse()
-                            !=null&&kabaTokenResponse.getPrepareDirectWalletRegistrationResponse().getToken()!=null
-                            &&kabaTokenResponse.getPrepareDirectWalletRegistrationResponse().getToken().length()>0)
-                    {
-                        Log.e(TAG, "Token From KABA : " + kabaTokenResponse.getPrepareDirectWalletRegistrationResponse().getToken());
-                        kabaRegistrationToken = kabaTokenResponse.getPrepareDirectWalletRegistrationResponse().getToken();
-                        // save token and start the process again
-                        Utilities.getInstance().saveValue(Constants.KABA_REGISTRATION_TOKEN, kabaRegistrationToken, mContext);
-                        startKabaProcessing();
-                    }
+            // LegicMobileSdkErrorReason gives more insight about the cause
+            LegicMobileSdkErrorReason reason = status.getReason();
 
+            Log.e("Kaba", "An action failed with the following error: " + status.getError().name());
+            switch (reason.getReasonType()) {
+                case SDK_ERROR:
+                    Log.e("Kaba", "SDK internal error:\n" +
+                            "You probably tried actions that are not allowed (unsupported interfaces, " +
+                            "activation of non-deployed files, invalid data).");
 
+                    Log.e("Kaba", "SDK error code: " + reason.getSdkErrorCode());
+                    break;
+                case BACKEND_ERROR:
+                    Log.e("Kaba", "Backend error:\n" +
+                            "This is usually caused by invalid configuration data (invalid mobileAppId), " +
+                            "incorrect requests (wrong state, not registered) or by problems on the backend system.");
 
-                } else {
-                    // Show the message  from the error body if response is not successful
-                    Utilities.getInstance().handleApiError(response.errorBody(),mContext);
-                    openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-                }
+                    Log.e("Kaba", "Back-end error code (LEGIC Connect): " + reason.getErrorCode());
+                    break;
+                case HTTP_ERROR:
+                    Log.e("Kaba", "HTTP error:\n" +
+                            "This could be caused by connection or authentication problems, please check " +
+                            "your configuration and/or your network settings.");
+
+                    Log.e("Kaba", "HTTP Error code: " + reason.getErrorCode());
+                    break;
+                default:
+                    Log.e("Kaba", "Unknown error reason: " + reason.toString());
             }
-
-            @Override
-            public void onFailure(Call<KabaTokenResponse> call, Throwable t) {
-                openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-            }
-        });*/
+            Log.e("Kaba", "Full error description:\n" + reason);
+        }
     }
 
 
-    /**
-     * Create publicSEId for KABA registration process
-     */
-    private String getPublicSEId() {
-        String phoneNumber = "919803446768".replace("+", "");
-        return "custom#" + walletId + "-" + phoneNumber;
-
+    //-----------------------------------------------------------------------------------------------------------------|
+    protected void unregisterListeners() {
+        if (mManager == null) {
+            return;
+        }
+        mManager.unregisterAnyEvents(this);
     }
 }

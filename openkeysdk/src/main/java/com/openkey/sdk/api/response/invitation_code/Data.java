@@ -1,4 +1,4 @@
-package com.openkey.sdk.kaba.response.invitationcode;
+package com.openkey.sdk.api.response.invitation_code;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

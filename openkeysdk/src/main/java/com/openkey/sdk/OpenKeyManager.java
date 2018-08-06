@@ -8,6 +8,7 @@ package com.openkey.sdk;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
@@ -42,7 +43,7 @@ public final class OpenKeyManager {
     private Kaba kaba;
     private Entrava entrava;
     private Miwa miwa;
-    private OpenKeyCallBack mOpenKeyCallBack;
+    public static volatile OpenKeyCallBack mOpenKeyCallBack;
 
     /**
      * Access to this class can only be provided by this class
@@ -73,6 +74,19 @@ public final class OpenKeyManager {
         return instance;
     }
 
+
+
+    /**
+     * @param authToken
+     * @param openKeyCallBack Call back for response purpose
+     */
+    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
+        if (authToken != null && authToken.length() > 0 && context != null)
+            Api.getSession(context, authToken, openKeyCallBack);
+        else
+            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE);
+    }
+
     /*
      * Getting mobile key from server, If the key is issued from backend then start syncing
      * process
@@ -97,13 +111,9 @@ public final class OpenKeyManager {
 
     /**
      * @param authToken
-     * @param openKeyCallBack Call back for response purpose
      */
-    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
-        if (authToken != null && authToken.length() > 0 && context != null)
-            Api.getSession(context, authToken, openKeyCallBack);
-        else
-            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE);
+    public void getSession(String authToken, final Callback callback) {
+        Api.getBooking(context, authToken, callback);
     }
 
     /**
@@ -116,6 +126,7 @@ public final class OpenKeyManager {
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
 
         if (context == null) {
+            Log.e("context", "initializationFailure");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
         }
@@ -163,6 +174,7 @@ public final class OpenKeyManager {
         if (context == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null) {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
+
         }
         mOpenKeyCallBack = openKeyCallBack;
 
@@ -188,6 +200,7 @@ public final class OpenKeyManager {
                 if (assa.isSetupComplete()) {
                     assa.getKey();
                 } else {
+                    Log.e("getKey", "initializationFailure");
                     mOpenKeyCallBack.initializationFailure(Response.NOT_INITIALIZED);
                 }
                 break;
@@ -198,7 +211,7 @@ public final class OpenKeyManager {
                 break;
 
             case KABA:
-                kaba.getKabaKey();
+                kaba.synchronise();
                 break;
 
             case MIWA:
@@ -221,7 +234,14 @@ public final class OpenKeyManager {
      * @return boolean
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
-        if (assa == null && salto == null && kaba == null && miwa==null&& entrava==null) return false;
+        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null) {
+            Log.e("Started", "KEY FOUND");
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+            initialize(openKeyCallBack);
+
+        }
+        Log.e("haveKey", "false");
+
         boolean haveKey = false;
         manufacturer = Utilities.getInstance().getManufacturer(context, openKeyCallBack);
         switch (manufacturer) {

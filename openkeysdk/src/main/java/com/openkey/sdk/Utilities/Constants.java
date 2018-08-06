@@ -32,6 +32,7 @@ public class Constants {
 
     public static final String BOOKING = "booking";
     public static final String UNIQUE_NUMBER = "unique_number";
+    public static final String MOBILE_KEY_STATUS = "mobile_key_status";
     public static final String BASE_URL = "base_url";
     public static final String TOKEN = "Token ";
     public static final long SCANNING_TIME = 12000;

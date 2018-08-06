@@ -9,6 +9,7 @@ package com.openkey.sdk.assa;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.assaabloy.mobilekeys.api.ApiConfiguration;
@@ -37,10 +38,9 @@ import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
+import com.openkey.sdk.api.response.invitation_code.InvitationCode;
 import com.openkey.sdk.assa.PayloadHelper.ByteArrayHelper;
-import com.openkey.sdk.assa.inviationcode.AssaInvitationCode;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
-import com.openkey.sdk.singleton.GetGson;
 
 import java.util.List;
 
@@ -68,35 +68,40 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         startSetup();
     }
 
-    private Callback<Object> invitationCodeCallback = new Callback<Object>() {
+    private Callback<InvitationCode> invitationCodeCallback = new Callback<InvitationCode>() {
         @Override
-        public void onResponse(Call<Object> call, retrofit2.Response<Object> response) {
+        public void onResponse(@NonNull Call<InvitationCode> call, retrofit2.Response<InvitationCode> response) {
             if (response.isSuccessful()) {
 
                 if (response.body() != null) {
 
-                    //Check if the response is not null
-                    String codeKey = response.body().toString();
-
-                    if (!(codeKey != null && codeKey.length() > 0))
-                        openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
-
-
-                    AssaInvitationCode responseModel = GetGson.getInstance()
-                            .fromJson(codeKey,
-                                    AssaInvitationCode.class);
-
+//                    String codeKey = response.body().toString();
+//
+//                    if (!(codeKey != null && codeKey.length() > 0))
+//                    {
+//                        openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+//                        return;
+//                    }
+//
+//
+//                    AssaInvitationCode responseModel = GetGson.getInstance()
+//                            .fromJson(codeKey,
+//                                    AssaInvitationCode.class);
+                    InvitationCode responseModel = response.body();
                     //If the invitation code is null then call back return with initialization failed
                     if (!(responseModel != null && responseModel.getData() != null && responseModel.getData().getCode() != null
-                            && responseModel.getData().getCode().getInvitationCode() != null))
+                            && responseModel.getData().getCode().getInvitationCode() != null)) {
                         openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+                    } else {
+                        String invitationCode = responseModel.getData().getCode().getInvitationCode();
+                        Log.e("InvitationCode", ":" + invitationCode);
 
-                    String invitationCode = responseModel.getData().getCode().getInvitationCode();
-                    Log.e("InvitationCode", ":" + invitationCode);
+                        Utilities.getInstance().saveValue(Constants.INVITATION_CODE,
+                                invitationCode, mContext);
+                        startSetup();
+                    }
 
-                    Utilities.getInstance().saveValue(Constants.INVITATION_CODE,
-                            invitationCode, mContext);
-                    startSetup();
+
                 }
 
             } else {
@@ -107,7 +112,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         }
 
         @Override
-        public void onFailure(Call<Object> call, Throwable t) {
+        public void onFailure(Call<InvitationCode> call, Throwable t) {
             openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
 
         }
@@ -161,6 +166,14 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     private void startSetup() {
         // if already personalized then return success
         if (isSetupComplete()) {
+            int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
+                    0, mContext);
+            if (haveKey() && mobileKeyStatusId == 3) {
+                Log.e("haveKey()", ":" + haveKey());
+                openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+                return;
+            }
+
             Api.setPeronalizationComplete(mContext,openKeyCallBack);
         } else {
             String invitationCode = Utilities.getInstance().getValue(Constants.INVITATION_CODE, "", mContext);
@@ -182,7 +195,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      */
     public boolean isSetupComplete() {
         try {
-            Log.e("ASSA", " :SetupCompleted");
+            Log.e("ASSA", " :SetupCompleted " + getMobileKeys().isEndpointSetupComplete());
             return getMobileKeys().isEndpointSetupComplete();
         } catch (MobileKeysException e) {
 
@@ -317,6 +330,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
         final boolean isReaderOpened = openingResult.getOpeningStatus().equals(OpeningStatus.SUCCESS);
         final boolean isLockOpened = isLockOpened(openingResult);
+        responseCallBack(isLockOpened);
+
         if (reader != null && isReaderOpened) {
             if (isLockOpened) {
                 // if lock opened successfully then let user know
@@ -328,7 +343,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             Log.e(TAG, "Reader Opening Failed");
             Api.logSDK(mContext, false);
         }
-        responseCallBack(isLockOpened);
+
     }
 
     /**
@@ -386,6 +401,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                 haveKey = true;
             } else { haveKey = false;  }
         } catch (MobileKeysException e) {
+            Log.e("MobileKeysException", "initializationFailure: " + e.getMessage());
+
             openKeyCallBack.initializationFailure(Response.UNKNOWN);
         }
         return haveKey;
@@ -433,6 +450,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             @Override
             public void handleMobileKeysTransactionFailed(MobileKeysException e) {
                 OpenKeyManager.getInstance(mContext).updateKeyStatus(false);
+                Log.e("handleMobileKeysTransactionFailed", "initializationFailure: " + e.getMessage());
                 openKeyCallBack.initializationFailure(Response.FETCH_KEY_FAILED);
             }
         });
