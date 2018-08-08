@@ -22,11 +22,8 @@ public class Settings {
     // the LC Confirmation methos is for registration method, Possible values are SMS, EMAIL, NONE (custom device ID)
     public static final LcConfirmationMethod lcConfirmationMethod = LcConfirmationMethod.NONE;
 
-    // GCM project ID (push support)
-    public static final String gcm_project_id = "862149074185";
-
     //Used for local storage of data
-    public static final String MY_PREFS_NAME = "DemoAppPrefs";
+    public static final String MY_PREFS_NAME = "OpenkeySDKAppPrefs";
 }
 
 

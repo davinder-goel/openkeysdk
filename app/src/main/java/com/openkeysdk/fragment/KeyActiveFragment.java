@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     // private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
 
     //SALTO
-    private String mToken = "mzhrdelucr72u62zawfufr3ecxkoototo4flmcy6hro36nkjgk3ij6xpfzeblqqu";
+    private String mToken = "cxfuihveoetedkah7vo2kc5ytczdtuxwt5ptlt7rqghwymou4cr2gyomwqychrbm";
 
 
     @Nullable
@@ -183,11 +184,32 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("onDestroy:", "onDestroy:");
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.e("onDestroyView:", "onDestroyView:");
+
+    }
+
     @Override
     public void isKeyAvailable(boolean haveKey, String description) {
-        hideMessage();
-        showToast("DEVICE HAVE KEY " + haveKey);
 
+        if (getActivity()!=null)
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showMessage("");
+                showToast("DONE");
+            }
+        });
     }
 
     public void showToast(String message) {

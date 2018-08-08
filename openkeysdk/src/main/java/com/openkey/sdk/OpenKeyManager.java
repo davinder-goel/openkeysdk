@@ -14,6 +14,7 @@ import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
+import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.assa.ASSA;
 import com.openkey.sdk.entrava.Entrava;
 import com.openkey.sdk.enums.MANUFACTURER;
@@ -21,6 +22,7 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.kaba.Kaba;
 import com.openkey.sdk.miwa.Miwa;
 import com.openkey.sdk.salto.Salto;
+import com.openkey.sdk.singleton.GetBooking;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -70,9 +72,14 @@ public final class OpenKeyManager {
                 throw new NullPointerException(Response.NULL_CONTEXT);
             }
             instance = new OpenKeyManager(context);
+
+            SessionResponse sessionResponse=Utilities.getInstance(context).getBookingFromLocal(context);
+            if (sessionResponse!=null)
+            GetBooking.getInstance().setBooking(sessionResponse);
         }
         return instance;
     }
+
 
 
 

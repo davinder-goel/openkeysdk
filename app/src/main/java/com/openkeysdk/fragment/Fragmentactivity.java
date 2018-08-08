@@ -19,8 +19,8 @@ public class Fragmentactivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        checkPermissions();
         getSupportFragmentManager().beginTransaction().add(R.id.action_container, new KeyActiveFragment(), "").commitAllowingStateLoss();
-        //  checkPermissions();
     }
 
     private void checkPermissions() {

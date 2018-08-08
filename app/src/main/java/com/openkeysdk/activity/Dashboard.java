@@ -54,7 +54,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     //  private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
 
     //SALTO
-    private String mToken = "dveau6syw6wxpakurvfzb7s5eliyqlqcy6k7blnsw7yooukmmcgqvthqyrha4jzi";
+    private String mToken = "wjo7y3nl4zkr563zdoseqmmhkipiy67bkh5lx57y6xrx4bmj7x4p3pe5eb4azqdx";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

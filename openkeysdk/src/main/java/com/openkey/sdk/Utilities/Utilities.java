@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.openkey.sdk.api.response.Status;
 import com.openkey.sdk.api.response.booking.BookingResponse;
+import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.cryptography.SharedPreferencesEncryption;
 import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
@@ -337,7 +338,7 @@ public class Utilities {
      *
      * @param booking {@link com.openkey.sdk.api.response.booking.BookingResponse}
      */
-    public void saveBookingToLocal(Context context, BookingResponse booking) {
+    public void saveBookingToLocal(Context context, SessionResponse booking) {
         Gson gson = new Gson();
         String bookingString = gson.toJson(booking);
         saveValue(Constants.BOOKING, bookingString, context);
@@ -348,11 +349,11 @@ public class Utilities {
     /**
      * Get booking from the saved shared preference
      */
-    public BookingResponse getBookingFromLocal(Context context) {
+    public SessionResponse getBookingFromLocal(Context context) {
         String bookingString = getValue(Constants.BOOKING, "", context);
         if (!TextUtils.isEmpty(bookingString)) {
             Gson gson = GetGson.getInstance();
-            return gson.fromJson(bookingString, BookingResponse.class);
+            return gson.fromJson(bookingString, SessionResponse.class);
         }
         return null;
     }

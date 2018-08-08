@@ -24,11 +24,13 @@ import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.api.service.Services;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
+import com.openkey.sdk.singleton.GetBooking;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Handler;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,7 +52,7 @@ public class Api {
      *
      * @param openKeyCallBack Call back for  response
      */
-    public static void getSession(final Context context, final String token,
+    public static void getSession(final Context context,final String token,
                                   final OpenKeyCallBack openKeyCallBack) {
 
         // Get the retrofit instance
@@ -80,7 +82,8 @@ public class Api {
 
     private static void saveData(SessionResponse bookingResponse, Context context) {
         if (bookingResponse != null && bookingResponse.getData() != null) {
-
+            Utilities.getInstance(context).saveBookingToLocal(context,bookingResponse);
+            GetBooking.getInstance().setBooking(bookingResponse);
             //Saved manufacturer in locally
             if (bookingResponse.getData().getHotel() != null &&
                     bookingResponse.getData().getHotel().getLockVendor() != null &&
@@ -93,6 +96,7 @@ public class Api {
                     bookingResponse.getData().getGuest().getPhone() != null) {
                 // save it locally
                 String phoneNumber = bookingResponse.getData().getGuest().getPhone();
+                phoneNumber=phoneNumber.replace("+","");
                 Utilities.getInstance().saveValue(Constants.UNIQUE_NUMBER, phoneNumber, context);
             }
 
@@ -294,14 +298,15 @@ public class Api {
     public static void setKeyStatus(final Context context, String status) {
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
-        services.setKeyStatus(TOKEN + tokenStr, new KeyStatusRequest(status)).enqueue(new Callback<KeyStatusResponse>() {
+        services.setKeyStatus(TOKEN + tokenStr, new KeyStatusRequest(status))
+                .enqueue(new Callback<Status>() {
             @Override
-            public void onResponse(Call<KeyStatusResponse> call, retrofit2.Response<KeyStatusResponse> response) {
+            public void onResponse(Call<Status> call, retrofit2.Response<Status> response) {
                 Log.e("onResponse", "onResponse");
             }
 
             @Override
-            public void onFailure(Call<KeyStatusResponse> call, Throwable t) {
+            public void onFailure(Call<Status> call, Throwable t) {
                 Log.e("onFailure", "onFailure" + t.getMessage());
             }
         });

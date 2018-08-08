@@ -47,7 +47,11 @@ public final class Salto {
      * Salto require no initial setup, just return the success
      */
     private void startSetup() {
-        Api.setPeronalizationComplete(mContext,openKeyCallBack);
+        int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
+                0, mContext);
+        if (!(haveKey() && mobileKeyStatusId == 3)) {
+            Api.setPeronalizationComplete(mContext,openKeyCallBack);
+        }
     }
 
 

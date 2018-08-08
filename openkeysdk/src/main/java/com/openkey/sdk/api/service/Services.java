@@ -10,6 +10,7 @@ import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
 import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.kaba.response.KabaTokenResponse;
+import com.openkey.sdk.kaba.response.invitationcode.KabaToken;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -54,7 +55,7 @@ public interface Services {
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/initializePersonalization.json")
-    Call<KabaTokenResponse> initializePersonalizationForKaba(@Header("Authorization") String Authorization);
+    Call<KabaToken> initializePersonalizationForKaba(@Header("Authorization") String Authorization);
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
@@ -73,7 +74,7 @@ public interface Services {
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @POST("sdk/v5/sessions/setMobileKeyStatus")
-    Call<KeyStatusResponse> setKeyStatus(@Header("Authorization") String Authorization,
+    Call<Status> setKeyStatus(@Header("Authorization") String Authorization,
                                          @Body KeyStatusRequest keyStatusRequest);
 
     String type = "application/vnd.assaabloy-com.credential-2.3+json";

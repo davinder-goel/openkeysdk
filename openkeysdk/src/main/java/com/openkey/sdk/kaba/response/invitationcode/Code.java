@@ -5,16 +5,16 @@ import com.google.gson.annotations.SerializedName;
 
 public class Code {
 
-    @SerializedName("prepareDirectWalletRegistrationResponse")
-    @Expose
-    private PrepareDirectWalletRegistrationResponse prepareDirectWalletRegistrationResponse;
+@SerializedName("prepareDirectWalletRegistrationResponse")
+@Expose
+private PrepareDirectWalletRegistrationResponse prepareDirectWalletRegistrationResponse;
 
-    public PrepareDirectWalletRegistrationResponse getPrepareDirectWalletRegistrationResponse() {
-        return prepareDirectWalletRegistrationResponse;
-    }
+public PrepareDirectWalletRegistrationResponse getPrepareDirectWalletRegistrationResponse() {
+return prepareDirectWalletRegistrationResponse;
+}
 
-    public void setPrepareDirectWalletRegistrationResponse(PrepareDirectWalletRegistrationResponse prepareDirectWalletRegistrationResponse) {
-        this.prepareDirectWalletRegistrationResponse = prepareDirectWalletRegistrationResponse;
-    }
+public void setPrepareDirectWalletRegistrationResponse(PrepareDirectWalletRegistrationResponse prepareDirectWalletRegistrationResponse) {
+this.prepareDirectWalletRegistrationResponse = prepareDirectWalletRegistrationResponse;
+}
 
 }

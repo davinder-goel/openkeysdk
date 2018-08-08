@@ -450,7 +450,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             @Override
             public void handleMobileKeysTransactionFailed(MobileKeysException e) {
                 OpenKeyManager.getInstance(mContext).updateKeyStatus(false);
-                Log.e("handleMobileKeysTransactionFailed", "initializationFailure: " + e.getMessage());
+                Log.e("handleMobileKeys", "initializationFailure: " + e.getMessage());
                 openKeyCallBack.initializationFailure(Response.FETCH_KEY_FAILED);
             }
         });
