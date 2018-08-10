@@ -58,7 +58,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     // private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
 
     //SALTO
-    private String mToken = "cxfuihveoetedkah7vo2kc5ytczdtuxwt5ptlt7rqghwymou4cr2gyomwqychrbm";
+    private String mToken = "2ynq4vki72mpllxwhurgh7y5cjiofn53qhsgqd7wetu65wgungomwb4kesp7vjgm";
 
 
     @Nullable

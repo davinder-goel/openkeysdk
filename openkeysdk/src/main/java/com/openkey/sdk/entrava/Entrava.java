@@ -20,13 +20,12 @@ import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import java.util.ArrayList;
-
+//
 import kr.co.chahoo.sdk.DoorLockSdk;
 import kr.co.chahoo.sdk.IssueCallback;
 
 public class Entrava {
 
-    private Handler mHandler;
     private Context mContext;
     private DoorLockSdk mDoorLockSdk;
     private PendingIntent mPendingIntent;
@@ -42,18 +41,25 @@ public class Entrava {
 
     private void initialize()
     {
-        requestPermission();
         Intent intent = new Intent(mContext, Entrava.class);
         mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Log.e("mPendingIntent", mPendingIntent + " ");
         IntentFilter mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(DoorLockSdk.ACTION_RESULT);
-        ServiceResult mServiceResultReceiver = new ServiceResult(openKeyCallBack);
 
         DoorLockSdk.initialize(mContext);
         mDoorLockSdk = DoorLockSdk.getInstance(mContext);
         mReferenceIds = mDoorLockSdk.issued();
+        ServiceResult mServiceResultReceiver = new ServiceResult(openKeyCallBack,mDoorLockSdk);
         LocalBroadcastManager.getInstance(mContext).registerReceiver(mServiceResultReceiver, mIntentFilter);
+
+        int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
+                0, mContext);
+        if (haveKey() && mobileKeyStatusId == 3) {
+            Log.e("haveKey()", ":" + haveKey());
+            openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
+            return;
+        }
         Api.setPeronalizationComplete(mContext,openKeyCallBack);
     }
 
@@ -91,35 +97,6 @@ public class Entrava {
         mDoorLockSdk.start(mPendingIntent);
 
     }
-
-    private void requestPermission() {
-        if (mHandler == null) {
-            mHandler = new Handler();
-        }
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Activity activity = (FragmentActivity)mContext;
-                if (ContextCompat.checkSelfPermission(activity,
-                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // Should we show an explanation?
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.BLUETOOTH)) {
-                    } else {
-                        ActivityCompat.requestPermissions(activity, new String[]{
-                                        Manifest.permission.ACCESS_FINE_LOCATION,
-                                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                        Manifest.permission.BLUETOOTH,
-                                        Manifest.permission.BLUETOOTH_ADMIN,
-                                },
-                                10);
-                    }
-                }
-            }
-        }, 500);
-    }
-
 
     /**
      * if device has a key for Imgate

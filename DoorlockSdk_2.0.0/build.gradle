@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('DoorlockSdk_2.0.0.aar'))

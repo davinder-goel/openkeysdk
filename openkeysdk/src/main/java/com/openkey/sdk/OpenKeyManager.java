@@ -165,7 +165,7 @@ public final class OpenKeyManager {
 
             case ENTRAVA:
             case ENTRAVATOUCH:
-                entrava = new Entrava(context, openKeyCallBack);
+                 entrava = new Entrava(context, openKeyCallBack);
                 break;
         }
     }
@@ -247,7 +247,7 @@ public final class OpenKeyManager {
             initialize(openKeyCallBack);
 
         }
-        Log.e("haveKey", "false");
+        Log.e("isKeyAvailable", ":called");
 
         boolean haveKey = false;
         manufacturer = Utilities.getInstance().getManufacturer(context, openKeyCallBack);
@@ -270,7 +270,7 @@ public final class OpenKeyManager {
 
             case ENTRAVA:
             case ENTRAVATOUCH:
-                haveKey = entrava.haveKey();
+                 haveKey = entrava.haveKey();
                 break;
         }
         return haveKey;
@@ -310,7 +310,7 @@ public final class OpenKeyManager {
 
                 case ENTRAVA:
                 case ENTRAVATOUCH:
-                    entrava.startImGateScanningService();
+                   entrava.startImGateScanningService();
                     break;
             }
         } else {
