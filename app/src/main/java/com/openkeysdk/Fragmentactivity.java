@@ -1,4 +1,4 @@
-package com.openkeysdk.fragment;
+package com.openkeysdk;
 
 import android.Manifest;
 import android.app.Activity;
@@ -8,15 +8,13 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
-import com.openkeysdk.R;
-import com.openkeysdk.activity.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Fragmentactivity extends BaseActivity {
+public class Fragmentactivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,10 +80,5 @@ public class Fragmentactivity extends BaseActivity {
             ActivityCompat.requestPermissions(this, missingPermissions.toArray(new String[0]),
                     /* unused because no callback*/ 0);
         }
-    }
-
-    @Override
-    public void sessionFailure(String errorDescription, String errorCode) {
-
     }
 }

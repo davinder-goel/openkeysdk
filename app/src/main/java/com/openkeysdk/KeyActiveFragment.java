@@ -1,15 +1,20 @@
-package com.openkeysdk.activity;
+package com.openkeysdk;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,11 +22,10 @@ import android.widget.Toast;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
-import com.openkeysdk.R;
 
-public class Dashboard extends BaseActivity implements View.OnClickListener {
+public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
-    private static final int MY_PERMISSIONS_REQUEST = 999;
+
     private Button mBtnAuthenciate;
     private Button mBtnIntialize;
     private Button mBtnGetKey;
@@ -31,9 +35,9 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     private BluetoothAdapter mBluetoothAdapter;
     private boolean isScanning;
     private Handler handler;
+    private static final int MY_PERMISSIONS_REQUEST = 999;
 
     private int MOBILE_KEY_STATUES = 0;
-
 
 
     private Runnable stopper = new Runnable() {
@@ -48,32 +52,64 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     //It should not be null
 
     //KABA
-    //private String mToken = "nbdcefbadslr7ezvlxp464rfkjrdrmkkpyh3767drd4a4hs3jaqmlv4cgxpl72tv";
+    private String mToken = "moyy3nmcdgz5ffqmitpovqqjx4circymjpz7rrglr3unrkvrokx7fxan2djmkjsa";
 
     //ASSA
-    //  private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
+    // private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
 
-    //SALTO
-    private String mToken = "wjo7y3nl4zkr563zdoseqmmhkipiy67bkh5lx57y6xrx4bmj7x4p3pe5eb4azqdx";
+    //ENTRAVA
+    //private String mToken = "tis45h2lttofr2c34zvjn3prspzwhuqreb6gy5yidb4x4wphibgz2lqc5leqinhy";
 
+    //MIWA
+    // private String mToken = "djicxibg6mb5mryee6cduzl542ct4fprfqb37pos7gtaeabrk4qlyxrxhn52d7hy";
+
+
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.dashboard);
-        init();
-        listners();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        //startActivity(new Intent(this,MainActivity.class));
+        View view = inflater.inflate(R.layout.dashboard, container, false);
+        init(view);
+        listners();
+        requestPermission();
+        return view.getRootView();
     }
 
-    public void init() {
+
+    private void requestPermission() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Activity activity = getActivity();
+                if (ContextCompat.checkSelfPermission(activity,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // Should we show an explanation?
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.BLUETOOTH)) {
+                    } else {
+                        ActivityCompat.requestPermissions(activity, new String[]{
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                        Manifest.permission.BLUETOOTH,
+                                        Manifest.permission.BLUETOOTH_ADMIN,
+                                },
+                                10);
+                    }
+                }
+            }
+        }, 500);
+    }
+
+
+    public void init(View view) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBtnAuthenciate = findViewById(R.id.buttonAuthenciate);
-        mBtnIntialize = findViewById(R.id.buttonIntialize);
-        mBtnGetKey = findViewById(R.id.buttonGetKey);
-        mBtnScan = findViewById(R.id.buttonOpenDoor);
-        mEdtTextToken = findViewById(R.id.editTextSdkToken);
-        mTextStatus = findViewById(R.id.textViewStatus);
+        mBtnAuthenciate = view.findViewById(R.id.buttonAuthenciate);
+        mBtnIntialize = view.findViewById(R.id.buttonIntialize);
+        mBtnGetKey = view.findViewById(R.id.buttonGetKey);
+        mBtnScan = view.findViewById(R.id.buttonOpenDoor);
+        mEdtTextToken = view.findViewById(R.id.editTextSdkToken);
+        mTextStatus = view.findViewById(R.id.textViewStatus);
     }
 
     public void listners() {
@@ -90,7 +126,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
         isScanning = true;
         handler = new Handler();
         handler.postDelayed(stopper, 10000);
-        OpenKeyManager.getInstance(this).startScanning(this);
+        OpenKeyManager.getInstance(getActivity()).startScanning(this);
     }
 
     /**
@@ -114,10 +150,9 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        OpenKeyManager.getInstance(Dashboard.this).getSession(mToken,
-                this);
+        //OpenKeyManager.getInstance(getActivity()).getSession(mToken,this);
     }
 
     public void keyStatus() {
@@ -129,12 +164,12 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
         switch (MOBILE_KEY_STATUES) {
             case 3:
                 //If the key status is delivered and device have key then it will not call initialize
-                if (!OpenKeyManager.getInstance(this).isKeyAvailable(this))
-                    OpenKeyManager.getInstance(this).initialize(this);
+                if (!OpenKeyManager.getInstance(getActivity()).isKeyAvailable(this))
+                    OpenKeyManager.getInstance(getActivity()).initialize(this);
                 break;
 
             default:
-                    OpenKeyManager.getInstance(this).initialize(this);
+                OpenKeyManager.getInstance(getActivity()).initialize(this);
                 break;
         }
     }
@@ -150,8 +185,15 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     }
 
 
+//    @Override
+//    public void sessionFailure(String errorDescription) {
+//        hideMessage();
+//        showToast("Booking not found");
+//    }
+
+
     @Override
-    public void sessionFailure(String errorDescription, String code) {
+    public void sessionFailure(String errorDescription, String errorCode) {
         hideMessage();
         showToast("Booking not found");
     }
@@ -159,7 +201,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
     @Override
     public void initializationSuccess() {
         hideMessage();
-        OpenKeyManager.getInstance(this).getKey(this);
+        OpenKeyManager.getInstance(getActivity()).getKey(this);
     }
 
     @Override
@@ -170,7 +212,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void stopScan(boolean isLockOpened, String description) {
-        runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 hideMessage();
@@ -179,30 +221,51 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
 
     }
 
+
     @Override
-    public void isKeyAvailable(boolean haveKey, String description) {
-        hideMessage();
-        showToast("DEVICE HAVE KEY " + haveKey);
+    public void onDestroy() {
+        super.onDestroy();
+        Log.e("onDestroy:", "onDestroy:");
 
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.e("onDestroyView:", "onDestroyView:");
+
+    }
+
+    @Override
+    public void isKeyAvailable(boolean haveKey, String description) {
+
+        if (getActivity()!=null)
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showMessage("");
+                showToast("DONE");
+            }
+        });
+    }
+
     public void showToast(String message) {
-        Toast.makeText(Dashboard.this, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 
 
     public void openDoor() {
         // Required for SDK
-        if (ContextCompat.checkSelfPermission(this,
+        if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_PERMISSIONS_REQUEST);
             return;
         }
 
-        if (OpenKeyManager.getInstance(this).isKeyAvailable
+        if (OpenKeyManager.getInstance(getActivity()).isKeyAvailable
                 (this)) {
             if (mBluetoothAdapter.enable()) {
                 showMessage("Scanning..");
@@ -223,19 +286,19 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
                 mEdtTextToken.setText(mToken);
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance(Dashboard.this).getSession(mToken,
+                    OpenKeyManager.getInstance(getActivity()).getSession(mToken,
                             this);
                 }
                 break;
 
             case R.id.buttonIntialize:
                 showMessage("Initializing...");
-                OpenKeyManager.getInstance(Dashboard.this).initialize(this);
+                OpenKeyManager.getInstance(getActivity()).initialize(this);
                 break;
 
             case R.id.buttonGetKey:
                 showMessage("Fetching key...");
-                OpenKeyManager.getInstance(Dashboard.this).getKey(this);
+                OpenKeyManager.getInstance(getActivity()).getKey(this);
                 break;
 
             case R.id.buttonOpenDoor:

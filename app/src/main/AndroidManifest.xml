@@ -34,7 +34,7 @@
         android:roundIcon="@drawable/ic_app_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".fragment.Fragmentactivity">
+        <activity android:name=".Fragmentactivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
