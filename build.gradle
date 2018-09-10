@@ -20,6 +20,7 @@ allprojects {
         jcenter()
         flatDir {
             dirs 'libs'
+            dirs project(':openkeysdk').file('libs')
         }
     }
 }

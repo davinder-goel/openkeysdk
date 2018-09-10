@@ -14,6 +14,9 @@ public class LockVendor {
     @SerializedName("created")
     @Expose
     private String created;
+    @SerializedName("video_url")
+    @Expose
+    private String videoUrl;
     @SerializedName("modified")
     @Expose
     private String modified;
@@ -43,6 +46,14 @@ public class LockVendor {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 
     public String getModified() {

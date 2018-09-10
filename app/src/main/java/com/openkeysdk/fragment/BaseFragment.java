@@ -19,9 +19,10 @@ public class BaseFragment extends Fragment implements OpenKeyCallBack {
     }
 
     @Override
-    public void sessionFailure(String errorDescription) {
+    public void sessionFailure(String errorDescription, String errorCode) {
 
     }
+
 
     @Override
     public void initializationFailure(String errorDescription) {

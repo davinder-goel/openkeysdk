@@ -17,8 +17,8 @@ import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.model.KeyStatusRequest;
 import com.openkey.sdk.api.model.SdkLogRequest;
 import com.openkey.sdk.api.response.Mobile_key_status.KeyStatusResp;
-import com.openkey.sdk.api.response.Status;
 import com.openkey.sdk.api.response.key_status.KeyStatusResponse;
+import com.openkey.sdk.api.response.logaction.LogActionResponse;
 import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
 import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
@@ -30,7 +30,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Handler;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,7 +51,7 @@ public class Api {
      *
      * @param openKeyCallBack Call back for  response
      */
-    public static void getSession(final Context context,final String token,
+    public static void getSession(final Context context, final String token,
                                   final OpenKeyCallBack openKeyCallBack) {
 
         // Get the retrofit instance
@@ -67,22 +66,20 @@ public class Api {
                     openKeyCallBack.session(response.body());
                 } else {
                     // get the error message from the response and return it to the callback
-                    openKeyCallBack.sessionFailure(Response.BOOKING_NOT_FOUNT);
+                    openKeyCallBack.sessionFailure(Response.BOOKING_NOT_FOUNT, response.code() + "");
                 }
             }
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
-                openKeyCallBack.sessionFailure(Response.UNKNOWN);
+                openKeyCallBack.sessionFailure(Response.UNKNOWN, "");
             }
         });
     }
 
-
-
     private static void saveData(SessionResponse bookingResponse, Context context) {
         if (bookingResponse != null && bookingResponse.getData() != null) {
-            Utilities.getInstance(context).saveBookingToLocal(context,bookingResponse);
+            Utilities.getInstance(context).saveBookingToLocal(context, bookingResponse);
             GetBooking.getInstance().setBooking(bookingResponse);
             //Saved manufacturer in locally
             if (bookingResponse.getData().getHotel() != null &&
@@ -96,7 +93,7 @@ public class Api {
                     bookingResponse.getData().getGuest().getPhone() != null) {
                 // save it locally
                 String phoneNumber = bookingResponse.getData().getGuest().getPhone();
-                phoneNumber=phoneNumber.replace("+","");
+                phoneNumber = phoneNumber.replace("+", "");
                 Utilities.getInstance().saveValue(Constants.UNIQUE_NUMBER, phoneNumber, context);
             }
 
@@ -186,21 +183,20 @@ public class Api {
     /**
      * @param context application's context
      */
-    public static void logSDK(final Context context, boolean isDoorOpened) {
-
-        String timeStamp = getDateTime("yyyy:MM:dd HH:mm:ss");
+    public static void logSDK(final Context context, int isDoorOpened) {
 
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
-        services.logSDK("Bearer " + tokenStr, new SdkLogRequest("Bearer " + tokenStr, "door-open-attempt", isDoorOpened,
-                timeStamp, "no reason")).enqueue(new Callback<Status>() {
+
+        services.logSDK(TOKEN + tokenStr, new SdkLogRequest("door-opened",
+                isDoorOpened)).enqueue(new Callback<LogActionResponse>() {
             @Override
-            public void onResponse(Call<Status> call, retrofit2.Response<Status> response) {
+            public void onResponse(Call<LogActionResponse> call, retrofit2.Response<LogActionResponse> response) {
                 Log.e("OnResponse", "Lock Opened Successfully");
             }
 
             @Override
-            public void onFailure(Call<Status> call, Throwable t) {
+            public void onFailure(Call<LogActionResponse> call, Throwable t) {
                 Log.e("onFailure", "Lock Opened Failed");
             }
         });
@@ -227,6 +223,8 @@ public class Api {
                         openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
 
                     Log.e(TAG, "Personalization Status updated on server");
+                } else if (response.code() == 403) {
+                    openKeyCallBack.initializationFailure("403");
                 } else {
                     // tell user, startSetup is success
                     openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
@@ -240,6 +238,22 @@ public class Api {
                 Log.e(TAG, "Personalization Status failed to update on server");
             }
         });
+    }
+
+    /**
+     * @param context
+     * @param callback
+     */
+    @SuppressWarnings("unchecked")
+    public static void setInitializePersonalizationForKaba(final Context context, final Callback callback
+            , OpenKeyCallBack openKeyCallBack) {
+        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
+
+        if (context == null || tokenStr == null && openKeyCallBack != null)
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+
+        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
+        services.initializePersonalizationForKaba(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
 
 
@@ -262,30 +276,28 @@ public class Api {
 
 
     /**
-     * @param context
-     * @param callback
-     */
-    @SuppressWarnings("unchecked")
-    public static void setInitializePersonalizationForKaba(final Context context, final Callback callback
-            , OpenKeyCallBack openKeyCallBack) {
-        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
-
-        if (context == null || tokenStr == null && openKeyCallBack != null)
-            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
-
-        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
-        services.initializePersonalizationForKaba(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
-    }
-
-
-    /**
+     *
      * @param context
      * @param callback
      */
     @SuppressWarnings("unchecked")
     public static void getBooking(final Context context, String tokenStr, final Callback callback) {
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
-        services.getSession(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
+        //  services.getSession(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
+        services.getSession(TOKEN + tokenStr).enqueue(new Callback<SessionResponse>() {
+            @Override
+            public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse> response) {
+                if (response.isSuccessful())
+                    saveData(response.body(), context);
+
+                callback.onResponse(call, response);
+            }
+
+            @Override
+            public void onFailure(Call<SessionResponse> call, Throwable t) {
+                callback.onFailure(call, t);
+            }
+        });
     }
 
     /**
@@ -298,15 +310,14 @@ public class Api {
     public static void setKeyStatus(final Context context, String status) {
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
-        services.setKeyStatus(TOKEN + tokenStr, new KeyStatusRequest(status))
-                .enqueue(new Callback<Status>() {
+        services.setKeyStatus(TOKEN + tokenStr, new KeyStatusRequest(status)).enqueue(new Callback<KeyStatusResponse>() {
             @Override
-            public void onResponse(Call<Status> call, retrofit2.Response<Status> response) {
+            public void onResponse(Call<KeyStatusResponse> call, retrofit2.Response<KeyStatusResponse> response) {
                 Log.e("onResponse", "onResponse");
             }
 
             @Override
-            public void onFailure(Call<Status> call, Throwable t) {
+            public void onFailure(Call<KeyStatusResponse> call, Throwable t) {
                 Log.e("onFailure", "onFailure" + t.getMessage());
             }
         });

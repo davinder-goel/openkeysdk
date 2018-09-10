@@ -32,6 +32,9 @@ public class Hotel {
     @SerializedName("address")
     @Expose
     private String address;
+    @SerializedName("phone")
+    @Expose
+    private String phone;
     @SerializedName("timezone")
     @Expose
     private String timezone;
@@ -133,6 +136,14 @@ public class Hotel {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getTimezone() {

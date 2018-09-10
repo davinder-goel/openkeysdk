@@ -45,7 +45,28 @@ public final class OpenKeyManager {
     private Kaba kaba;
     private Entrava entrava;
     private Miwa miwa;
-    public static volatile OpenKeyCallBack mOpenKeyCallBack;
+    private OpenKeyCallBack mOpenKeyCallBack;
+    /*
+     * Getting mobile key from server, If the key is issued from backend then start syncing
+     * process
+     * */
+    private Callback getKeyCallback = new Callback() {
+        @Override
+        public void onResponse(Call call, retrofit2.Response response) {
+            if (response.isSuccessful()) {
+                startSync();
+            } else {
+                if (mOpenKeyCallBack != null)
+                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+            }
+        }
+
+        @Override
+        public void onFailure(Call call, Throwable t) {
+            if (mOpenKeyCallBack != null)
+                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+        }
+    };
 
     /**
      * Access to this class can only be provided by this class
@@ -73,16 +94,12 @@ public final class OpenKeyManager {
             }
             instance = new OpenKeyManager(context);
 
-            SessionResponse sessionResponse=Utilities.getInstance(context).getBookingFromLocal(context);
-            if (sessionResponse!=null)
-            GetBooking.getInstance().setBooking(sessionResponse);
+            SessionResponse sessionResponse = Utilities.getInstance(context).getBookingFromLocal(context);
+            if (sessionResponse != null)
+                GetBooking.getInstance().setBooking(sessionResponse);
         }
         return instance;
     }
-
-
-
-
     /**
      * @param authToken
      * @param openKeyCallBack Call back for response purpose
@@ -91,30 +108,8 @@ public final class OpenKeyManager {
         if (authToken != null && authToken.length() > 0 && context != null)
             Api.getSession(context, authToken, openKeyCallBack);
         else
-            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE);
+            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
     }
-
-    /*
-     * Getting mobile key from server, If the key is issued from backend then start syncing
-     * process
-     * */
-    private Callback getKeyCallback = new Callback() {
-        @Override
-        public void onResponse(Call call, retrofit2.Response response) {
-            if (response.isSuccessful()) {
-                startSync();
-            } else {
-                if (mOpenKeyCallBack != null)
-                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-            }
-        }
-
-        @Override
-        public void onFailure(Call call, Throwable t) {
-            if (mOpenKeyCallBack != null)
-                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-        }
-    };
 
     /**
      * @param authToken
@@ -133,7 +128,7 @@ public final class OpenKeyManager {
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
 
         if (context == null) {
-            Log.e("context", "initializationFailure");
+            Log.e("context", "null");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
         }
@@ -165,7 +160,7 @@ public final class OpenKeyManager {
 
             case ENTRAVA:
             case ENTRAVATOUCH:
-                 entrava = new Entrava(context, openKeyCallBack);
+                entrava = new Entrava(context, openKeyCallBack);
                 break;
         }
     }
@@ -242,13 +237,11 @@ public final class OpenKeyManager {
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
         if (assa == null && salto == null && kaba == null && miwa == null && entrava == null) {
-            Log.e("Started", "KEY FOUND");
+            Log.e("Started", "INITIALIZATION_FAILED");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             initialize(openKeyCallBack);
 
         }
-        Log.e("isKeyAvailable", ":called");
-
         boolean haveKey = false;
         manufacturer = Utilities.getInstance().getManufacturer(context, openKeyCallBack);
         switch (manufacturer) {
@@ -270,7 +263,7 @@ public final class OpenKeyManager {
 
             case ENTRAVA:
             case ENTRAVATOUCH:
-                 haveKey = entrava.haveKey();
+                haveKey = entrava.haveKey();
                 break;
         }
         return haveKey;
@@ -310,10 +303,11 @@ public final class OpenKeyManager {
 
                 case ENTRAVA:
                 case ENTRAVATOUCH:
-                   entrava.startImGateScanningService();
+                    entrava.startImGateScanningService();
                     break;
             }
         } else {
+            Log.e("Manager", "called");
             openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
         }
     }

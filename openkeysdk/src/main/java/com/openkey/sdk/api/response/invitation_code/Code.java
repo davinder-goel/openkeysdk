@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Code {
-
     @SerializedName("endpointId")
     @Expose
     private String endpointId;
@@ -27,5 +26,4 @@ public class Code {
     public void setInvitationCode(String invitationCode) {
         this.invitationCode = invitationCode;
     }
-
 }

@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">OpenKey SDK</string>
+    <string name="app_name">Android_openkeySdk</string>
+
     <string name="seos_hce_aid_description">Access Control</string>
     <string name="seos_hce_description" translateable="false">Seos</string>
 
@@ -40,4 +41,9 @@
     <string name="error_154">Standard Key: Key is an opening key, but the lock is dead bolted and the key cannot override it.</string>
     <string name="error_178">Standard Key: The key is new and is identified as a pre-reg key which will not work until its check-in date and time. If desired, replace key with a new key.</string>
     <string name="error_255">Generic Error</string>
+
+
+    <string name="unlock_notification_title">Mobile Access is running</string>
+    <string name="notification_channel_name_informative">Running foreground scan service</string>
+
 </resources>

@@ -7,6 +7,7 @@
  */
 package com.openkey.sdk.assa;
 
+import android.app.Notification;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -60,14 +61,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     private Context mContext;
     private ReaderConnectionCallback readerConnectionCallback;
     private Handler mHandlerStopScanning;
-
-    public ASSA(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
-        this.openKeyCallBack = OpenKeyCallBack;
-        this.mContext = mContext;
-        initializeMobileKeysApi();
-        startSetup();
-    }
-
     private Callback<InvitationCode> invitationCodeCallback = new Callback<InvitationCode>() {
         @Override
         public void onResponse(@NonNull Call<InvitationCode> call, retrofit2.Response<InvitationCode> response) {
@@ -125,6 +118,13 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         }
     };
 
+    public ASSA(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
+        this.openKeyCallBack = OpenKeyCallBack;
+        this.mContext = mContext;
+        initializeMobileKeysApi();
+        startSetup();
+    }
+
     /**
      * Configure and initialize the ASSA SDK
      */
@@ -171,10 +171,14 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             if (haveKey() && mobileKeyStatusId == 3) {
                 Log.e("haveKey()", ":" + haveKey());
                 openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
-                return;
+            } else {
+                if (mobileKeyStatusId == 1) {
+                    Api.setPeronalizationComplete(mContext, openKeyCallBack);
+                } else {
+                    openKeyCallBack.initializationSuccess();
+                }
             }
 
-            Api.setPeronalizationComplete(mContext,openKeyCallBack);
         } else {
             String invitationCode = Utilities.getInstance().getValue(Constants.INVITATION_CODE, "", mContext);
             if (invitationCode.length() > 0) {
@@ -235,8 +239,10 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             @Override
             public void handleMobileKeysTransactionFailed(MobileKeysException e) {
                 Log.e("personalize", "failed");
+                Utilities.getInstance().saveValue(Constants.INVITATION_CODE, "", mContext);
+                startSetup();
                 // tell user , startSetup is failure
-                openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+//                openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             }
         }, personalizationCode);
     }
@@ -331,18 +337,22 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         final boolean isReaderOpened = openingResult.getOpeningStatus().equals(OpeningStatus.SUCCESS);
         final boolean isLockOpened = isLockOpened(openingResult);
         responseCallBack(isLockOpened);
+        Log.e("ASSA isLockOpened", isLockOpened + "");
+        Log.e("ASSA isReaderOpened", isReaderOpened + "");
+        Log.e("ASSA openingResult", openingResult + "");
 
         if (reader != null && isReaderOpened) {
             if (isLockOpened) {
                 // if lock opened successfully then let user know
                 // save door opened log on server
                 Log.e(TAG, "Lock Opened Successfully");
-                Api.logSDK(mContext, true);
+                Api.logSDK(mContext, 1);
             }
         } else {
             Log.e(TAG, "Reader Opening Failed");
-            Api.logSDK(mContext, false);
+//            Api.logSDK(mContext, 0);
         }
+        Utilities.getInstance().vibrate(mContext);
 
     }
 
@@ -368,7 +378,14 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      * reader(Locks) and communicate with them if found one
      */
     public void startScanning() {
-        getReaderConnectionController().startScanning();
+        Log.d(TAG, "Starting BLE service and enabling HCE");
+        ReaderConnectionController controller = mobileKeysFactory.getReaderConnectionController();
+        // ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
+        controller.enableHce();
+        Notification notification = UnlockNotification.create(mContext);
+        controller.startForegroundScanning(notification);
+
+        // getReaderConnectionController().startScanning();
         mHandlerStopScanning = new Handler();
         mHandlerStopScanning.postDelayed(scanningStopCallBack, SCANNING_TIME);
     }
@@ -377,8 +394,11 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      * Stop looking for locks
      */
     private void stopScanning() {
+        ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
+        controller.stopScanning();
+        controller.disableHce();
         responseCallBack(false);
-        getReaderConnectionController().stopScanning();
+//        getReaderConnectionController().stopScanning();
     }
 
     /**
@@ -417,8 +437,14 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      */
     private boolean isLockOpened(OpeningResult result) {
         byte[] payload = result.getStatusPayload();
+        Log.e("ASSA payload", payload + " ");
+        Log.e("ASSA getOpeningStatus", result.getOpeningStatus() + " ");
+        Log.e("ASSA opening type", result.getOpeningType() + " ");
+
         if (ByteArrayHelper.containsData(payload)) {
+            Log.e("ASSA containsData", "containsData ");
             if (ByteArrayHelper.didUnlock(payload)) {
+                Log.e("ASSA didUnlock", "didUnlock ");
                 return true;
             }
         }
@@ -450,7 +476,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             @Override
             public void handleMobileKeysTransactionFailed(MobileKeysException e) {
                 OpenKeyManager.getInstance(mContext).updateKeyStatus(false);
-                Log.e("handleMobileKeys", "initializationFailure: " + e.getMessage());
+                Log.e("handleMobileKeysTransactionFailed", "initializationFailure: " + e.getMessage());
                 openKeyCallBack.initializationFailure(Response.FETCH_KEY_FAILED);
             }
         });

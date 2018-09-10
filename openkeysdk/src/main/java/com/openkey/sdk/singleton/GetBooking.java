@@ -1,7 +1,6 @@
 package com.openkey.sdk.singleton;
 
 
-import com.openkey.sdk.api.response.booking.BookingResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
 
 /**

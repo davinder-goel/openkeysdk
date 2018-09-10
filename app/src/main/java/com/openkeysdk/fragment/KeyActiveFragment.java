@@ -1,6 +1,7 @@
 package com.openkeysdk.fragment;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,7 +27,6 @@ import com.openkeysdk.R;
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
 
-    private static final int MY_PERMISSIONS_REQUEST = 999;
     private Button mBtnAuthenciate;
     private Button mBtnIntialize;
     private Button mBtnGetKey;
@@ -36,6 +36,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     private BluetoothAdapter mBluetoothAdapter;
     private boolean isScanning;
     private Handler handler;
+    private static final int MY_PERMISSIONS_REQUEST = 999;
 
     private int MOBILE_KEY_STATUES = 0;
 
@@ -52,13 +53,16 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //It should not be null
 
     //KABA
-    //private String mToken = "nbdcefbadslr7ezvlxp464rfkjrdrmkkpyh3767drd4a4hs3jaqmlv4cgxpl72tv";
+    private String mToken = "moyy3nmcdgz5ffqmitpovqqjx4circymjpz7rrglr3unrkvrokx7fxan2djmkjsa";
 
     //ASSA
     // private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
 
-    //SALTO
-    private String mToken = "2ynq4vki72mpllxwhurgh7y5cjiofn53qhsgqd7wetu65wgungomwb4kesp7vjgm";
+    //ENTRAVA
+    //private String mToken = "tis45h2lttofr2c34zvjn3prspzwhuqreb6gy5yidb4x4wphibgz2lqc5leqinhy";
+
+    //MIWA
+    // private String mToken = "djicxibg6mb5mryee6cduzl542ct4fprfqb37pos7gtaeabrk4qlyxrxhn52d7hy";
 
 
     @Nullable
@@ -68,7 +72,34 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         View view = inflater.inflate(R.layout.dashboard, container, false);
         init(view);
         listners();
+        requestPermission();
         return view.getRootView();
+    }
+
+
+    private void requestPermission() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Activity activity = getActivity();
+                if (ContextCompat.checkSelfPermission(activity,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // Should we show an explanation?
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.BLUETOOTH)) {
+                    } else {
+                        ActivityCompat.requestPermissions(activity, new String[]{
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                        Manifest.permission.BLUETOOTH,
+                                        Manifest.permission.BLUETOOTH_ADMIN,
+                                },
+                                10);
+                    }
+                }
+            }
+        }, 500);
     }
 
 
@@ -155,8 +186,15 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     }
 
 
+//    @Override
+//    public void sessionFailure(String errorDescription) {
+//        hideMessage();
+//        showToast("Booking not found");
+//    }
+
+
     @Override
-    public void sessionFailure(String errorDescription) {
+    public void sessionFailure(String errorDescription, String errorCode) {
         hideMessage();
         showToast("Booking not found");
     }

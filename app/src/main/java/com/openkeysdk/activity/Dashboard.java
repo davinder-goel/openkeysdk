@@ -151,7 +151,7 @@ public class Dashboard extends BaseActivity implements View.OnClickListener {
 
 
     @Override
-    public void sessionFailure(String errorDescription) {
+    public void sessionFailure(String errorDescription, String code) {
         hideMessage();
         showToast("Booking not found");
     }

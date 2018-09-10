@@ -49,13 +49,19 @@ public final class Salto {
     private void startSetup() {
         int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
                 0, mContext);
-        if (!(haveKey() && mobileKeyStatusId == 3)) {
-            Api.setPeronalizationComplete(mContext,openKeyCallBack);
+        if (haveKey() && mobileKeyStatusId == 3) {
+            openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
+        } else {
+            if (mobileKeyStatusId == 1) {
+                /**
+                 * Update the status on server that Registration Complete has been completed on Kaba server
+                 */
+                Api.setPeronalizationComplete(mContext, openKeyCallBack);
+            } else {
+                openKeyCallBack.initializationSuccess();
+            }
         }
     }
-
-
-
 
     /**
      * check if device have keys
@@ -129,10 +135,10 @@ public final class Salto {
                         final boolean isSuccess = authResult == IMasterDeviceManagerApi.AUTH_SUCCESS_ACCESS_GRANTED;
                         if (isSuccess) {
                             openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
-                            Api.logSDK(mContext, true);
+                            Api.logSDK(mContext, 1);
                         } else {
                             openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-                            Api.logSDK(mContext, false);
+//                            Api.logSDK(mContext, 0);
                         }
                     }
 
@@ -140,19 +146,19 @@ public final class Salto {
                     public void onFailure(SaltoException e) {
                         e.printStackTrace();
                         openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-                        Api.logSDK(mContext, false);
+//                        Api.logSDK(mContext, 0);
                     }
                 });
 
             } catch (SaltoException e) {
                 openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-                Api.logSDK(mContext, false);
+//                Api.logSDK(mContext, 0);
                 e.printStackTrace();
             }
         } else {
             // if key is not decrypted by any  reason then show key error
             openKeyCallBack.stopScan(false, Response.KEY_NOT_CORRECT);
-            Api.logSDK(mContext, false);
+//            Api.logSDK(mContext, 0);
         }
     }
 }

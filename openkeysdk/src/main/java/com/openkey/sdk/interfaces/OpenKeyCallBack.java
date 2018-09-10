@@ -25,7 +25,7 @@ public interface OpenKeyCallBack {
      */
     void initializationSuccess();
 
-    void sessionFailure(String errorDescription);
+    void sessionFailure(String errorDescription, String errorCode);
 
     /**
      * If setting up the device has been failed
