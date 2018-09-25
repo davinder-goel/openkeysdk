@@ -11,6 +11,9 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+        /*ndk {
+            abiFilters "armeabi"
+        }*/
     }
     buildTypes {
         release {
@@ -52,7 +55,11 @@ dependencies {
  /*   implementation 'com.google.android.gms:play-services-gcm:11.8.0'*/
     implementation 'com.google.android.gms:play-services-gcm:15.0.1'
     implementation files('libs/LEGIC-Mobile-SDK-Android-V2.0.9.0.jar')
-    implementation(name:'Alv2Service', ext:'aar')
-    implementation(name:'DoorlockApi_2.5.0', ext:'aar')
-    implementation(name:'DoorlockSdk_2.0.0', ext:'aar')
+   /* implementation(name:'Alv2Service', ext:'aar')*/
+ /*   implementation(name:'DoorlockApi_2.5.0', ext:'aar')
+    implementation(name:'DoorlockSdk_2.0.0', ext:'aar')*/
+    implementation files('libs/DoorlockApi_2.5.0.jar')
+    implementation files('libs/DoorlockSdk_2.0.0.jar')
+    implementation files('libs/miwa.jar')
+
 }

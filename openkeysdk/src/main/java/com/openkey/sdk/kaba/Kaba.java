@@ -438,7 +438,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     }
 
     private void activateFile() {
-
+        isLoginActionFired = true;
         Log.e("Kaba", "Activate file index ");
 
         try {

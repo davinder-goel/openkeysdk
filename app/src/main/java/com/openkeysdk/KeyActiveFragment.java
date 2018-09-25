@@ -52,16 +52,16 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //It should not be null
 
     //KABA
-    private String mToken = "moyy3nmcdgz5ffqmitpovqqjx4circymjpz7rrglr3unrkvrokx7fxan2djmkjsa";
+    // private String mToken = "cadk4grxflw55h5y7wpjclyiqcnea7jklvevtax6jh2cdjxauayrlei3ykk6edj4";
 
     //ASSA
-    // private String mToken = "cqeevtgne7lchpcy24td22oc7m4qqvy4rsf3fjd7g5o6zkcvpcszhzax5wprcl72";
+    //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    //private String mToken = "tis45h2lttofr2c34zvjn3prspzwhuqreb6gy5yidb4x4wphibgz2lqc5leqinhy";
+    private String mToken = "p7cwvrrr6va4juij5qonccxvvb2b7bksiy3a7ld5hyr3oojawv7bj2ofcan24cjl";
 
     //MIWA
-    // private String mToken = "djicxibg6mb5mryee6cduzl542ct4fprfqb37pos7gtaeabrk4qlyxrxhn52d7hy";
+    //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
 
 
     @Nullable

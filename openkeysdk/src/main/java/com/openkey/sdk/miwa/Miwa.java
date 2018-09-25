@@ -40,6 +40,7 @@ public class Miwa {
     private Alv2Key selectedKey;
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
+    private boolean isDoorOpenedLogged;
     private BroadcastReceiver receiverMiwa = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -58,7 +59,9 @@ public class Miwa {
      */
     private void setUpMiwa() {
         try {
+            Log.e("loadKeyData", "loadKeyData" + isDoorOpenedLogged);
             loadKeyData();
+
             alv2 = new Alv2ServiceStart(mContext, SERIAL);
             IntentFilter filter = new IntentFilter(Alv2Service.ACTION_NOTIFY);
             mContext.registerReceiver(receiverMiwa, filter);
@@ -87,6 +90,8 @@ public class Miwa {
             List<Alv2Key> list = Alv2Key.list(sql);
             if (list != null && list.size() > 0) {
                 selectedKey = list.get(0);
+                Log.e("isDoorOpenedLogged", "loadKeyData" + isDoorOpenedLogged);
+                isDoorOpenedLogged = true;
             }
         } finally {
             db.close();
@@ -148,6 +153,7 @@ public class Miwa {
         } finally {
             db.close();
         }
+        Log.e("loadKeyData", "Alv2KeyDb" + isDoorOpenedLogged);
         loadKeyData();
     }
 
@@ -166,6 +172,8 @@ public class Miwa {
     public void startScanning()
     {
         if (deviceHasMiwaKey()) {
+            Log.e("startScanning", "deviceHasMiwaKey" + isDoorOpenedLogged);
+            isDoorOpenedLogged = true;
             Log.e("startScanning", "deviceHasMiwaKey");
             alv2.startAuth(selectedKey.get_id(), ALV2_RSSI, RDFL_RSSI, TIMEOUT);
         } else {
@@ -190,6 +198,7 @@ public class Miwa {
                 if (code == Alv2ResultCode.SUCCESS) {
                     long id = intent.getLongExtra(Alv2Service.EXT_KEY_ID, 0);
                     Log.d(TAG, String.format(Locale.US, "SUCCESS: id=%d", id));
+                    Log.e("loadKeyData", "Alv2KeyDb RECV_RES" + isDoorOpenedLogged);
                     loadKeyData();
                 }
                 //showResult(code);
@@ -198,7 +207,11 @@ public class Miwa {
             case Alv2NotifyType.AUTH_RES: {
                 if (code == Alv2ResultCode.SUCCESS) {
                     openKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
-                    Api.logSDK(mContext, 1);
+                    if (isDoorOpenedLogged) {
+                        Log.e("open", "SUCCESS");
+                        isDoorOpenedLogged = false;
+                        Api.logSDK(mContext, 1);
+                    }
                 } else {
                     openKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
 //                    Api.logSDK(mContext, 0);
@@ -218,6 +231,7 @@ public class Miwa {
         } finally {
             db.close();
         }
+        Log.e("loadKeyData", "delAllKey" + isDoorOpenedLogged);
         loadKeyData();
     }
 
