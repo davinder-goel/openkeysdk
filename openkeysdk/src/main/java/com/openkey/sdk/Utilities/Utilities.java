@@ -291,10 +291,9 @@ public class Utilities {
 
         String url=Constants.BASE_URL_DEV;
 
-//        if (context!=null)
-//        {
-//            url=Utilities.getInstance().getValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
-//        }
+        if (context!=null)
+            url=Utilities.getInstance().getValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
+
         // add logging as last interceptor
 //        httpClient.addInterceptor(logging);
         retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())

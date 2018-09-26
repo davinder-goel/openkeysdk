@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Gradle: openkeysdk-release:@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/salto-justinmobile-sdk.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/DoorlockApi_2.5.0.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/LEGIC-Mobile-SDK-Android-V2.0.9.0.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/classes-2.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/salto-justinkey-sdk-0.2.15.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/LEGIC-Mobile-SDK-Android-V2.0.9.0-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/miwa.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/4f5456f9014c4e462f9f1dea8c615cda/jars/libs/DoorlockSdk_2.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

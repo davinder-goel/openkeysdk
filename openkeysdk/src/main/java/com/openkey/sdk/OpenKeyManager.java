@@ -100,21 +100,48 @@ public final class OpenKeyManager {
         }
         return instance;
     }
+//    /**
+//     * @param authToken
+//     * @param openKeyCallBack Call back for response purpose
+//     */
+//    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
+//        if (authToken != null && authToken.length() > 0 && context != null)
+//            Api.getSession(context, authToken, openKeyCallBack);
+//        else
+//            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
+//    }
+
     /**
      * @param authToken
      * @param openKeyCallBack Call back for response purpose
      */
-    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
+    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack,boolean isLiveEnvironment) {
+        //Set configuration
+        setConfiguration(isLiveEnvironment);
+
         if (authToken != null && authToken.length() > 0 && context != null)
             Api.getSession(context, authToken, openKeyCallBack);
         else
             openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
     }
 
+
+    private void setConfiguration(boolean isLiveEnvironment)
+    {
+        if (isLiveEnvironment)
+            Utilities.getInstance().saveValue(Constants.BASE_URL,Constants.BASE_URL_LIVE,context);
+        else
+            Utilities.getInstance().saveValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
+    }
+
+
     /**
      * @param authToken
      */
-    public void getSession(String authToken, final Callback callback) {
+    public void getSession(String authToken, final Callback callback,boolean isLiveEnvironment) {
+
+        //Set configuration
+        setConfiguration(isLiveEnvironment);
         Api.getBooking(context, authToken, callback);
     }
 

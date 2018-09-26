@@ -286,8 +286,8 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 mEdtTextToken.setText(mToken);
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance(getActivity()).getSession(mToken,
-                            this);
+                    OpenKeyManager.getInstance(getActivity()).authenticate(mToken,
+                            this,false);
                 }
                 break;
 
