@@ -92,6 +92,10 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     //-----------------------------------------------------------------------------------------------------------------|
     private void setupKaba() {
         try {
+
+            if (mManager!=null)
+                mManager=null;
+
             mManager = Utils.getSdkManager(mContext);
             registerListeners();
             initSdk();
@@ -151,11 +155,9 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         kabaRegistrationToken = Utilities.getInstance().getValue(Constants.KABA_REGISTRATION_TOKEN, "", mContext);
         if (kabaRegistrationToken.length() > 0) {
             Log.e("Sttat", "7");
-
             startKABA();
         } else {
             Log.e("Sttat", "8");
-
             getKabaRegistrationToken();
         }
     }
@@ -176,7 +178,6 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         try {
             if (!mManager.isRegisteredToBackend()) {
                 Log.e("Sttat", "9");
-
                 register();
             } else {
                 Log.e("Sttat", "10");
@@ -274,19 +275,9 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     //-----------------------------------------------------------------------------------------------------------------|
     public void synchronise() {
         Log.e("kaba synchronise", "Called");
-        isLoginActionFired = true;
+       // isLoginActionFired = true;
         isSynchronizationStarted = true;
         mManager.synchronizeWithBackend();
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.e("kaba synchronise", "Called");
-//                isLoginActionFired = true;
-//                isSynchronizationStarted = true;
-//                mManager.synchronizeWithBackend();
-//            }
-//        }, 7000);
-
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -325,7 +316,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
             mOpenKeyCallBack.isKeyAvailable(false, com.openkey.sdk.Utilities.Response.FETCH_KEY_FAILED);
         } else {
             Log.e("kaba synchronise", "else");
-            isLoginActionFired = true;
+           // isLoginActionFired = true;
             isSynchronizationStarted = true;
             mManager.synchronizeWithBackend();
         }
@@ -438,7 +429,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     }
 
     private void activateFile() {
-        isLoginActionFired = true;
+
         Log.e("Kaba", "Activate file index ");
 
         try {
@@ -463,6 +454,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                                     == _bookingId && roomNumber.equals(sessionResponse.getData()
                                     .getHotelRoom().getTitle())) {
                                 try {
+                                    isLoginActionFired = true;
                                     Log.e("legicNeonFile", ":" + legicNeonFile);
                                     mManager.activateFile(legicNeonFile);
                                     mManager.setDefault(legicNeonFile, LegicNeonFileDefaultMode.LC_PROJECT_DEFAULT, true);

@@ -29,12 +29,12 @@ public class Hotel {
     @SerializedName("city")
     @Expose
     private String city;
+    @SerializedName("nearby_cities")
+    @Expose
+    private String nearbyCities;
     @SerializedName("address")
     @Expose
     private String address;
-    @SerializedName("phone")
-    @Expose
-    private String phone;
     @SerializedName("timezone")
     @Expose
     private String timezone;
@@ -47,12 +47,36 @@ public class Hotel {
     @SerializedName("late_check_out")
     @Expose
     private String lateCheckOut;
+    @SerializedName("wifi")
+    @Expose
+    private String wifi;
     @SerializedName("logo_url")
     @Expose
     private String logoUrl;
     @SerializedName("booking_url")
     @Expose
     private String bookingUrl;
+    @SerializedName("review_url")
+    @Expose
+    private String reviewUrl;
+    @SerializedName("phone")
+    @Expose
+    private String phone;
+    @SerializedName("email")
+    @Expose
+    private String email;
+    @SerializedName("manager")
+    @Expose
+    private String manager;
+    @SerializedName("manager_title")
+    @Expose
+    private String managerTitle;
+    @SerializedName("manager_email")
+    @Expose
+    private String managerEmail;
+    @SerializedName("manager_phone")
+    @Expose
+    private String managerPhone;
     @SerializedName("created")
     @Expose
     private String created;
@@ -130,20 +154,20 @@ public class Hotel {
         this.city = city;
     }
 
+    public String getNearbyCities() {
+        return nearbyCities;
+    }
+
+    public void setNearbyCities(String nearbyCities) {
+        this.nearbyCities = nearbyCities;
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public String getTimezone() {
@@ -178,6 +202,14 @@ public class Hotel {
         this.lateCheckOut = lateCheckOut;
     }
 
+    public String getWifi() {
+        return wifi;
+    }
+
+    public void setWifi(String wifi) {
+        this.wifi = wifi;
+    }
+
     public String getLogoUrl() {
         return logoUrl;
     }
@@ -192,6 +224,62 @@ public class Hotel {
 
     public void setBookingUrl(String bookingUrl) {
         this.bookingUrl = bookingUrl;
+    }
+
+    public String getReviewUrl() {
+        return reviewUrl;
+    }
+
+    public void setReviewUrl(String reviewUrl) {
+        this.reviewUrl = reviewUrl;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getManager() {
+        return manager;
+    }
+
+    public void setManager(String manager) {
+        this.manager = manager;
+    }
+
+    public String getManagerTitle() {
+        return managerTitle;
+    }
+
+    public void setManagerTitle(String managerTitle) {
+        this.managerTitle = managerTitle;
+    }
+
+    public String getManagerEmail() {
+        return managerEmail;
+    }
+
+    public void setManagerEmail(String managerEmail) {
+        this.managerEmail = managerEmail;
+    }
+
+    public String getManagerPhone() {
+        return managerPhone;
+    }
+
+    public void setManagerPhone(String managerPhone) {
+        this.managerPhone = managerPhone;
     }
 
     public String getCreated() {

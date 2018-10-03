@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
 
@@ -36,10 +35,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     private boolean isScanning;
     private Handler handler;
     private static final int MY_PERMISSIONS_REQUEST = 999;
-
     private int MOBILE_KEY_STATUES = 0;
-
-
     private Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -58,7 +54,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "p7cwvrrr6va4juij5qonccxvvb2b7bksiy3a7ld5hyr3oojawv7bj2ofcan24cjl";
+    private String mToken = "fhybuzcwccuexugmhcx5j53pm4swaitse2jit6ba3kzw3sgk5yge2dszo2kpogm3 ";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -66,7 +62,8 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.dashboard, container, false);
         init(view);
@@ -160,7 +157,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 //    PENDING_KEY_SERVER_REQUEST=1;
 //    KEY_SERVER_REQUESTED=2;
 //    KEY_DELIVERED=3;
-
         switch (MOBILE_KEY_STATUES) {
             case 3:
                 //If the key status is delivered and device have key then it will not call initialize
