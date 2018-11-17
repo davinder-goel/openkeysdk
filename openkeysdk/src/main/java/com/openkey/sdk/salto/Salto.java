@@ -16,11 +16,16 @@ import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
-import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerApi;
-import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerResultAndDiscoverCallback;
-import com.saltosystems.justinkey.sdk.ble.MasterDeviceManagerApi;
-import com.saltosystems.justinkey.sdk.exceptions.SaltoException;
-import com.saltosystems.justinkey.sdk.model.SaltoAccessKey;
+import com.saltosystems.justinmobile.sdk.ble.IJustinBleResultAndDiscoverCallback;
+import com.saltosystems.justinmobile.sdk.ble.JustinBle;
+import com.saltosystems.justinmobile.sdk.common.OpResult;
+import com.saltosystems.justinmobile.sdk.exceptions.JustinException;
+import com.saltosystems.justinmobile.sdk.model.MobileKey;
+//import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerApi;
+//import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerResultAndDiscoverCallback;
+//import com.saltosystems.justinkey.sdk.ble.MasterDeviceManagerApi;
+//import com.saltosystems.justinkey.sdk.exceptions.SaltoException;
+//import com.saltosystems.justinkey.sdk.model.SaltoAccessKey;
 
 /**
  * @author OpenKey Inc.
@@ -33,7 +38,8 @@ public final class Salto {
     private final String SECRET_KEY = "Op3nk3y4.0";
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
-    private MasterDeviceManagerApi api;
+    //    private MasterDeviceManagerApi api;
+    private JustinBle api;
 
 
     public Salto(Context mContext, OpenKeyCallBack openKeyCallBack) {
@@ -121,19 +127,18 @@ public final class Salto {
         if (!TextUtils.isEmpty(decryptedKey)) {
             try {
                 if (api == null) {
-                    api = new MasterDeviceManagerApi(mContext);
+                    api = new JustinBle(mContext);
                 }
-                SaltoAccessKey virtualkey = new SaltoAccessKey(decryptedKey);
-                api.startLockOpening(virtualkey, new IMasterDeviceManagerResultAndDiscoverCallback() {
+                MobileKey virtualkey = new MobileKey(decryptedKey);
+                api.startLockOpening(virtualkey, new IJustinBleResultAndDiscoverCallback() {
                     @Override
                     public void onPeripheralFound() {
 
                     }
 
                     @Override
-                    public void onSuccess(int authResult) {
-                        final boolean isSuccess = authResult == IMasterDeviceManagerApi.AUTH_SUCCESS_ACCESS_GRANTED;
-                        if (isSuccess) {
+                    public void onSuccess(int opResult) {
+                        if (opResult == OpResult.AUTH_SUCCESS_ACCESS_GRANTED) {
                             openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
                             Api.logSDK(mContext, 1);
                         } else {
@@ -143,14 +148,14 @@ public final class Salto {
                     }
 
                     @Override
-                    public void onFailure(SaltoException e) {
+                    public void onFailure(JustinException e) {
                         e.printStackTrace();
                         openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
 //                        Api.logSDK(mContext, 0);
                     }
                 });
 
-            } catch (SaltoException e) {
+            } catch (JustinException e) {
                 openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
 //                Api.logSDK(mContext, 0);
                 e.printStackTrace();

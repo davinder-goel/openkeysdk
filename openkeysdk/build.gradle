@@ -1,8 +1,5 @@
 apply plugin: 'com.android.library'
 
-
-
-/*applicationId "com.openkey.sdk"*/
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -53,6 +50,7 @@ dependencies {
     implementation files('libs/DoorlockApi_2.6.1.jar')
     implementation files('libs/DoorlockSdk_2.1.1.jar')
     implementation files('libs/miwa.jar')
-    implementation(name:'salto-justinmobile-sdk-2.2.0', ext:'aar')
+    implementation files('libs/salto.jar')
+  /*  implementation(name:'salto-justinmobile-sdk-2.2.0', ext:'aar')*/
 
 }

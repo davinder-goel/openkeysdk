@@ -28,45 +28,51 @@ import retrofit2.http.Path;
 public interface Services {
 
     //V5
-
     String key = "45144534-f181-4011-b142-5d53162a95c8";
     String type = "application/vnd.assaabloy-com.credential-2.3+json";
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions")
     Call<SessionResponse> authenticateGuest(@Header("Authorization") String Authorization);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions")
     Call<SessionResponse> getSession(@Header("Authorization") String Authorization);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/initializePersonalization.json")
     Call<InvitationCode> initializePersonalization(@Header("Authorization") String Authorization);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/9/session_mobile_keys")
     Call<MobileKeyResponse> getMobileKey(@Header("Authorization") String Authorization);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/setPersonalization.json")
     Call<PersonlizationResponse> setPeronalizationComplete(@Header("Authorization") String Authorization);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
             "Cache-Control: no-cache"})
     @GET("sdk/v5/sessions/initializePersonalization.json")
     Call<KabaToken> initializePersonalizationForKaba(@Header("Authorization") String Authorization);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: application/json",
             "x-openkey-app: " + key,
@@ -74,12 +80,16 @@ public interface Services {
     @POST("sdk/v5/sessions/setMobileKeyStatus")
     Call<KeyStatusResponse> setKeyStatus(@Header("Authorization") String Authorization,
                                          @Body KeyStatusRequest keyStatusRequest);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: " + "application/json"})
     @GET("sdk_api/v1/sessions/{session_id}/mobile_keys/getStatus")
     Call<KeyStatusResp> getStatus(@Header("Authorization") String Authorization, @Path("session_id") String session_id);
+    //-----------------------------------------------------------------------------------------------------------------|
 
     @Headers({"Accept: " + "application/json"})
     @POST("/sdk/v5/sessions/logAction")
     Call<LogActionResponse> logSDK(@Header("Authorization") String Authorization, @Body SdkLogRequest sdkLogRequest);
+    //-----------------------------------------------------------------------------------------------------------------|
+
 }

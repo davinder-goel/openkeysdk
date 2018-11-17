@@ -31,13 +31,7 @@
         android:roundIcon="@drawable/ic_app_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--<activity android:name=".MainActivity">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN" />-->
 
-        <!--<category android:name="android.intent.category.LAUNCHER" />-->
-        <!--</intent-filter>-->
-        <!--</activity>-->
 
         <!-- NFC service, disable if not needed -->
         <service
@@ -64,10 +58,28 @@
             android:name="com.mixpanel.android.MPConfig.DisableViewCrawler"
             android:value="true" />
 
-        <service
-            android:name="com.saltosystems.justinkey.sdk.ble.BluetoothLeService"
-            android:enabled="true" />
+
         <service android:name="kr.co.chahoo.doorlock.service.CookieService" />
+
+        <!-- BLE Service -->
+        <service
+            android:name="com.saltosystems.justinmobile.sdk.ble.JustinBleService"
+            android:enabled="true" />
+
+        <!-- APDU Service: To use it has to be enabled by Manifest replacing tool -->
+        <service
+            android:name="com.saltosystems.justinmobile.sdk.hce.JustinHceService"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE" >
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+
+        </service>
 
     </application>
 

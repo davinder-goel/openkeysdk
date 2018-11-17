@@ -11,14 +11,11 @@ import com.openkey.sdk.api.response.session.SessionResponse;
 
 public interface OpenKeyCallBack {
 
-
-
-
     /**
      * @param sessionResponse Provide booking response to user if user is authorized
      *                        to use SDK
      */
-    void session(SessionResponse sessionResponse);
+    void sessionResponse(SessionResponse sessionResponse);
 
     /**
      * If setting up device has been successful
@@ -50,6 +47,4 @@ public interface OpenKeyCallBack {
      * @param haveKey is Key available
      */
     void isKeyAvailable(boolean haveKey, String description);
-
-
 }
