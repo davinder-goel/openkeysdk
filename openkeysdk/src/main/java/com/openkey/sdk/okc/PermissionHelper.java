@@ -1,6 +1,6 @@
 package com.openkey.sdk.okc;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -13,7 +13,7 @@ public class PermissionHelper {
 
     private PermissionCallBack callBack;
 
-    public void requestPermission(FragmentActivity activity, PermissionCallBack callBack, String... perms) {
+    public void requestPermission(Activity activity, PermissionCallBack callBack, String... perms) {
         this.callBack = callBack;
         if (perms == null || activity == null) {
             return;

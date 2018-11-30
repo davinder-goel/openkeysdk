@@ -183,10 +183,9 @@ public final class OpenKeyManager {
         if (context == null)
             openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
 
-        openKeyCallBack.isKeyAvailable(true, Response.NULL_CONTEXT);
 
         //Getting key from server
-        //Api.getMobileKey(context, getKeyCallback);
+        Api.getMobileKey(context, getKeyCallback);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -253,7 +252,7 @@ public final class OpenKeyManager {
                 break;
 
             case OKC:
-                //      okc.issueEntravaKey();
+                mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 break;
         }
     }

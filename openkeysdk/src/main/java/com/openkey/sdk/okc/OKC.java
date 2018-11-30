@@ -1,15 +1,14 @@
 package com.openkey.sdk.okc;
 
-import android.Manifest;
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.clj.fastble.data.BleDevice;
-import com.openkey.sdk.Utilities.Response;
+import com.openkey.sdk.Utilities.Constants;
+import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.okc.ble.configs.OpenKeyConfig;
-import com.openkey.sdk.singleton.GetBooking;
 
 import java.util.List;
 import java.util.Map;
@@ -35,25 +34,30 @@ public class OKC implements BleCallBack {
 
     //-----------------------------------------------------------------------------------------------------------------|
     private void initialize() {
-
-        FragmentActivity fragmentActivity = (FragmentActivity) mContext;
-        new PermissionHelper().requestPermission(fragmentActivity, new PermissionHelper.PermissionCallBack() {
-            @Override
-            public void permissionGranted() {
-                if (!BleHelper.isBleOpend()) {
-                    BleHelper.enableBle(fragmentActivity, 1 /*request_code*/);
-                }
-
-                BleHelper.getInstance().initAfterPermission(mContext);
+        BleHelper.getInstance().initAfterPermission(mContext);
+        int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
+                0, mContext);
+        Log.e("mobileKeyStatusId", ":" + mobileKeyStatusId);
+        Log.e("haveKey()", ":" + haveKey());
+        if (haveKey() && mobileKeyStatusId == 3) {
+            Log.e("Keystatus ", ":" + mobileKeyStatusId);
+            Log.e("mobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
+            openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
+        } else {
+            if (mobileKeyStatusId == 1) {
+                /**
+                 * Update the status on server that Registration Complete has been completed on Kaba server
+                 */
+                Log.e("Keystatus ", ":" + mobileKeyStatusId);
+                Log.e("mobileKeyStatusId", "is: " + haveKey());
+                // Api.setPeronalizationComplete(mContext, openKeyCallBack);
+                openKeyCallBack.initializationSuccess();
+            } else {
+                Log.e("Keystatus ", ":" + mobileKeyStatusId);
+                openKeyCallBack.initializationSuccess();
             }
+        }
 
-            @Override
-            public void permissionRefused() {
-
-            }
-
-        }, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH);
-        openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
     }
 
     /**
@@ -62,7 +66,11 @@ public class OKC implements BleCallBack {
      * @return
      */
     public boolean haveKey() {
-        return true;
+        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
+        if (key != null && key.length() > 0)
+            return true;
+
+        return false;
     }
 
     /**
@@ -71,10 +79,13 @@ public class OKC implements BleCallBack {
     public void startScanning() {
         OpenKeyConfig.getIns().setScanType(BaseDeviceConfig.ScanType.ByMac);
 
-        if (GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava() != null)
-            mMacAddress = GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava();
+//        if (GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava() != null)
+//            mMacAddress = GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava();
 
-        OpenKeyConfig.getIns().setMac(mMacAddress);
+        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "asdfghe", mContext);
+        if (key != null && key.length() > 0)
+
+            OpenKeyConfig.getIns().setMac(key);
         BleHelper.getInstance().scanDevice(OpenKeyConfig.getIns());
         BleHelper.getInstance().sendToSpecificDevice(OpenKeyConfig.getIns());
     }
