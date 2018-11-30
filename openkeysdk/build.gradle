@@ -15,6 +15,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 
@@ -53,4 +58,11 @@ dependencies {
     implementation files('libs/salto.jar')
   /*  implementation(name:'salto-justinmobile-sdk-2.2.0', ext:'aar')*/
 
+    /*implementation(name: 'FastBleLib-release', ext: 'aar')
+    implementation(name: 'blecontrollor-release', ext: 'aar')*/
+    implementation files('libs/blecontrollor-debug.jar')
+    implementation files('libs/fastblelib-debug.jar')
+
+    api 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
 }

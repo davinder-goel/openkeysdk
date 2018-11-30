@@ -27,6 +27,19 @@ public class HotelRoom {
     @Expose
     private Object deleted;
 
+    @SerializedName("entrava")
+    @Expose
+
+    private String entrava;
+
+    public String getEntrava() {
+        return entrava;
+    }
+
+    public void setEntrava(String entrava) {
+        this.entrava = entrava;
+    }
+
     public Integer getId() {
         return id;
     }

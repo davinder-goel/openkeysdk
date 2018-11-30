@@ -17,6 +17,7 @@ import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.kaba.Kaba;
 import com.openkey.sdk.miwa.Miwa;
+import com.openkey.sdk.okc.OKC;
 import com.openkey.sdk.salto.Salto;
 import com.openkey.sdk.singleton.GetBooking;
 
@@ -41,6 +42,7 @@ public final class OpenKeyManager {
     private Kaba kaba;
     private Entrava entrava;
     private Miwa miwa;
+    private OKC okc;
     private OpenKeyCallBack mOpenKeyCallBack;
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -154,6 +156,10 @@ public final class OpenKeyManager {
             case ENTRAVATOUCH:
                 entrava = new Entrava(context, openKeyCallBack);
                 break;
+
+            case OKC:
+                okc = new OKC(context, openKeyCallBack);
+                break;
         }
     }
 
@@ -169,16 +175,18 @@ public final class OpenKeyManager {
         if (context == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null) {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
-
         }
+
         mOpenKeyCallBack = openKeyCallBack;
 
         //if context null then it returned callback with null context description
         if (context == null)
             openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
 
+        openKeyCallBack.isKeyAvailable(true, Response.NULL_CONTEXT);
+
         //Getting key from server
-        Api.getMobileKey(context, getKeyCallback);
+        //Api.getMobileKey(context, getKeyCallback);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -243,6 +251,10 @@ public final class OpenKeyManager {
             case ENTRAVATOUCH:
                 entrava.issueEntravaKey();
                 break;
+
+            case OKC:
+                //      okc.issueEntravaKey();
+                break;
         }
     }
 
@@ -282,6 +294,10 @@ public final class OpenKeyManager {
             case ENTRAVA:
             case ENTRAVATOUCH:
                 haveKey = entrava.haveKey();
+                break;
+
+            case OKC:
+                haveKey = okc.haveKey();
                 break;
         }
         return haveKey;
@@ -323,6 +339,10 @@ public final class OpenKeyManager {
                 case ENTRAVA:
                 case ENTRAVATOUCH:
                     entrava.startImGateScanningService();
+                    break;
+
+                case OKC:
+                    okc.startScanning();
                     break;
             }
         } else {
