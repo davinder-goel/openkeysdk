@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.clj.fastble.data.BleDevice;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Utilities;
+import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.okc.ble.configs.OpenKeyConfig;
 
@@ -23,12 +24,12 @@ public class OKC implements BleCallBack {
     private Context mContext;
     private OpenKeyCallBack openKeyCallBack;
 
-    private String mMacAddress = "";
-
     //-----------------------------------------------------------------------------------------------------------------|
     public OKC(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
         this.openKeyCallBack = OpenKeyCallBack;
         this.mContext = mContext;
+        BleHelper.getInstance().init(mContext);
+
         initialize();
     }
 
@@ -50,14 +51,13 @@ public class OKC implements BleCallBack {
                  */
                 Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 Log.e("mobileKeyStatusId", "is: " + haveKey());
-                // Api.setPeronalizationComplete(mContext, openKeyCallBack);
-                openKeyCallBack.initializationSuccess();
+                Api.setPeronalizationComplete(mContext, openKeyCallBack);
+//                openKeyCallBack.initializationSuccess();
             } else {
                 Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 openKeyCallBack.initializationSuccess();
             }
         }
-
     }
 
     /**
@@ -77,97 +77,102 @@ public class OKC implements BleCallBack {
      * start IMGATE service for open lock when scanning animation on going
      */
     public void startScanning() {
-        OpenKeyConfig.getIns().setScanType(BaseDeviceConfig.ScanType.ByMac);
+
 
 //        if (GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava() != null)
 //            mMacAddress = GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava();
 
-        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "asdfghe", mContext);
-        if (key != null && key.length() > 0)
+        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
+//        if (key != null && key.length() > 0)
 
-            OpenKeyConfig.getIns().setMac(key);
+        Log.e("token key", key + "");
+        OpenKeyConfig.getIns().setScanType(BaseDeviceConfig.ScanType.ByMac);
+        OpenKeyConfig.getIns().setMac(key);
+        BleHelper.getInstance().setCallBack(this);
+
         BleHelper.getInstance().scanDevice(OpenKeyConfig.getIns());
-        BleHelper.getInstance().sendToSpecificDevice(OpenKeyConfig.getIns());
     }
 
-/*
-    @Override
-    protected void onResume() {
-        super.onResume();
-        BleHelper.getInstance().resume();
+    private void sendToSpecificDevice() {
+        try {
+            BleHelper.getInstance().sendToSpecificDevice(OpenKeyConfig.getIns());
+        } catch (Exception e) {
+            Log.e("Exception okc", e.getLocalizedMessage() + "");
+        }
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        BleHelper.getInstance().pause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        BleHelper.getInstance().destroy(MainActivity.this);
-        super.onDestroy();
-    }
-*/
 
     //BLEs
     @Override
     public void find(BaseDeviceConfig baseDeviceConfig, BleDevice bleDevice) {
+        sendToSpecificDevice();
         Toast.makeText(mContext, "find device", Toast.LENGTH_SHORT).show();
+        Log.e("find mac", baseDeviceConfig.getMac()+"   called");
+        Log.e("find bleDevice", bleDevice.getMac()+"   called");
     }
 
     @Override
     public void endScan(Map<BaseDeviceConfig, List<BleDevice>> map) {
-
+        sendToSpecificDevice();
+        Log.e("endScan", "called");
     }
 
     @Override
     public void connectFailed(BaseDeviceConfig baseDeviceConfig) {
+        Log.e("connectFailed", "called");
 
     }
 
     @Override
     public void connectSuccess(BaseDeviceConfig baseDeviceConfig) {
+        Log.e("connectSuccess", "called");
 
     }
 
     @Override
     public void disconnect(BaseDeviceConfig baseDeviceConfig) {
+        Log.e("disconnect", "called");
 
     }
 
     @Override
     public void writeSuccess(BaseDeviceConfig baseDeviceConfig) {
+        Log.e("writeSuccess", "called");
 
     }
 
     @Override
     public void writeFailed(BaseDeviceConfig baseDeviceConfig) {
+        Log.e("writeFailed", "called");
 
     }
 
     @Override
     public void finishNotify(BaseDeviceConfig baseDeviceConfig, String s) {
+        Log.e("finishNotify", "called");
         Toast.makeText(mContext, "electricity is : " + s, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void bleStatus(int i) {
+        Log.e("bleStatus", "called");
 
     }
 
     @Override
     public void locationStatus(int i) {
+        Log.e("locationStatus", "called");
 
     }
 
     @Override
     public void busy() {
+        Log.e("busy", "called");
 
     }
 
     @Override
     public void disable() {
+        Log.e("disable", "called");
 
     }
 }
