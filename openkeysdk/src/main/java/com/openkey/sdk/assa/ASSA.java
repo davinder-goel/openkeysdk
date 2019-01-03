@@ -61,6 +61,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     private Context mContext;
     private ReaderConnectionCallback readerConnectionCallback;
     private Handler mHandlerStopScanning;
+    private boolean isLoginActionFired;
+
     private Callback<InvitationCode> invitationCodeCallback = new Callback<InvitationCode>() {
         @Override
         public void onResponse(@NonNull Call<InvitationCode> call, retrofit2.Response<InvitationCode> response) {
@@ -346,7 +348,12 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                 // if lock opened successfully then let user know
                 // save door opened log on server
                 Log.e(TAG, "Lock Opened Successfully");
-                Api.logSDK(mContext, 1);
+                if (isLoginActionFired)
+                {
+                    isLoginActionFired=false;
+                    Api.logSDK(mContext, 1);
+                }
+
             }
         } else {
             Log.e(TAG, "Reader Opening Failed");
@@ -378,6 +385,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      * reader(Locks) and communicate with them if found one
      */
     public void startScanning() {
+        isLoginActionFired=true;
         Log.d(TAG, "Starting BLE service and enabling HCE");
         ReaderConnectionController controller = mobileKeysFactory.getReaderConnectionController();
         // ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();

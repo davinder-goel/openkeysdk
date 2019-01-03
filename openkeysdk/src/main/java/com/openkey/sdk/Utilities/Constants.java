@@ -38,14 +38,14 @@ public class Constants {
     public static final long SCANNING_TIME = 12000;
 
     // KEY_DELIVERED=0;
-    //  PENDING_KEY_SERVER_REQUEST=1;
-    //  KEY_SERVER_REQUESTED=2;
+    // PENDING_KEY_SERVER_REQUEST=1;
+    // KEY_SERVER_REQUESTED=2;
     public static final String KEY_DELIVERED = "KEY DELIVERED";
     public static final String PENDING_KEY_SERVER_REQUEST = "PENDING KEY SERVER REQUEST";
     public static final String KEY_SERVER_REQUESTED = "KEY SERVER REQUESTED";
 
     //LIVE BASE URL
-     public static final String BASE_URL_LIVE = "https://developer.openkey.co/";
+   //  public static final String BASE_URL_LIVE = "https://developer.openkey.co/";
     // public static final String BASE_URL_LIVE = "https://betadeveloper.openkey.co/";
     //ASSA LIVE
     public static final String ASSA_LIVE_URL = "https://credential-services.sci.assaabloy.com/";
@@ -57,7 +57,7 @@ public class Constants {
     //public static  String BASE_URL_DEV = "https://partner.openkey.co/";
     public static String BASE_URL_DEV = "https://apidev.openkey.co/";
     //Live
-//    public static String BASE_URL_DEV = "https://connector.openkey.co/";
+    public static String BASE_URL_LIVE = "https://developer.openkey.co/";
 
 
 }
