@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/eT_webbrowser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10" >
+
+            <requestFocus />
+        </EditText>
+
+        <Button
+            android:id="@+id/btn_Go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="Go" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_GoBack"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Go back a Page"
+            />
+
+        <Button
+            android:id="@+id/btn_GoForward"
+            android:layout_width="78dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:text="Go Forward"
+            />
+
+        <Button
+            android:id="@+id/btn_RefreshPage"
+            android:layout_width="66dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.90"
+            android:text="Refresh Page"
+            />
+
+        <Button
+            android:id="@+id/btn_ClrHistory"
+            android:layout_width="82dp"
+            android:layout_height="wrap_content"
+            android:text="Clear History"
+            />
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/WVBrowser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </WebView>
+
+</LinearLayout>

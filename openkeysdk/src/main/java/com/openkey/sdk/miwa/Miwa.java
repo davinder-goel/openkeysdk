@@ -41,18 +41,23 @@ public class Miwa {
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
     private boolean isDoorOpenedLogged;
+
+    //-----------------------------------------------------------------------------------------------------------------|
+
     private BroadcastReceiver receiverMiwa = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             handleResult(intent);
         }
     };
+    //-----------------------------------------------------------------------------------------------------------------|
 
     public Miwa(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
         this.openKeyCallBack = OpenKeyCallBack;
         this.mContext = mContext;
         setUpMiwa();
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * setup device for miwa lock
@@ -79,6 +84,8 @@ public class Miwa {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * loading key data from SQLite DB.
      */
@@ -94,6 +101,7 @@ public class Miwa {
             db.close();
         }
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * if devive has a key for salto
@@ -104,6 +112,7 @@ public class Miwa {
                 "",mContext);
         return (key.length() > 0 && selectedKey != null);
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     public void addKey() {
 
@@ -153,6 +162,8 @@ public class Miwa {
         loadKeyData();
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * check if device have keys
      *
@@ -162,6 +173,7 @@ public class Miwa {
         String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
         return !TextUtils.isEmpty(key);
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
 
 
@@ -175,6 +187,7 @@ public class Miwa {
             Log.e("startScanning", "failed");
         }
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * Handle Alv2Service result.
@@ -214,6 +227,8 @@ public class Miwa {
             break;
         }
     }
+    //-----------------------------------------------------------------------------------------------------------------|
+
 
     /**
      * delete all key data from DB.
@@ -227,5 +242,6 @@ public class Miwa {
         }
         loadKeyData();
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
 }

@@ -1,13 +1,4 @@
 package com.openkey.sdk.api.request;
-
-/*
- *
- *  Copyright 2018 OpenKey. All Rights Reserved
- *
- *  @author OpenKey Inc.
- *
- */
-
 import android.content.Context;
 import android.util.Log;
 
@@ -42,7 +33,6 @@ import static com.openkey.sdk.Utilities.Constants.TOKEN;
  *         <p>
  *         This class will hold all the api calls made from the SDK
  */
-
 public class Api {
 
     /**
@@ -53,7 +43,6 @@ public class Api {
      */
     public static void getSession(final Context context, final String token,
                                   final OpenKeyCallBack openKeyCallBack) {
-
         // Get the retrofit instance
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.getSession(TOKEN + token).enqueue(new Callback<SessionResponse>() {
@@ -63,20 +52,21 @@ public class Api {
                 if (response.isSuccessful()) {
                     Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, token, context);
                     saveData(response.body(), context);
-                    openKeyCallBack.session(response.body());
+                    openKeyCallBack.sessionResponse(response.body());
                 } else {
                     // get the error message from the response and return it to the callback
-                    openKeyCallBack.sessionFailure(Response.BOOKING_NOT_FOUNT, response.code() + "");
+                    openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED,response.code() + "");
                 }
             }
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
-                openKeyCallBack.sessionFailure(Response.UNKNOWN, "");
+                openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED,"");
             }
         });
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     private static void saveData(SessionResponse bookingResponse, Context context) {
         if (bookingResponse != null && bookingResponse.getData() != null) {
             Utilities.getInstance(context).saveBookingToLocal(context, bookingResponse);
@@ -104,6 +94,7 @@ public class Api {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /*
     * Getting the key from server
@@ -138,6 +129,7 @@ public class Api {
             }
         });
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
 
     /*
@@ -161,6 +153,7 @@ public class Api {
             }
         });
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * Gets date time.
@@ -178,6 +171,7 @@ public class Api {
         Time = dateFormat.format(date);
         return Time;
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
 
     /**
@@ -202,6 +196,7 @@ public class Api {
         });
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
 
 
     /**
@@ -239,6 +234,7 @@ public class Api {
             }
         });
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * @param context
@@ -256,6 +252,7 @@ public class Api {
         services.initializePersonalizationForKaba(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      *
@@ -274,6 +271,7 @@ public class Api {
         services.initializePersonalization(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      *
@@ -281,16 +279,14 @@ public class Api {
      * @param callback
      */
     @SuppressWarnings("unchecked")
-    public static void getBooking(final Context context, String tokenStr, final Callback callback) {
+    public static void getBooking(String authToken,final Context context,final Callback callback) {
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
-        //  services.getSession(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
-        services.getSession(TOKEN + tokenStr).enqueue(new Callback<SessionResponse>() {
+        services.getSession(TOKEN + authToken).enqueue(new Callback<SessionResponse>() {
             @Override
             public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse> response) {
                 if (response.isSuccessful())
                     saveData(response.body(), context);
-
-                callback.onResponse(call, response);
+                    callback.onResponse(call, response);
             }
 
             @Override
@@ -299,6 +295,8 @@ public class Api {
             }
         });
     }
+
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * Update status on server once device get key.
@@ -322,4 +320,6 @@ public class Api {
             }
         });
     }
+    //-----------------------------------------------------------------------------------------------------------------|
+
 }

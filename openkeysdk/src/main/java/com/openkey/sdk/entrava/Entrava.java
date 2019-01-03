@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -23,7 +24,6 @@ import kr.co.chahoo.sdk.ResultReceiver;
 //
 
 public class Entrava {
-    private final String TAG = getClass().getSimpleName();
     private Context mContext;
     private DoorLockSdk mDoorLockSdk;
     private PendingIntent mPendingIntent;
@@ -31,13 +31,14 @@ public class Entrava {
     private OpenKeyCallBack openKeyCallBack;
     private ServiceResult mServiceResultReceiver;
     private boolean isLogActionFired;
+    //-----------------------------------------------------------------------------------------------------------------|
 
     public Entrava(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
         this.openKeyCallBack = OpenKeyCallBack;
         this.mContext = mContext;
         initialize();
     }
-
+    //-----------------------------------------------------------------------------------------------------------------|
     private void initialize() {
         Intent intent = new Intent(mContext, Entrava.class);
         mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -57,7 +58,7 @@ public class Entrava {
         Log.e("mobileKeyStatusId", ":" + mobileKeyStatusId);
         Log.e("haveKey()", ":" + haveKey());
         if (haveKey() && mobileKeyStatusId == 3) {
-            Log.e("Keystatus ", "3:" + mobileKeyStatusId);
+            Log.e("Keystatus ", ":" + mobileKeyStatusId);
             Log.e("mobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
             openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
         } else {
@@ -65,16 +66,16 @@ public class Entrava {
                 /**
                  * Update the status on server that Registration Complete has been completed on Kaba server
                  */
-                Log.e("Keystatus ", "1:" + mobileKeyStatusId);
-
-                Log.e("mobileKeyStatusId", "is 1: " + haveKey());
+                Log.e("Keystatus ", ":" + mobileKeyStatusId);
+                Log.e("mobileKeyStatusId", "is: " + haveKey());
                 Api.setPeronalizationComplete(mContext, openKeyCallBack);
             } else {
-                Log.e("Keystatus ", "2:" + mobileKeyStatusId);
+                Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 openKeyCallBack.initializationSuccess();
             }
         }
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * issue imgate doorlock key from imgate server
@@ -133,6 +134,7 @@ public class Entrava {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
         }
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * start IMGATE service for open lock when scanning animation on going
@@ -140,8 +142,8 @@ public class Entrava {
     public void startImGateScanningService() {
         isLogActionFired = true;
         mDoorLockSdk.start(mPendingIntent);
-
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * if device has a key for Imgate
@@ -156,6 +158,7 @@ public class Entrava {
 
         return false;
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     class ServiceResult extends ResultReceiver {
 
@@ -185,4 +188,7 @@ public class Entrava {
             }
         }
     }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+
 }

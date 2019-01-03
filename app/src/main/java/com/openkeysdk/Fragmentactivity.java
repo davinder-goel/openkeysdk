@@ -10,7 +10,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +53,6 @@ public class Fragmentactivity extends AppCompatActivity {
 
 
     private void checkPermissions() {
-
         String[] requiredPermissions = new String[]{
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN,

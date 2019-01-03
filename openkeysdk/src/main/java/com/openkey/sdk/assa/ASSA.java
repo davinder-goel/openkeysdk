@@ -330,6 +330,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     @Override
     public void onReaderConnectionFailed(Reader reader, OpeningType openingType, OpeningStatus openingStatus) {
         responseCallBack(false);
+        Log.e(TAG, "onReaderConnectionFailed");
+
     }
 
     @Override
@@ -348,9 +350,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                 // if lock opened successfully then let user know
                 // save door opened log on server
                 Log.e(TAG, "Lock Opened Successfully");
-                if (isLoginActionFired)
-                {
-                    isLoginActionFired=false;
+                if (isLoginActionFired) {
+                    isLoginActionFired = false;
                     Api.logSDK(mContext, 1);
                 }
 
@@ -375,9 +376,15 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         } else {
             openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
         }
+
+        ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
+        controller.stopScanning();
+        controller.disableHce();
+
         if (mHandlerStopScanning != null) {
             mHandlerStopScanning.removeCallbacks(scanningStopCallBack);
         }
+
     }
 
     /**
@@ -385,7 +392,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      * reader(Locks) and communicate with them if found one
      */
     public void startScanning() {
-        isLoginActionFired=true;
+        isLoginActionFired = true;
         Log.d(TAG, "Starting BLE service and enabling HCE");
         ReaderConnectionController controller = mobileKeysFactory.getReaderConnectionController();
         // ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
@@ -405,6 +412,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
         controller.stopScanning();
         controller.disableHce();
+        Log.e("stopScanning", ":called");
         responseCallBack(false);
 //        getReaderConnectionController().stopScanning();
     }
@@ -474,7 +482,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
                 boolean haveKey = haveKey();
                 OpenKeyManager.getInstance(mContext).updateKeyStatus(haveKey);
-                 if (haveKey) {
+                if (haveKey) {
                     openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 } else {
                     openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
@@ -489,5 +497,4 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             }
         });
     }
-
 }

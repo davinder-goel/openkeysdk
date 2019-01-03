@@ -9,7 +9,7 @@ public class BaseFragment extends Fragment implements OpenKeyCallBack {
 
 
     @Override
-    public void session(SessionResponse sessionResponse) {
+    public void sessionResponse(SessionResponse sessionResponse) {
 
     }
 

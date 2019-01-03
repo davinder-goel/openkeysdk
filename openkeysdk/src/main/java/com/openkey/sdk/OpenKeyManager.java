@@ -1,8 +1,4 @@
 
-/*
- *  Copyright 2018 OpenKey. All Rights Reserved
- *  @author OpenKey Inc.
- */
 package com.openkey.sdk;
 
 import android.annotation.SuppressLint;
@@ -46,28 +42,8 @@ public final class OpenKeyManager {
     private Entrava entrava;
     private Miwa miwa;
     private OpenKeyCallBack mOpenKeyCallBack;
-    /*
-     * Getting mobile key from server, If the key is issued from backend then start syncing
-     * process
-     * */
-    private Callback getKeyCallback = new Callback() {
-        @Override
-        public void onResponse(Call call, retrofit2.Response response) {
-            if (response.isSuccessful()) {
-                startSync();
-            } else {
-                if (mOpenKeyCallBack != null)
-                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-            }
-        }
 
-        @Override
-        public void onFailure(Call call, Throwable t) {
-            if (mOpenKeyCallBack != null)
-                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-        }
-    };
-
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * Access to this class can only be provided by this class
      * so object creation is limited to this only.
@@ -78,6 +54,7 @@ public final class OpenKeyManager {
         this.context = context.getApplicationContext();
         Utilities.getInstance(context);
     }
+    //-----------------------------------------------------------------------------------------------------------------|
 
     /**
      * This will return the instance of this class and provide a
@@ -100,51 +77,39 @@ public final class OpenKeyManager {
         }
         return instance;
     }
-//    /**
-//     * @param authToken
-//     * @param openKeyCallBack Call back for response purpose
-//     */
-//    public void getSession(String authToken, OpenKeyCallBack openKeyCallBack) {
-//        if (authToken != null && authToken.length() > 0 && context != null)
-//            Api.getSession(context, authToken, openKeyCallBack);
-//        else
-//            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
-//    }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * @param authToken
      * @param openKeyCallBack Call back for response purpose
      */
-    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack,boolean isLiveEnvironment) {
+    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack,boolean environmentType) {
+
         //Set configuration
-        setConfiguration(isLiveEnvironment);
+        setConfiguration(environmentType);
 
         if (authToken != null && authToken.length() > 0 && context != null)
             Api.getSession(context, authToken, openKeyCallBack);
         else
-            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
+            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE,"");
     }
 
-
-    private void setConfiguration(boolean isLiveEnvironment)
+    //-----------------------------------------------------------------------------------------------------------------|
+    private void setConfiguration(boolean environmentType)
     {
-        if (isLiveEnvironment)
+        if (environmentType)
             Utilities.getInstance().saveValue(Constants.BASE_URL,Constants.BASE_URL_LIVE,context);
         else
             Utilities.getInstance().saveValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
     }
 
-
-    /**
-     * @param authToken
-     */
-    public void getSession(String authToken, final Callback callback,boolean isLiveEnvironment) {
-
+    public void getSession(String authToken,final Callback callback) {
         //Set configuration
-        setConfiguration(isLiveEnvironment);
-        Api.getBooking(context, authToken, callback);
+       // setConfiguration();
+        Api.getBooking(authToken,context, callback);
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * Initialize SDK with unique number.
      * <p>
@@ -192,6 +157,7 @@ public final class OpenKeyManager {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * If the user is successfully authenticated
      * and initialization is also successful, can
@@ -215,6 +181,30 @@ public final class OpenKeyManager {
         Api.getMobileKey(context, getKeyCallback);
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
+    /*
+     * Getting mobile key from server, If the key is issued from backend then start syncing
+     * process
+     * */
+    private Callback getKeyCallback = new Callback() {
+        @Override
+        public void onResponse(Call call, retrofit2.Response response) {
+            if (response.isSuccessful()) {
+                startSync();
+            } else {
+                if (mOpenKeyCallBack != null)
+                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+            }
+        }
+
+        @Override
+        public void onFailure(Call call, Throwable t) {
+            if (mOpenKeyCallBack != null)
+                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+        }
+    };
+
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * If the user is successfully
      * get keys then start sync process via this method
@@ -256,6 +246,7 @@ public final class OpenKeyManager {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      *  If device has a key available
      *
@@ -296,6 +287,7 @@ public final class OpenKeyManager {
         return haveKey;
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * start scanning if passes the initial checks
      * and device have a key
@@ -339,6 +331,7 @@ public final class OpenKeyManager {
         }
     }
 
+    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * * This method is used to update the key status on server.
      * 1 identify the device have key
@@ -353,4 +346,6 @@ public final class OpenKeyManager {
         else
             Api.setKeyStatus(context, Constants.PENDING_KEY_SERVER_REQUEST);
     }
+    //-----------------------------------------------------------------------------------------------------------------|
+
 }

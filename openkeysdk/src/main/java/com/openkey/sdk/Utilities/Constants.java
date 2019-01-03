@@ -1,10 +1,3 @@
-/*
- * *
- *  * Copyright 2015 OpenKey. All Rights Reserved
- *  *
- *  * @author OpenKey Inc.
- *
- */
 package com.openkey.sdk.Utilities;
 
 /**
@@ -35,6 +28,7 @@ public class Constants {
     public static final String MOBILE_KEY_STATUS = "mobile_key_status";
     public static final String BASE_URL = "base_url";
     public static final String TOKEN = "Token ";
+    public static final String ENVIRONMENT_TYPE = "environment_type";
     public static final long SCANNING_TIME = 12000;
 
     // KEY_DELIVERED=0;

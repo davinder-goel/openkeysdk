@@ -20,7 +20,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.openkey.sdk.OpenKeyManager;
+import com.openkey.sdk.api.request.RetrofitCallback;
 import com.openkey.sdk.api.response.session.SessionResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
@@ -54,7 +59,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "fhybuzcwccuexugmhcx5j53pm4swaitse2jit6ba3kzw3sgk5yge2dszo2kpogm3 ";
+    private String mToken = "duoc772vd3e5gb2mhescdeu27jgetmwmlwolixowmzb7ois6gf7cpacd7gn4tngc";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -64,7 +69,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.dashboard, container, false);
         init(view);
         listners();
@@ -169,16 +173,34 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 break;
         }
     }
-
-
+/*
     @Override
-    public void session(SessionResponse sessionResponse) {
-        hideMessage();
-        if (sessionResponse != null && sessionResponse.getData() != null) {
-            MOBILE_KEY_STATUES = sessionResponse.getData().getMobileKeyStatusId();
-            keyStatus();
-        }
-    }
+    public void authenticated(boolean isAuthenticated, String description) {
+        Log.e("authenticated",":"+isAuthenticated);
+
+        if (isAuthenticated)
+            OpenKeyManager.getInstance(getActivity()).getSession(new Callback() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    hideMessage();
+                    SessionResponse sessionResponse=(SessionResponse)response.body();
+                    Log.e("sessionResponse",":"+sessionResponse.getData().getCheckOut());
+
+                    if (sessionResponse.getData() != null) {
+                        MOBILE_KEY_STATUES = sessionResponse.getData().getMobileKeyStatusId();
+                        keyStatus();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    Log.e("onFailure",":");
+                    hideMessage();
+                    showToast("Booking not found");
+
+                }
+            });
+    }*/
 
 
 //    @Override
@@ -189,7 +211,16 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
 
     @Override
+    public void sessionResponse(SessionResponse sessionResponse) {
+        if (sessionResponse.getData() != null) {
+            MOBILE_KEY_STATUES = sessionResponse.getData().getMobileKeyStatusId();
+            keyStatus();
+        }
+    }
+
+    @Override
     public void sessionFailure(String errorDescription, String errorCode) {
+        Log.e("onFailure",":");
         hideMessage();
         showToast("Booking not found");
     }
