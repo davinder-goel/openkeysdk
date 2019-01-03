@@ -1,23 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.openkey.sdk">
 
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
+    <!-- Declaration that this app is usable on phones with Bluetooth. -->
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
 
     <application
         android:allowBackup="false"
+        android:icon="@drawable/ic_app_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true">
+        android:roundIcon="@drawable/ic_app_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
 
         <!-- NFC service, disable if not needed -->
         <service
@@ -28,7 +42,6 @@
             <intent-filter>
                 <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
             </intent-filter>
-
             <meta-data
                 android:name="android.nfc.cardemulation.host_apdu_service"
                 android:resource="@xml/seos_hce_service" />
@@ -45,9 +58,28 @@
             android:name="com.mixpanel.android.MPConfig.DisableViewCrawler"
             android:value="true" />
 
+
+        <service android:name="kr.co.chahoo.doorlock.service.CookieService" />
+
+        <!-- BLE Service -->
         <service
-            android:name="com.saltosystems.justinkey.sdk.ble.BluetoothLeService"
+            android:name="com.saltosystems.justinmobile.sdk.ble.JustinBleService"
             android:enabled="true" />
+
+        <!-- APDU Service: To use it has to be enabled by Manifest replacing tool -->
+        <service
+            android:name="com.saltosystems.justinmobile.sdk.hce.JustinHceService"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE" >
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+
+        </service>
 
     </application>
 

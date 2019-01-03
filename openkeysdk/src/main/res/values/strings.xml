@@ -1,9 +1,49 @@
 <resources>
-    <string name="app_name">OpenKey SDK</string>
+    <string name="app_name">Android_openkeySdk</string>
+
     <string name="seos_hce_aid_description">Access Control</string>
     <string name="seos_hce_description" translateable="false">Seos</string>
 
 
     //KeyActive
     <string name="wrong_door">Wrong door</string>
+
+    <string name="mobile_App_Id">Mobile App Id: %s</string>
+    <string name="ble_registration_device_Id">Device Id: %s</string>
+    <string name="ble_status_msg">BLE Status: %s</string>
+    <string name="unregister">Unregister</string>
+    <string name="synchronise">Synchronise</string>
+    <string name="get_all_files">Get all files</string>
+    <string name="activate_file">Activate</string>
+    <string name="deactivate_all_files">Deactivate all</string>
+    <string name="clear">Clear</string>
+    <string name="enter_phone_number">Enter Phone Number with country code</string>
+    <string name="register">Register…</string>
+    <string name="enter_token_from_sms">Enter Token from SMS</string>
+    <string name="complete_registration">Complete Registration…</string>
+    <string name="about">About…</string>
+
+    <string name="error_113">All Keys: The key is not valid in the current lock mode or cycle. Lock is typically in an invalid mode. This code may also appear if you use standard or display keys when the PPK or SPK LEDs are flashing.</string>
+    <string name="error_117">Standard, Special, PPK and SPK Keys: The lock is in shutdown cycle because 10 or more invalid keys were used. A valid key must be used to terminate shutdown mode.</string>
+    <string name="error_122">Standard Keys: Lock level is non-operating for this key’s type. The key does not belong to this lock.</string>
+    <string name="error_123">Standard and Special Keys: Key is not mastered into the lock. The key does not belong to this lock.</string>
+    <string name="error_127">Standard Keys: Key does not have one of the 12 valid pass numbers required for the pass level.</string>
+    <string name="error_128">Standard and Special Keys: Key is an old key; its new key date is earlier than the lock’s key data. Replace the key with a current or new key.</string>
+    <string name="error_129">Standard and Special Keys: Key is an old key; its new key time is earlier than the lock’s key data. Replace the key with a current or new key.</string>
+    <string name="error_134">Standard and Special Keys: Key is an old key, level has limited sequence range (1-15) but key’s sequence number is older than the lock’s key data. Replace key with a current or new key. Use a re-sequence key if necessary.</string>
+    <string name="error_135">Standard and Special Keys: Key is too new, level has limited sequence range and key’s sequence number is beyond the lock’s key data and range. Make and use a re-sequence key, then try the original key again.</string>
+    <string name="error_136">Standard Key: Key is a limited use key and has already been used the maximum number of times. Replace key with a new key.</string>
+    <string name="error_137">Standard Key: The key is a new key but the door is dead bolted and the new key cannot be accepted. If key is for a new guest, the room is still occupied. Assign new guest to another room.</string>
+    <string name="error_141">All Keys: The key is expired based on the lock’s clock date and time. Replace key with a duplicate key with a later expiration date and time.</string>
+    <string name="error_149">Standard Key: Key is current but key’s level is inhibited. Replace key with a new key.</string>
+    <string name="error_150">Special Key: Key is current but key is inhibited. Replace key with a new key.</string>
+    <string name="error_152">Standard Key: Key’s level is electronically locked out. If this key is a dual, electronic lock/unlock, inhibit level, or unlatch/latch key; it will not perform its function. The electronic unlock key must be used to remove the electronic lockout.</string>
+    <string name="error_154">Standard Key: Key is an opening key, but the lock is dead bolted and the key cannot override it.</string>
+    <string name="error_178">Standard Key: The key is new and is identified as a pre-reg key which will not work until its check-in date and time. If desired, replace key with a new key.</string>
+    <string name="error_255">Generic Error</string>
+
+
+    <string name="unlock_notification_title">Mobile Access is running</string>
+    <string name="notification_channel_name_informative">Running foreground scan service</string>
+
 </resources>

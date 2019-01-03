@@ -2,13 +2,13 @@ package com.openkey.sdk.api.model;
 
 public class KeyStatusRequest {
 
-    public int status;
+    public String status;
 
 
     /**
      * @param status
      */
-    public KeyStatusRequest(int status) {
+    public KeyStatusRequest(String status) {
         this.status = status;
     }
 }

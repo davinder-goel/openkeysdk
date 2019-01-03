@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="openkeysdk-release:@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/classes-2.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/classes.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/salto.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/DoorlockApi_2.6.1.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/LEGIC-Mobile-SDK-Android-V2.1.1.0-sources.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/DoorlockSdk_2.1.1.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/LEGIC-Mobile-SDK-Android-V2.1.1.0.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/openkeysdk-release.aar/97c449d367ccdff82c418191dbc98b0e/jars/libs/miwa.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,11 +1,3 @@
-/*
- *
- *  Copyright 2015 OpenKey. All Rights Reserved
- *
- *  @author OpenKey Inc.
- *
- */
-
 package com.openkey.sdk.Utilities;
 
 /**
@@ -33,6 +25,9 @@ public class Response {
 
     // IF device has failed authentication
     public static final String AUTHENTICATION_FAILED = "AUTHENTICATION FAILED";
+
+    // IF booking not exist
+    public static final String BOOKING_NOT_FOUNT = "BOOKING NOT FOUND";
 
     // IF device has failed authentication
     public static final String AUTHENTICATION_SUCCESSFUL = "AUTHENTICATION SUCCESSFUL";

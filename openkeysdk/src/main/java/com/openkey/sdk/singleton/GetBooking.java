@@ -1,7 +1,7 @@
 package com.openkey.sdk.singleton;
 
 
-import com.openkey.sdk.api.response.booking.BookingResponse;
+import com.openkey.sdk.api.response.session.SessionResponse;
 
 /**
  * @author OpenKey Inc.
@@ -14,7 +14,7 @@ public class GetBooking {
     private static GetBooking mInstance;
 
     // response from server
-    private BookingResponse mBookingResponse;
+    private SessionResponse mBookingResponse;
 
 
     private GetBooking() {
@@ -29,11 +29,11 @@ public class GetBooking {
     }
 
 
-    public BookingResponse getBooking() {
+    public SessionResponse getBooking() {
         return mBookingResponse;
     }
 
-    public void setBooking(BookingResponse booking) {
+    public void setBooking(SessionResponse booking) {
         mBookingResponse = booking;
     }
 

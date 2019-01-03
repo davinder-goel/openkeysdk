@@ -16,7 +16,17 @@ public class Status {
     @SerializedName("message")
     @Expose
     private String message;
+    @SerializedName("success")
+    @Expose
+    private Boolean success;
 
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
 
     /**
      * @return The message
