@@ -26,15 +26,15 @@ import retrofit2.Callback;
 
 /**
  * @author OpenKey Inc.
- *         <p>
- *         This class is responsible for the  SDK task management and Exception handling.
- *         This class is build upon the Singleton pattern to prevent the multiple Object
- *         creation.
+ * <p>
+ * This class is responsible for the  SDK task management and Exception handling.
+ * This class is build upon the Singleton pattern to prevent the multiple Object
+ * creation.
  */
-public final class OpenKeyManager {
+public final class OpenKeyManagerSAVE {
 
     @SuppressLint("StaticFieldLeak")
-    private static volatile OpenKeyManager instance;
+    private static volatile OpenKeyManagerSAVE instance;
     private Context context;
     private MANUFACTURER manufacturer;
     private ASSA assa;
@@ -46,16 +46,42 @@ public final class OpenKeyManager {
     private OpenKeyCallBack mOpenKeyCallBack;
 
     //-----------------------------------------------------------------------------------------------------------------|
+    //-----------------------------------------------------------------------------------------------------------------|
+    /*
+     * Getting mobile key from server, If the key is issued from backend then start syncing
+     * process
+     * */
+    private Callback getKeyCallback = new Callback() {
+        @Override
+        public void onResponse(Call call, retrofit2.Response response) {
+            if (response.isSuccessful()) {
+                startSync();
+            } else {
+                if (mOpenKeyCallBack != null)
+                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+            }
+        }
+
+        @Override
+        public void onFailure(Call call, Throwable t) {
+            if (mOpenKeyCallBack != null)
+                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+        }
+    };
+    //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * Access to this class can only be provided by this class
      * so object creation is limited to this only.
+     *
      * @param context
      */
 
-    private OpenKeyManager(Context context) {
+    private OpenKeyManagerSAVE(Context context) {
         this.context = context.getApplicationContext();
         Utilities.getInstance(context);
     }
+
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**
@@ -63,15 +89,15 @@ public final class OpenKeyManager {
      * context to this class.
      *
      * @param context {@link Context } of the host application
-     * @return Instance of the {@link OpenKeyManager} class
+     * @return Instance of the {@link OpenKeyManagerSAVE} class
      */
-    public static synchronized OpenKeyManager getInstance(Context context)
+    public static synchronized OpenKeyManagerSAVE getInstance(Context context)
             throws NullPointerException {
         if (instance == null) {
             if (context == null) {
                 throw new NullPointerException(Response.NULL_CONTEXT);
             }
-            instance = new OpenKeyManager(context);
+            instance = new OpenKeyManagerSAVE(context);
 
             SessionResponse sessionResponse = Utilities.getInstance(context).getBookingFromLocal(context);
             if (sessionResponse != null)
@@ -80,12 +106,11 @@ public final class OpenKeyManager {
         return instance;
     }
 
-    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * @param authToken
      * @param openKeyCallBack Call back for response purpose
      */
-    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack,boolean environmentType) {
+    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack, boolean environmentType) {
 
         //Set configuration
         setConfiguration(environmentType);
@@ -93,25 +118,27 @@ public final class OpenKeyManager {
         if (authToken != null && authToken.length() > 0 && context != null)
             Api.getSession(context, authToken, openKeyCallBack);
         else
-            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE,"");
+            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    private void setConfiguration(boolean environmentType)
-    {
+    private void setConfiguration(boolean environmentType) {
         if (environmentType)
-            Utilities.getInstance().saveValue(Constants.BASE_URL,Constants.BASE_URL_LIVE,context);
+            Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_LIVE, context);
         else
-            Utilities.getInstance().saveValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
-    }
-
-    public void getSession(String authToken,final Callback callback) {
-        //Set configuration
-       // setConfiguration();
-        Api.getBooking(authToken,context, callback);
+            Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_DEV, context);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
+    public void getSession(String authToken, final Callback callback) {
+        //Set configuration
+        // setConfiguration();
+        Api.getBooking(authToken, context, callback);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * Initialize SDK with unique number.
      * <p>
@@ -163,7 +190,6 @@ public final class OpenKeyManager {
         }
     }
 
-    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * If the user is successfully authenticated
      * and initialization is also successful, can
@@ -183,35 +209,12 @@ public final class OpenKeyManager {
         if (context == null)
             openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
 
-
         //Getting key from server
         Api.getMobileKey(context, getKeyCallback);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    /*
-     * Getting mobile key from server, If the key is issued from backend then start syncing
-     * process
-     * */
-    private Callback getKeyCallback = new Callback() {
-        @Override
-        public void onResponse(Call call, retrofit2.Response response) {
-            if (response.isSuccessful()) {
-                startSync();
-            } else {
-                if (mOpenKeyCallBack != null)
-                    mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-            }
-        }
 
-        @Override
-        public void onFailure(Call call, Throwable t) {
-            if (mOpenKeyCallBack != null)
-                mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-        }
-    };
-
-    //-----------------------------------------------------------------------------------------------------------------|
     /**
      * If the user is successfully
      * get keys then start sync process via this method
@@ -250,16 +253,13 @@ public final class OpenKeyManager {
             case ENTRAVATOUCH:
                 entrava.issueEntravaKey();
                 break;
-
-            case OKC:
-                mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
-                break;
         }
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
-     *  If device has a key available
+     * If device has a key available
      *
      * @param openKeyCallBack Call back for response purpose
      * @return boolean
@@ -294,18 +294,16 @@ public final class OpenKeyManager {
             case ENTRAVATOUCH:
                 haveKey = entrava.haveKey();
                 break;
-
-            case OKC:
-                haveKey = okc.haveKey();
-                break;
         }
         return haveKey;
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * start scanning if passes the initial checks
      * and device have a key
+     *
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack) {
@@ -339,10 +337,6 @@ public final class OpenKeyManager {
                 case ENTRAVATOUCH:
                     entrava.startImGateScanningService();
                     break;
-
-                case OKC:
-                    okc.startScanning();
-                    break;
             }
         } else {
             Log.e("Manager", "called");
@@ -351,6 +345,7 @@ public final class OpenKeyManager {
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * * This method is used to update the key status on server.
      * 1 identify the device have key
@@ -358,8 +353,7 @@ public final class OpenKeyManager {
      *
      * @param haveKey Device have key or not
      */
-    public void updateKeyStatus(boolean haveKey)
-    {
+    public void updateKeyStatus(boolean haveKey) {
         if (haveKey)
             Api.setKeyStatus(context, Constants.KEY_DELIVERED);
         else
