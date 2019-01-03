@@ -99,51 +99,69 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/splits-support" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/reports" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 28 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.mixpanel.android:mixpanel-android-4.9.8" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-v4-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.8.1@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:common:1.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-annotations:27.1.1@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.5@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-compat-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: javax.annotation:javax.annotation-api:1.2@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.13.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:viewmodel-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-android:1.7.21@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:multidex-1.0.2" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-vector-drawable-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-media-compat-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-1.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: openkeysdk-release:@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.retrofit2:converter-gson:2.3.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:logging-interceptor:3.8.1@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-gcm-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.bouncycastle:bcprov-jdk15on:1.54@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.4@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.retrofit2:retrofit:2.3.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.core:runtime-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: com.android.support:multidex-instrumentation-1.0.2" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-stats-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-solver:1.1.2@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-iid-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.0" level="project" />
+    <orderEntry type="library" name="com.squareup.retrofit2:converter-gson:2.3.0@jar" level="project" />
+    <orderEntry type="library" name="android.arch.core:runtime-1.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:multidex-1.0.2" level="project" />
+    <orderEntry type="library" name="com.android.support:asynclayoutinflater-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:swiperefreshlayout-28.0.0" level="project" />
+    <orderEntry type="library" name="openkeysdk-release:@aar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-v4-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:drawerlayout-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:animated-vector-drawable-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:coordinatorlayout-28.0.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-stats-15.0.1" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:livedata-1.1.1" level="project" />
+    <orderEntry type="library" name="com.google.guava:guava:18.0@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:cursoradapter-28.0.0" level="project" />
+    <orderEntry type="library" name="org.apache.commons:commons-lang3:3.4@jar" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-basement-15.0.1" level="project" />
+    <orderEntry type="library" name="com.android.support:localbroadcastmanager-28.0.0" level="project" />
+    <orderEntry type="library" name="org.slf4j:slf4j-android:1.7.21@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-ui-28.0.0" level="project" />
+    <orderEntry type="library" name="com.squareup.okhttp3:logging-interceptor:3.8.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-media-compat-28.0.0" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:viewmodel-1.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-fragment-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-annotations:28.0.0@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-vector-drawable-28.0.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-gcm-15.0.1" level="project" />
+    <orderEntry type="library" name="com.android.support:collections:28.0.0@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:print-28.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="com.android.support:multidex-instrumentation-1.0.2" level="project" />
+    <orderEntry type="library" name="javax.annotation:javax.annotation-api:1.2@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-compat-28.0.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-base-15.0.1" level="project" />
+    <orderEntry type="library" name="com.android.support:viewpager-28.0.0" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.8.5@jar" level="project" />
+    <orderEntry type="library" name="com.mixpanel.android:mixpanel-android-4.9.8" level="project" />
+    <orderEntry type="library" name="com.squareup.okhttp3:okhttp:3.8.1@jar" level="project" />
+    <orderEntry type="library" name="android.arch.core:common:1.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:loader-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support.constraint:constraint-layout-1.1.2" level="project" />
+    <orderEntry type="library" name="org.bouncycastle:bcprov-jdk15on:1.54@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:versionedparcelable-28.0.0" level="project" />
+    <orderEntry type="library" name="com.squareup.okio:okio:1.13.0@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:documentfile-28.0.0" level="project" />
+    <orderEntry type="library" name="com.squareup.retrofit2:retrofit:2.3.0@jar" level="project" />
+    <orderEntry type="library" name="org.slf4j:slf4j-api:1.7.25@jar" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:runtime-1.1.1" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-iid-15.0.1" level="project" />
+    <orderEntry type="library" name="com.android.support:slidingpanelayout-28.0.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-tasks-15.0.1" level="project" />
+    <orderEntry type="library" name="com.android.support:interpolator-28.0.0" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:livedata-core-1.1.1" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:common:1.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:customview-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:appcompat-v7-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-utils-28.0.0" level="project" />
+    <orderEntry type="library" name="com.android.support.constraint:constraint-layout-solver:1.1.2@jar" level="project" />
   </component>
 </module>
