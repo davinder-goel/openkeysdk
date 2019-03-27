@@ -19,13 +19,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.openkey.sdk.OpenKeyManager;
-import com.openkey.sdk.api.request.RetrofitCallback;
-import com.openkey.sdk.api.response.session.SessionResponse;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.openkey.sdk.OpenKeyManager;
+import com.openkey.sdk.api.response.session.SessionResponse;
 
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
@@ -127,7 +123,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         isScanning = true;
         handler = new Handler();
         handler.postDelayed(stopper, 10000);
-        OpenKeyManager.getInstance(getActivity()).startScanning(this);
+        OpenKeyManager.getInstance().startScanning(this);
     }
 
     /**
@@ -164,12 +160,12 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         switch (MOBILE_KEY_STATUES) {
             case 3:
                 //If the key status is delivered and device have key then it will not call initialize
-                if (!OpenKeyManager.getInstance(getActivity()).isKeyAvailable(this))
-                    OpenKeyManager.getInstance(getActivity()).initialize(this);
+                if (!OpenKeyManager.getInstance().isKeyAvailable(this))
+                    OpenKeyManager.getInstance().initialize(this);
                 break;
 
             default:
-                OpenKeyManager.getInstance(getActivity()).initialize(this);
+                OpenKeyManager.getInstance().initialize(this);
                 break;
         }
     }
@@ -228,7 +224,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void initializationSuccess() {
         hideMessage();
-        OpenKeyManager.getInstance(getActivity()).getKey(this);
+        OpenKeyManager.getInstance().getKey(this);
     }
 
     @Override
@@ -292,7 +288,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
             return;
         }
 
-        if (OpenKeyManager.getInstance(getActivity()).isKeyAvailable
+        if (OpenKeyManager.getInstance().isKeyAvailable
                 (this)) {
             if (mBluetoothAdapter.enable()) {
                 showMessage("Scanning..");
@@ -313,19 +309,19 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 mEdtTextToken.setText(mToken);
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance(getActivity()).authenticate(mToken,
+                    OpenKeyManager.getInstance().authenticate(mToken,
                             this,false);
                 }
                 break;
 
             case R.id.buttonIntialize:
                 showMessage("Initializing...");
-                OpenKeyManager.getInstance(getActivity()).initialize(this);
+                OpenKeyManager.getInstance().initialize(this);
                 break;
 
             case R.id.buttonGetKey:
                 showMessage("Fetching key...");
-                OpenKeyManager.getInstance(getActivity()).getKey(this);
+                OpenKeyManager.getInstance().getKey(this);
                 break;
 
             case R.id.buttonOpenDoor:
