@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import com.openkey.sdk.OpenKeyManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class Fragmentactivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        OpenKeyManager.getInstance().init(getApplication());
         checkPermissions();
         requestPermission();
         getSupportFragmentManager().beginTransaction().add(R.id.action_container, new KeyActiveFragment(), "").commitAllowingStateLoss();
