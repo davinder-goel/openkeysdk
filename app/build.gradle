@@ -22,6 +22,11 @@ android {
         javaMaxHeapSize System.getenv("DISABLE_DEX_MAX_HEAP") ? null : "8g"
         preDexLibraries = false
     }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 
@@ -51,10 +56,8 @@ dependencies {
     implementation 'org.slf4j:slf4j-android:1.7.21'*/
     implementation 'org.bouncycastle:bcprov-jdk15on:1.54'
     implementation 'com.google.android.gms:play-services-gcm:15.0.1'
-      implementation(name:'openkeysdk-release', ext:'aar')
-/*    implementation project(':openkeysdk')*/
-
-
+   //implementation(name:'openkeysdk-release', ext:'aar')
+     implementation project(':openkeysdk')
 
     //
     implementation 'com.android.support:multidex:1.0.2'
@@ -64,4 +67,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
     implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'org.slf4j:slf4j-android:1.7.21'
+    implementation 'com.clj.fastble:FastBleLib:2.3.4'
+    api 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+
 }
