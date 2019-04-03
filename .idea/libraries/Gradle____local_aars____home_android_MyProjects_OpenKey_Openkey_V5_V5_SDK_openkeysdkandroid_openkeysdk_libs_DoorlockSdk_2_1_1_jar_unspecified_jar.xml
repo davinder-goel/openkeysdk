@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: __local_aars__:/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/openkeysdk/libs/DoorlockSdk_2.1.1.jar:unspecified@jar">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/openkeysdk/libs/DoorlockSdk_2.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

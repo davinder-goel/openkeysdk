@@ -16,6 +16,8 @@ public class Constants {
     public final static String INVITATION_CODE = "invitation_code";
     public static final String MOBILE_KEY = "mobile_key";
     public static final String KABA_REGISTRATION_TOKEN = "kaba_registration";
+    public static final String OKC_KEY_TOKEN = "guest_sdk_okc_token";
+    public static final String OKC_ROOM_LIST = "guest_sdk_okc_ROOM_LIST";
 
     // KABA requirements
     public static final String URL_KABA_BASE = "https://api.legicconnect.com";
@@ -39,7 +41,7 @@ public class Constants {
     public static final String KEY_SERVER_REQUESTED = "KEY SERVER REQUESTED";
 
     //LIVE BASE URL
-   //  public static final String BASE_URL_LIVE = "https://developer.openkey.co/";
+    //  public static final String BASE_URL_LIVE = "https://developer.openkey.co/";
     // public static final String BASE_URL_LIVE = "https://betadeveloper.openkey.co/";
     //ASSA LIVE
     public static final String ASSA_LIVE_URL = "https://credential-services.sci.assaabloy.com/";
@@ -48,10 +50,13 @@ public class Constants {
     public static final String ASSA_DEV_URL = "https://demo.credential-services.sci.assaabloy.net";
     public static final String ASSA_DEV_TOKEN = "Basic b3BlbmtleS1kZW1vLXRubnQ6eFpKTGM1aHNTcTdKcDJ2d1FGMjU=";
     //DEV BASE URL
-    //public static  String BASE_URL_DEV = "https://partner.openkey.co/";
+//    public static String BASE_URL_DEV = "https://connector.openkey.co/";
+    //    public static  String BASE_URL_DEV = "https://partner.openkey.co/";
     public static String BASE_URL_DEV = "https://apidev.openkey.co/";
     //Live
-    public static String BASE_URL_LIVE = "https://developer.openkey.co/";
+    public static String BASE_URL_LIVE = "https://connector.openkey.co/";
+//    public static String BASE_URL_LIVE = "https://developer.openkey.co/";
+
 
 
 }

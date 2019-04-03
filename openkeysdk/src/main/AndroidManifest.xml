@@ -3,19 +3,10 @@
     package="com.openkey.sdk">
 
 
-    <!-- Declaration that this app is usable on phones with Bluetooth. -->
-    <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="true" />
-
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -23,12 +14,16 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- Declaration that this app is usable on phones with Bluetooth. -->
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
 
     <application
         android:allowBackup="false"
-        android:icon="@drawable/ic_app_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_app_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -71,7 +66,7 @@
             android:name="com.saltosystems.justinmobile.sdk.hce.JustinHceService"
             android:enabled="false"
             android:exported="true"
-            android:permission="android.permission.BIND_NFC_SERVICE" >
+            android:permission="android.permission.BIND_NFC_SERVICE">
             <intent-filter>
                 <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
 
@@ -80,7 +75,6 @@
 
 
         </service>
-
     </application>
 
 </manifest>

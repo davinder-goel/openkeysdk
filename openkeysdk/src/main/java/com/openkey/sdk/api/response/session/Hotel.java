@@ -74,6 +74,7 @@ public class Hotel {
     @SerializedName("manager_email")
     @Expose
     private String managerEmail;
+
     @SerializedName("manager_phone")
     @Expose
     private String managerPhone;
@@ -90,9 +91,11 @@ public class Hotel {
     @Expose
     private LockVendor lockVendor;
 
+
     public Integer getId() {
         return id;
     }
+
 
     public void setId(Integer id) {
         this.id = id;

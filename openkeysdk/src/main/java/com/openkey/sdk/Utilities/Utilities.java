@@ -3,6 +3,8 @@ package com.openkey.sdk.Utilities;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Vibrator;
 import android.text.TextUtils;
@@ -56,7 +58,9 @@ public class Utilities {
     public static Utilities getInstance(Context... contexts) {
         if (utilities == null) {
             utilities = new Utilities();
-            prefs = new SharedPreferencesEncryption(contexts[0].getApplicationContext());
+
+            if (contexts != null && contexts.length > 0)
+                prefs = new SharedPreferencesEncryption(contexts[0].getApplicationContext());
         }
         return utilities;
 
@@ -87,12 +91,27 @@ public class Utilities {
         return client;
     }
 
+    public boolean isOnline(Context ctx) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            return false;
+        }
+
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        } else
+            return false;
+
+    }
+
     /**
      * Clear values of shared preference.
      *
      * @param context the context
-     * If user logout then clear all the saved values from the
-     * shared preference file
+     *                If user logout then clear all the saved values from the
+     *                shared preference file
      */
     public void clearValueOfKey(Context context, String key) {
         if (context == null) return;
@@ -148,7 +167,6 @@ public class Utilities {
 
     /**
      * for vibration
-     *
      */
     @SuppressLint("MissingPermission")
     public void vibrate(Context context) {
@@ -161,8 +179,8 @@ public class Utilities {
      *
      * @param context the context
      * @param toast   String value which needs to shown in the toast.
-     * if you want to print a toast just call this method and pass
-     * what you want to be shown.
+     *                if you want to print a toast just call this method and pass
+     *                what you want to be shown.
      */
     public Toast showToast(Context context, String toast) {
         if (context != null && msg == null || msg.getView().getWindowVisibility() != View.VISIBLE) {
@@ -289,10 +307,10 @@ public class Utilities {
 //        httpClient.connectTimeout(30, TimeUnit.SECONDS);
 
 
-        String url=Constants.BASE_URL_DEV;
+        String url = Constants.BASE_URL_DEV;
 
-        if (context!=null)
-            url=Utilities.getInstance().getValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
+        if (context != null)
+            url = Utilities.getInstance().getValue(Constants.BASE_URL, Constants.BASE_URL_DEV, context);
 
         // add logging as last interceptor
 //        httpClient.addInterceptor(logging);
@@ -309,7 +327,7 @@ public class Utilities {
      *
      * @param responseBody Get message from the response body
      */
-    public String handleApiError(ResponseBody responseBody,Context context) {
+    public String handleApiError(ResponseBody responseBody, Context context) {
         Converter<ResponseBody, Status> errorConverter = getRetrofit(context)
                 .responseBodyConverter(Status.class, new Annotation[0]);
         try {
@@ -385,10 +403,12 @@ public class Utilities {
      * Get booking from the saved shared preference
      */
     public SessionResponse getBookingFromLocal(Context context) {
-        String bookingString = getValue(Constants.BOOKING, "", context);
-        if (!TextUtils.isEmpty(bookingString)) {
-            Gson gson = GetGson.getInstance();
-            return gson.fromJson(bookingString, SessionResponse.class);
+        if (context != null) {
+            String bookingString = getValue(Constants.BOOKING, "", context);
+            if (!TextUtils.isEmpty(bookingString)) {
+                Gson gson = GetGson.getInstance();
+                return gson.fromJson(bookingString, SessionResponse.class);
+            }
         }
         return null;
     }

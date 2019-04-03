@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -38,6 +37,7 @@ public class Entrava {
         this.mContext = mContext;
         initialize();
     }
+
     //-----------------------------------------------------------------------------------------------------------------|
     private void initialize() {
         Intent intent = new Intent(mContext, Entrava.class);
@@ -111,7 +111,7 @@ public class Entrava {
                         Api.setKeyStatus(mContext, Constants.KEY_DELIVERED);
                     } else {
                         openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-                        Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
+//                        Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
                     }
                 }
             });
