@@ -100,7 +100,7 @@ public class OKC implements OkcManagerCallback {
     /**
      * start IMGATE service for open lock when scanning animation on going
      */
-    public void startScanning() {
+    public void startScanning(String roomNumber) {
         Log.e("OKC startScanning", "true");
         //Retrieve the values
         String jsonText = Utilities.getInstance().getValue(Constants.OKC_ROOM_LIST, "", mContext);
@@ -108,12 +108,18 @@ public class OKC implements OkcManagerCallback {
         }.getType();
 
         mRoomList = createGsonObj().fromJson(jsonText, type);
+        Log.e("fetch room list size", mRoomList.size() + "");
         if (Utilities.getInstance().isOnline(mContext)) {
             if (mRoomList != null && mRoomList.size() > 0) {
                 Log.e("OKC mRoomList", "true");
 
-//            for (int i=0; i<mRoomList.size();i++){
-                OKCManager.getInstance(mContext).scanMyDevice(mRoomList.get(0).getMac());
+                for (int i = 0; i < mRoomList.size(); i++) {
+                    if (roomNumber.equals(mRoomList.get(i).getTitle())) {
+                        OKCManager.getInstance(mContext).scanMyDevice(mRoomList.get(i).getMac(), mRoomList.get(i).getId());
+                        Log.e("room & mac", roomNumber + " " + mRoomList.get(i).getMac());
+                        break;
+                    }
+                }
 //
             } else {
                 Log.e("OKC mRoomList", "FALSE");
@@ -159,12 +165,17 @@ public class OKC implements OkcManagerCallback {
         } else {
             mRoomList.clear();
         }
+        ArrayList<String> tempRoomList = new ArrayList<>();
 
         if (response != null) {
             Log.e("RoomList Size", response.getData().getPropertyLocks().size() + "");
             mRoomList.addAll(response.getData().getPropertyLocks());
             String jsonText = createGsonObj().toJson(mRoomList);
             Utilities.getInstance().saveValue(Constants.OKC_ROOM_LIST, jsonText, mContext);
+            for (int i = 0; i < response.getData().getPropertyLocks().size(); i++) {
+                tempRoomList.add(response.getData().getPropertyLocks().get(i).getTitle());
+            }
+            openKeyCallBack.getOKCMobileKeysResponse(tempRoomList);
         }
     }
 

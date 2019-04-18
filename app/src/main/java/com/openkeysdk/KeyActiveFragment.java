@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
 
+import java.util.ArrayList;
+
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
 
@@ -37,6 +39,9 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     private Handler handler;
     private static final int MY_PERMISSIONS_REQUEST = 999;
     private int MOBILE_KEY_STATUES = 0;
+
+    private ArrayList<String> okcRoomNumbers;
+    private String mOkCSelectedRoom;
     private Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -55,7 +60,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "duoc772vd3e5gb2mhescdeu27jgetmwmlwolixowmzb7ois6gf7cpacd7gn4tngc";
+    private String mToken = "l3ypw4zdeuxfidtfjkisg5oxq3xidw4rqghh2tm45nrfybyxjy4zhi2kkvamdoxe";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -123,7 +128,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         isScanning = true;
         handler = new Handler();
         handler.postDelayed(stopper, 10000);
-        OpenKeyManager.getInstance().startScanning(this);
+        OpenKeyManager.getInstance().startScanning(this, mOkCSelectedRoom);
     }
 
     /**
@@ -216,7 +221,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void sessionFailure(String errorDescription, String errorCode) {
-        Log.e("onFailure",":");
+        Log.e("onFailure", ":");
         hideMessage();
         showToast("Booking not found");
     }
@@ -262,14 +267,28 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void isKeyAvailable(boolean haveKey, String description) {
 
-        if (getActivity()!=null)
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showMessage("");
-                showToast("DONE");
+        if (getActivity() != null)
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showMessage("");
+                    showToast("DONE");
+                }
+            });
+    }
+
+    @Override
+    public void getOKCMobileKeysResponse(ArrayList<String> availableRooms) {
+        if (okcRoomNumbers == null) {
+            okcRoomNumbers = new ArrayList<>();
+        }
+        if (availableRooms.size() > 0) {
+            for (int i = 0; i < availableRooms.size() - 1; i++) {
+                okcRoomNumbers.add(availableRooms.get(i));
             }
-        });
+        }
+
+        mOkCSelectedRoom = okcRoomNumbers.get(0); // for example
     }
 
     public void showToast(String message) {
@@ -310,7 +329,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
                     OpenKeyManager.getInstance().authenticate(mToken,
-                            this,false);
+                            this, false);
                 }
                 break;
 

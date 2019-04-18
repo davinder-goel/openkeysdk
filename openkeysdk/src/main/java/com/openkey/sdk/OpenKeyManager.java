@@ -317,7 +317,7 @@ public final class OpenKeyManager {
      *
      * @param openKeyCallBack Call back for response purpose
      */
-    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack) {
+    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber) {
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
 
         if (mContext == null) {
@@ -332,7 +332,7 @@ public final class OpenKeyManager {
         if (isKeyAvailable(openKeyCallBack)) {
             switch (manufacturer) {
                 case OKC:
-                    okc.startScanning();
+                    okc.startScanning(roomNumber);
                     break;
 
                 case ASSA:
