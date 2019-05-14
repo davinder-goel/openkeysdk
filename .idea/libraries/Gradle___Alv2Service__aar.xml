@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: :Alv2Service:@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/Alv2Service.aar/8ba055fddcdd86e56c7e8cf9988db087/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/Alv2Service.aar/8ba055fddcdd86e56c7e8cf9988db087/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/Alv2Service.aar/27e1c0ed0b3cc80d6ad083d604b41734/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/Alv2Service.aar/27e1c0ed0b3cc80d6ad083d604b41734/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
