@@ -90,11 +90,12 @@ public final class OpenKeyManager {
      *
      * @param context
      */
-    public void init(Application context) throws NullPointerException {
+    public void init(Application context, String UUID) throws NullPointerException {
         if (context == null) throw new NullPointerException(Response.NULL_CONTEXT);
 
         mContext = context;
         Utilities.getInstance(mContext);
+        Utilities.getInstance().saveValue(Constants.UUID, UUID, mContext);
         SessionResponse sessionResponse = Utilities.getInstance().getBookingFromLocal(mContext);
         if (sessionResponse != null)
             GetBooking.getInstance().setBooking(sessionResponse);

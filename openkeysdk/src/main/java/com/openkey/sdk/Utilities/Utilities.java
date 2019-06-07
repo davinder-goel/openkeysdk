@@ -300,7 +300,7 @@ public class Utilities {
 //        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 //        // set your desired log level
 //        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = getNewHttpClient().newBuilder();
+        OkHttpClient.Builder httpClient = getNewHttpClient(context).newBuilder();
 
 //        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 //        httpClient.readTimeout(30, TimeUnit.SECONDS);
@@ -343,7 +343,8 @@ public class Utilities {
         return null;
     }
 
-    private OkHttpClient getNewHttpClient() {
+    private OkHttpClient getNewHttpClient(Context context) {
+        String UUID = Utilities.getInstance().getValue(Constants.UUID, "", context);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // set your desired log level
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -351,6 +352,21 @@ public class Utilities {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(logging);
+
+        client.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+
+                Request request = chain.request().newBuilder()
+                        .header("x-openkey-app", UUID)
+                        .header("Accept", "application/json")
+                        .header("Cache-Control", "no-cache")
+//                        .method(original.method(), original.body())
+                        .build();
+
+                return chain.proceed(request);
+            }
+        });
         return enableTls12OnPreLollipop(client).build();
     }
 

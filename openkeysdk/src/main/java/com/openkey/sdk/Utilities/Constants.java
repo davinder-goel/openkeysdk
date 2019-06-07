@@ -10,6 +10,8 @@ public class Constants {
 
     // SharedPreference keys below
     // Manufacturer for identification purpose to use which SDK needs to be started
+    public static final String UUID = "openkey_sdk_uuid";
+    //    public static String UUID = "";
     public static final String MANUFACTURER = "manufacturer";
     public static final String AUTH_SIGNATURE = "auth_signature";
     public static final String BOOKING_ID = "booking_id";
