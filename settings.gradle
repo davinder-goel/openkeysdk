@@ -1,1 +1,1 @@
-include ':app', ':openkeysdk', ':okcsdk'
+include ':app', ':openkeysdk'
