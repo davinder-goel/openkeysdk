@@ -22,12 +22,14 @@ import android.widget.Toast;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
+import com.openkeysdk.security.KeyStoreEncryptionDecryptionHelper;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
-
+    KeyStoreEncryptionDecryptionHelper passwordStorageHelper;
     private Button mBtnAuthenciate;
     private Button mBtnIntialize;
     private Button mBtnGetKey;
@@ -71,6 +73,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dashboard, container, false);
+        passwordStorageHelper = new KeyStoreEncryptionDecryptionHelper(getActivity());
         init(view);
         listners();
         requestPermission();
@@ -339,12 +342,32 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 break;
 
             case R.id.buttonGetKey:
-                showMessage("Fetching key...");
-                OpenKeyManager.getInstance().getKey(this);
+//                showMessage("Fetching key...");
+//                OpenKeyManager.getInstance().getKey(this);
+                try {
+                    byte[] data = passwordStorageHelper.getData("OpenKeySdk");
+                    if (data != null) {
+                        String str = new String(data, "UTF-8");
+
+                        mTextStatus.setText(str);
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
                 break;
 
             case R.id.buttonOpenDoor:
-                openDoor();
+//                openDoor();
+
+                try {
+                    passwordStorageHelper.setData("OpenKeySdk", mEdtTextToken.getText().toString().getBytes("UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }
