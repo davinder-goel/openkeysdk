@@ -32,7 +32,6 @@ import com.openkey.sdk.singleton.GetBooking;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -324,8 +323,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                 SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
                 for (int i = 0; i < files.size(); i++) {
                     LegicNeonFile legicNeonFile = files.get(i);
-                    String reservationnumber = "" + Objects.requireNonNull(legicNeonFile.getMetaData().get("ReservationNumber")).getStringValue();
-                    String roomNumber = "" + Objects.requireNonNull(legicNeonFile.getMetaData().get("RoomNumber")).getStringValue();
+                    String reservationnumber = "" + legicNeonFile.getMetaData().get("ReservationNumber").getStringValue();
+                    String roomNumber = "" + legicNeonFile.getMetaData().get("RoomNumber").getStringValue();
                     logs(legicNeonFile);
                     Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
                             ? sessionResponse.getData().getParentSessionId()
@@ -349,6 +348,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
             }
         } catch (LegicMobileSdkException e) {
             Log.e("Kaba", e.getLocalizedMessage());
+        } catch (Exception e) {
+            Log.e("Kaba null files", e.getLocalizedMessage());
         }
         return false;
     }
@@ -361,7 +362,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         if (fileId.length > 0) {
             fileInfos += "\nFile Id: " + Utils.dataToByteString(legicNeonFile.getFileId());
             for (String key : legicNeonFile.getMetaData().keySet()) {
-                fileInfos += "\n" + key + ": " + Objects.requireNonNull(legicNeonFile.getMetaData().get(key)).getStringValue();
+                fileInfos += "\n" + key + ": " + legicNeonFile.getMetaData().get(key).getStringValue();
             }
         }
         Log.e("GetAllFiles Kaba", fileInfos);
@@ -386,8 +387,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                     for (int i = 0; i < files.size(); i++) {
 
                         LegicNeonFile legicNeonFile = files.get(i);
-                        String reservationnumber = "" + Objects.requireNonNull(legicNeonFile.getMetaData().get("ReservationNumber")).getStringValue();
-                        String roomNumber = "" + Objects.requireNonNull(legicNeonFile.getMetaData().get("RoomNumber")).getStringValue();
+                        String reservationnumber = "" + legicNeonFile.getMetaData().get("ReservationNumber").getStringValue();
+                        String roomNumber = "" + legicNeonFile.getMetaData().get("RoomNumber").getStringValue();
                         SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
                         Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
                                 ? sessionResponse.getData().getParentSessionId()
@@ -414,6 +415,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                 }
             } catch (LegicMobileSdkException e) {
                 Log.e("Kaba", e.getLocalizedMessage());
+            } catch (Exception e) {
+                Log.e("Kaba null activate file", e.getLocalizedMessage());
             }
 
         } catch (LegicMobileSdkException e) {

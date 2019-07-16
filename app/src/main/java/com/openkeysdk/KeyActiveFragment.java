@@ -22,14 +22,11 @@ import android.widget.Toast;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
-import com.openkeysdk.security.KeyStoreEncryptionDecryptionHelper;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
 
-    KeyStoreEncryptionDecryptionHelper passwordStorageHelper;
     private Button mBtnAuthenciate;
     private Button mBtnIntialize;
     private Button mBtnGetKey;
@@ -62,7 +59,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "l5tpnhnntsyqjotp3dkpgty7hzb5tnzcdhy77bfy76ky5obo2kw3xaz5nirkujdd";
+    private String mToken = "f5h26wkahjpvgb4nkycuqv6giea7bm2hdrya5xj6ebnql34mb2iw2rm2kuxxx6en";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -73,7 +70,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dashboard, container, false);
-        passwordStorageHelper = new KeyStoreEncryptionDecryptionHelper(getActivity());
         init(view);
         listners();
         requestPermission();
@@ -342,32 +338,12 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 break;
 
             case R.id.buttonGetKey:
-//                showMessage("Fetching key...");
-//                OpenKeyManager.getInstance().getKey(this);
-                try {
-                    byte[] data = passwordStorageHelper.getData("OpenKeySdk");
-                    if (data != null) {
-                        String str = new String(data, "UTF-8");
-
-                        mTextStatus.setText(str);
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
+                showMessage("Fetching key...");
+                OpenKeyManager.getInstance().getKey(this);
                 break;
 
             case R.id.buttonOpenDoor:
-//                openDoor();
-
-                try {
-                    passwordStorageHelper.setData("OpenKeySdk", mEdtTextToken.getText().toString().getBytes("UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                openDoor();
                 break;
         }
     }
