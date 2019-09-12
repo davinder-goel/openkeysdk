@@ -80,10 +80,13 @@ public class Api {
             Utilities.getInstance(context).saveBookingToLocal(context, bookingResponse);
             GetBooking.getInstance().setBooking(bookingResponse);
             //Saved manufacturer in locally
+//            if (bookingResponse.getData().getHotel() != null &&
+//                    bookingResponse.getData().getHotel().getLockVendor() != null &&
+//                    bookingResponse.getData().getHotel().getLockVendor().getTitle() != null) {
             if (bookingResponse.getData().getHotel() != null &&
-                    bookingResponse.getData().getHotel().getLockVendor() != null &&
-                    bookingResponse.getData().getHotel().getLockVendor().getTitle() != null) {
-                String manufacturer = bookingResponse.getData().getHotel().getLockVendor().getTitle().toUpperCase();
+                    bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor() != null &&
+                    bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor().getTitle() != null) {
+                String manufacturer = bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor().getTitle().toUpperCase();
                 Utilities.getInstance().saveValue(Constants.MANUFACTURER, manufacturer, context);
             }
 

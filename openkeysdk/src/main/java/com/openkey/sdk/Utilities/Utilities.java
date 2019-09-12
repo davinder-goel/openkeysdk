@@ -37,7 +37,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import okhttp3.TlsVersion;
-import okhttp3.internal.platform.Platform;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
@@ -45,8 +44,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * @author OpenKey Inc.
- *         <p>
- *         This class will provide all the necessary  utility methods.
+ * <p>
+ * This class will provide all the necessary  utility methods.
  */
 
 public class Utilities {
@@ -71,7 +70,7 @@ public class Utilities {
             try {
                 SSLContext sc = SSLContext.getInstance("TLSv1.2");
                 sc.init(null, null, null);
-                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()), Platform.get().trustManager(sc.getSocketFactory()));
+                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()));
 
                 ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                         .tlsVersions(TlsVersion.TLS_1_2)
