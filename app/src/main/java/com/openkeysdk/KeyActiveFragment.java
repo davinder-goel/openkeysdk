@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +15,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
@@ -277,7 +278,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void getOKCMobileKeysResponse(ArrayList<String> availableRooms) {
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms) {
         if (okcRoomNumbers == null) {
             okcRoomNumbers = new ArrayList<>();
         }

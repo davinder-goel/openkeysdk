@@ -3,7 +3,8 @@ package com.openkey.sdk.assa;
 import android.app.Application;
 import android.app.Notification;
 import android.os.Handler;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.assaabloy.mobilekeys.api.ApiConfiguration;
 import com.assaabloy.mobilekeys.api.MobileKey;

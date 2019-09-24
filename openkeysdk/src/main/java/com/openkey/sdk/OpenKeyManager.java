@@ -2,8 +2,9 @@ package com.openkey.sdk;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
@@ -17,6 +18,7 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.kaba.Kaba;
 import com.openkey.sdk.miwa.Miwa;
 import com.openkey.sdk.okc.OKC;
+import com.openkey.sdk.okmodule.OKModule;
 import com.openkey.sdk.salto.Salto;
 import com.openkey.sdk.singleton.GetBooking;
 
@@ -25,10 +27,10 @@ import retrofit2.Callback;
 
 /**
  * @author OpenKey Inc.
- *         <p>
- *         This class is responsible for the  SDK task management and Exception handling.
- *         This class is build upon the Singleton pattern to prevent the multiple Object
- *         creation.
+ * <p>
+ * This class is responsible for the  SDK task management and Exception handling.
+ * This class is build upon the Singleton pattern to prevent the multiple Object
+ * creation.
  */
 public final class OpenKeyManager {
 
@@ -42,6 +44,7 @@ public final class OpenKeyManager {
     private Entrava entrava;
     private Miwa miwa;
     private OKC okc;
+    private OKModule okModule;
     private OpenKeyCallBack mOpenKeyCallBack;
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -97,8 +100,7 @@ public final class OpenKeyManager {
         Utilities.getInstance(mContext);
         Utilities.getInstance().saveValue(Constants.UUID, UUID, mContext);
         SessionResponse sessionResponse = Utilities.getInstance().getBookingFromLocal(mContext);
-        if (sessionResponse != null)
-            GetBooking.getInstance().setBooking(sessionResponse);
+        if (sessionResponse != null) GetBooking.getInstance().setBooking(sessionResponse);
     }
 
 
@@ -115,8 +117,7 @@ public final class OpenKeyManager {
 
         if (authToken != null && authToken.length() > 0 && mContext != null)
             Api.getSession(mContext, authToken, openKeyCallBack);
-        else
-            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
+        else openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -133,8 +134,7 @@ public final class OpenKeyManager {
 
     public void getSession(String authToken, final Callback callback) {
         //Set configuration
-        if (mContext != null && authToken != null)
-            Api.getBooking(authToken, mContext, callback);
+        if (mContext != null && authToken != null) Api.getBooking(authToken, mContext, callback);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -154,8 +154,7 @@ public final class OpenKeyManager {
             return;
         }
 
-        final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER,
-                "", mContext);
+        final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", mContext);
         if (manufacturerStr.isEmpty()) {
             openKeyCallBack.initializationFailure(Response.BOOKING_NOT_FOUNT);
             return;
@@ -183,6 +182,10 @@ public final class OpenKeyManager {
                 okc = new OKC(mContext, openKeyCallBack);
                 break;
 
+            case MODULE:
+                okModule = new OKModule(mContext, openKeyCallBack);
+                break;
+
             case ENTRAVA:
             case ENTRAVATOUCH:
                 entrava = new Entrava(mContext, openKeyCallBack);
@@ -198,8 +201,7 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void getKey(@NonNull final OpenKeyCallBack openKeyCallBack) {
-        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null
-                && entrava == null && okc == null) {
+        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null) {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
         }
@@ -207,8 +209,7 @@ public final class OpenKeyManager {
         mOpenKeyCallBack = openKeyCallBack;
 
         //if mContext null then it returned callback with null mContext description
-        if (mContext == null)
-            openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
+        if (mContext == null) openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
 
 
         //Getting key from server
@@ -222,8 +223,7 @@ public final class OpenKeyManager {
      * get keys then start sync process via this method
      */
     private void startSync() {
-        if (mOpenKeyCallBack == null || mContext == null)
-            return;
+        if (mOpenKeyCallBack == null || mContext == null) return;
 
         manufacturer = Utilities.getInstance().getManufacturer(mContext, mOpenKeyCallBack);
         switch (manufacturer) {
@@ -261,6 +261,12 @@ public final class OpenKeyManager {
                 updateKeyStatus(true);
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 break;
+
+            case MODULE:
+                okModule.fetchOkModuleRoomList();
+                updateKeyStatus(true);
+                mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+                break;
         }
     }
 
@@ -273,8 +279,7 @@ public final class OpenKeyManager {
      * @return boolean
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
-        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null
-                && okc == null) {
+        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null) {
             Log.e("Started", "INITIALIZATION_FAILED");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             initialize(openKeyCallBack);
@@ -307,11 +312,15 @@ public final class OpenKeyManager {
             case OKC:
                 haveKey = okc.haveKey();
                 break;
+            case MODULE:
+                haveKey = okModule.haveKey();
+                break;
         }
         return haveKey;
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * start scanning if passes the initial checks
      * and device have a key
@@ -334,6 +343,9 @@ public final class OpenKeyManager {
             switch (manufacturer) {
                 case OKC:
                     okc.startScanning(roomNumber);
+                    break;
+                case MODULE:
+                    okModule.startScanning(roomNumber);
                     break;
 
                 case ASSA:
@@ -369,6 +381,7 @@ public final class OpenKeyManager {
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * * This method is used to update the key status on server.
      * 1 identify the device have key
@@ -378,10 +391,8 @@ public final class OpenKeyManager {
      */
     public void updateKeyStatus(boolean haveKey) {
 
-        if (haveKey)
-            Api.setKeyStatus(mContext, Constants.KEY_DELIVERED);
-        else
-            Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
+        if (haveKey) Api.setKeyStatus(mContext, Constants.KEY_DELIVERED);
+        else Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
     }
     //-----------------------------------------------------------------------------------------------------------------|
 

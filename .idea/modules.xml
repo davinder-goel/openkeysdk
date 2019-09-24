@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/open_key_sdk.iml" filepath="$PROJECT_DIR$/open_key_sdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/openkeysdk/openkeysdk.iml" filepath="$PROJECT_DIR$/openkeysdk/openkeysdk.iml" />
-      <module fileurl="file://$PROJECT_DIR$/openkeysdkandroid.iml" filepath="$PROJECT_DIR$/openkeysdkandroid.iml" />
     </modules>
   </component>
 </project>
