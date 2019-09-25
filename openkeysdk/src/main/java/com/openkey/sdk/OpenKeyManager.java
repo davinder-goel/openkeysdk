@@ -47,6 +47,8 @@ public final class OpenKeyManager {
     private OKModule okModule;
     private OpenKeyCallBack mOpenKeyCallBack;
 
+    private boolean mEnvironmentType;
+
     //-----------------------------------------------------------------------------------------------------------------|
     //-----------------------------------------------------------------------------------------------------------------|
     /*
@@ -123,6 +125,7 @@ public final class OpenKeyManager {
     //-----------------------------------------------------------------------------------------------------------------|
     private void setConfiguration(boolean environmentType) {
         if (mContext != null) {
+            Utilities.getInstance().saveValue(Constants.ENVIRONMENT_TYPE, environmentType, mContext);
             if (environmentType)
                 Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_LIVE, mContext);
             else

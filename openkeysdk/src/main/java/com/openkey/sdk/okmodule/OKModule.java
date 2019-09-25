@@ -53,8 +53,9 @@ public class OKModule implements OKModuleCallBack {
     }
 
     private void okModuleSDKInitialize() {
+        boolean environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, false, mApplication);
         OKModuleManager.Companion.getInstance(mApplication).registerOKModuleCallback(this);
-        OKModuleManager.Companion.getInstance(mApplication).OKInit(false);
+        OKModuleManager.Companion.getInstance(mApplication).OKInit(environmentType);
     }
 
     /**

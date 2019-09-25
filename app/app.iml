@@ -31,13 +31,12 @@
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="app_debug" />
-          <option name="languageVersion" value="1.3" />
-          <option name="apiVersion" value="1.3" />
           <option name="pluginOptions">
             <array>
               <option value="plugin:org.jetbrains.kotlin.android:experimental=false" />
               <option value="plugin:org.jetbrains.kotlin.android:enabled=true" />
               <option value="plugin:org.jetbrains.kotlin.android:defaultCacheImplementation=hashMap" />
+              <option value="plugin:org.jetbrains.kotlin.android:configuration=rO0ABXeSAAAAAwAIZmVhdHVyZXMAAAABAAV2aWV3cwAHcGFja2FnZQAAAAEADmNvbS5vcGVua2V5c2RrAAd2YXJpYW50AAAAAQBNbWFpbjsvaG9tZS9hbmRyb2lkL0Rlc2t0b3Avb3Blbl9rZXlfcHJvamVjdC9zZGsvb3Blbl9rZXlfc2RrL2FwcC9zcmMvbWFpbi9yZXM=" />
             </array>
           </option>
           <option name="pluginClasspaths">
@@ -217,6 +216,8 @@
     <orderEntry type="library" name="Gradle: androidx.savedstate:savedstate:1.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-common:2.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks:16.0.1@aar" level="project" />
+    <orderEntry type="module" module-name="openkeysdk" />
+    <orderEntry type="module" module-name="openkeysdk" />
     <orderEntry type="module" module-name="openkeysdk" />
   </component>
 </module>

@@ -32,13 +32,12 @@
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="openkeysdk_debug" />
-          <option name="languageVersion" value="1.3" />
-          <option name="apiVersion" value="1.3" />
           <option name="pluginOptions">
             <array>
               <option value="plugin:org.jetbrains.kotlin.android:experimental=false" />
               <option value="plugin:org.jetbrains.kotlin.android:enabled=true" />
               <option value="plugin:org.jetbrains.kotlin.android:defaultCacheImplementation=hashMap" />
+              <option value="plugin:org.jetbrains.kotlin.android:configuration=rO0ABXeaAAAAAwAIZmVhdHVyZXMAAAABAAV2aWV3cwAHcGFja2FnZQAAAAEAD2NvbS5vcGVua2V5LnNkawAHdmFyaWFudAAAAAEAVG1haW47L2hvbWUvYW5kcm9pZC9EZXNrdG9wL29wZW5fa2V5X3Byb2plY3Qvc2RrL29wZW5fa2V5X3Nkay9vcGVua2V5c2RrL3NyYy9tYWluL3Jlcw==" />
             </array>
           </option>
           <option name="pluginClasspaths">
