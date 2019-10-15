@@ -55,7 +55,7 @@ dependencies {
     implementation files('libs/okmodule_v1.0.jar')
     implementation files('libs/salto_v2.2.0.jar')
     implementation(name: 'Alv2Service_v1.3.4', ext: 'aar')
-    implementation files('libs/okc_sdk_v1.3.jar')
+    implementation files('libs/okc_sdk_v1.4.jar')
     api 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
