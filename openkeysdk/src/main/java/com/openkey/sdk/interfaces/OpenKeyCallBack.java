@@ -56,5 +56,5 @@ public interface OpenKeyCallBack {
      *
      * @param availableRooms is Keys available
      */
-    void getOKCMobileKeysResponse(ArrayList<String> availableRooms);
+    void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms);
 }

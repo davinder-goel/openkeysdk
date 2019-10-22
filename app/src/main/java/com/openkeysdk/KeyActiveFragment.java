@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +15,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
@@ -59,7 +60,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "f5h26wkahjpvgb4nkycuqv6giea7bm2hdrya5xj6ebnql34mb2iw2rm2kuxxx6en";
+    private String mToken = "3xu3cwsiwscmbpg3rjsjxyd7vh2r56737akvdbc6dh7rsjtejibel6mv2bceydhl";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -277,7 +278,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void getOKCMobileKeysResponse(ArrayList<String> availableRooms) {
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms) {
         if (okcRoomNumbers == null) {
             okcRoomNumbers = new ArrayList<>();
         }
@@ -327,8 +328,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 mEdtTextToken.setText(mToken);
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance().authenticate(mToken,
-                            this, false);
+                    OpenKeyManager.getInstance().authenticate(mToken, this, true);
                 }
                 break;
 

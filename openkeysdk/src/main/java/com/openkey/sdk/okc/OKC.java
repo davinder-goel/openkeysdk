@@ -173,7 +173,7 @@ public class OKC implements OkcManagerCallback {
 //            for (int i = 0; i < response.getData().getPropertyLocks().size(); i++) {
 //                tempRoomList.add(response.getData().getPropertyLocks().get(i).getTitle());
 //            }
-        openKeyCallBack.getOKCMobileKeysResponse(roomList);
+        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(roomList);
 //        }
     }
 
