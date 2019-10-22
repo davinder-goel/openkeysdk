@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
@@ -31,13 +32,25 @@ public class Entrava {
     private OpenKeyCallBack openKeyCallBack;
     private ServiceResult mServiceResultReceiver;
     private boolean isLogActionFired;
+    private boolean isDeviceScanned = false;
+
     //-----------------------------------------------------------------------------------------------------------------|
+    private Runnable runnable = new Runnable() {
+        public void run() {
+            if (mDoorLockSdk != null && !isDeviceScanned) {
+                Log.e("Stop Scan Called", "when not scanned");
+                mDoorLockSdk.stop();
+                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+            }
+        }
+    };
 
     public Entrava(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
         this.openKeyCallBack = OpenKeyCallBack;
         this.mContext = mContext;
         initialize();
     }
+
     //-----------------------------------------------------------------------------------------------------------------|
     private void initialize() {
         Intent intent = new Intent(mContext, Entrava.class);
@@ -111,7 +124,7 @@ public class Entrava {
                         Api.setKeyStatus(mContext, Constants.KEY_DELIVERED);
                     } else {
                         openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-                        Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
+//                        Api.setKeyStatus(mContext, Constants.PENDING_KEY_SERVER_REQUEST);
                     }
                 }
             });
@@ -141,7 +154,11 @@ public class Entrava {
      */
     public void startImGateScanningService() {
         isLogActionFired = true;
+        isDeviceScanned = false;
         mDoorLockSdk.start(mPendingIntent);
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 10 * 1000);
+
     }
     //-----------------------------------------------------------------------------------------------------------------|
 
@@ -171,6 +188,7 @@ public class Entrava {
         @Override
         protected void onResult(int result, int battery, String issueId) {
             super.onResult(result, battery, issueId);
+            isDeviceScanned = true;
             mDoorLockSdk.stop();
             Log.e(" Receiver result", ":" + result);
             Log.e(" Receiver issuedId", ":" + issueId);

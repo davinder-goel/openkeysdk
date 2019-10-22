@@ -1,41 +1,37 @@
 package com.openkey.sdk.okc;
 
-import android.content.Context;
+import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.clj.fastble.data.BleDevice;
+import com.google.gson.Gson;
+import com.openkey.okcsdk.BleHelper;
+import com.openkey.okcsdk.OKCManager;
+import com.openkey.okcsdk.callbacks.OkcManagerCallback;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
-import com.openkey.sdk.okc.ble.configs.OpenKeyConfig;
 
-import java.util.List;
-import java.util.Map;
-
-import key.open.cn.blecontrollor.helper.BaseDeviceConfig;
-import key.open.cn.blecontrollor.helper.BleCallBack;
-import key.open.cn.blecontrollor.helper.BleHelper;
+import java.util.ArrayList;
 
 //
 
-public class OKC implements BleCallBack {
-    private Context mContext;
+public class OKC implements OkcManagerCallback {
+    //    ArrayList<PropertyLock> mRoomList;
+    private Application mContext;
     private OpenKeyCallBack openKeyCallBack;
+    private Gson gson;
 
     //-----------------------------------------------------------------------------------------------------------------|
-    public OKC(Context mContext, OpenKeyCallBack OpenKeyCallBack) {
+    public OKC(Application mContext, OpenKeyCallBack OpenKeyCallBack) {
         this.openKeyCallBack = OpenKeyCallBack;
         this.mContext = mContext;
-        BleHelper.getInstance().init(mContext);
-
         initialize();
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    private void initialize() {
-        BleHelper.getInstance().initAfterPermission(mContext);
+    public void initialize() {
+        okcSDKInitialize();
         int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
                 0, mContext);
         Log.e("mobileKeyStatusId", ":" + mobileKeyStatusId);
@@ -52,11 +48,22 @@ public class OKC implements BleCallBack {
                 Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 Log.e("mobileKeyStatusId", "is: " + haveKey());
                 Api.setPeronalizationComplete(mContext, openKeyCallBack);
-//                openKeyCallBack.initializationSuccess();
             } else {
                 Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 openKeyCallBack.initializationSuccess();
             }
+        }
+    }
+
+    public void okcSDKInitialize() {
+        OKCManager.getInstance(mContext).registerOkcCallBack(this);
+        OKCManager.getInstance(mContext).OkcInit();
+        checkPermission();
+    }
+
+    private void checkPermission() {
+        if (!BleHelper.isBleOpend()) {
+            BleHelper.enableBle();
         }
     }
 
@@ -73,106 +80,105 @@ public class OKC implements BleCallBack {
         return false;
     }
 
+    public void fetchOkcRoomList() {
+        String keyToken = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
+        OKCManager.getInstance(mContext).fetchKeys(keyToken);
+
+    }
+
+//    private Gson createGsonObj() {
+//        if (gson == null) {
+//            gson = new Gson();
+//        }
+//        return gson;
+//    }
+
     /**
      * start IMGATE service for open lock when scanning animation on going
      */
-    public void startScanning() {
+    public void startScanning(String roomNumber) {
+        Log.e("OKC startScanning", "true");
+        OKCManager.getInstance(mContext).scanMyDevice(roomNumber);
 
-
-//        if (GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava() != null)
-//            mMacAddress = GetBooking.getInstance().getBooking().getData().getHotelRoom().getEntrava();
-
-        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
-//        if (key != null && key.length() > 0)
-
-        Log.e("token key", key + "");
-        OpenKeyConfig.getIns().setScanType(BaseDeviceConfig.ScanType.ByMac);
-        OpenKeyConfig.getIns().setMac(key);
-        BleHelper.getInstance().setCallBack(this);
-
-        BleHelper.getInstance().scanDevice(OpenKeyConfig.getIns());
-    }
-
-    private void sendToSpecificDevice() {
-        try {
-            BleHelper.getInstance().sendToSpecificDevice(OpenKeyConfig.getIns());
-        } catch (Exception e) {
-            Log.e("Exception okc", e.getLocalizedMessage() + "");
-        }
-    }
-
-    //BLEs
-    @Override
-    public void find(BaseDeviceConfig baseDeviceConfig, BleDevice bleDevice) {
-        sendToSpecificDevice();
-        Toast.makeText(mContext, "find device", Toast.LENGTH_SHORT).show();
-        Log.e("find mac", baseDeviceConfig.getMac()+"   called");
-        Log.e("find bleDevice", bleDevice.getMac()+"   called");
+        //Retrieve the values
+//        String jsonText = Utilities.getInstance().getValue(Constants.OKC_ROOM_LIST, "", mContext);
+//        Type type = new TypeToken<ArrayList<PropertyLock>>() {
+//        }.getType();
+//
+//        mRoomList = createGsonObj().fromJson(jsonText, type);
+//        Log.e("fetch room list size", mRoomList.size() + "");
+//        if (Utilities.getInstance().isOnline(mContext)) {
+//            if (mRoomList != null && mRoomList.size() > 0) {
+//                Log.e("OKC mRoomList", "true");
+//
+//                for (int i = 0; i < mRoomList.size(); i++) {
+//                    if (roomNumber.equals(mRoomList.get(i).getTitle())) {
+//                        OKCManager.getInstance(mContext).scanMyDevice(mRoomList.get(i).getMac(), mRoomList.get(i).getId());
+//                        Log.e("room & mac", roomNumber + " " + mRoomList.get(i).getMac());
+//                        break;
+//                    }
+//                }
+////
+//            } else {
+//                Log.e("OKC mRoomList", "FALSE");
+//
+//                openKeyCallBack.initializationFailure("Your Device not Synchronized please click on Fetch Keys");
+//            }
+//        }
     }
 
     @Override
-    public void endScan(Map<BaseDeviceConfig, List<BleDevice>> map) {
-        sendToSpecificDevice();
-        Log.e("endScan", "called");
-    }
-
-    @Override
-    public void connectFailed(BaseDeviceConfig baseDeviceConfig) {
-        Log.e("connectFailed", "called");
+    public void scanResult(String msg) {
 
     }
 
     @Override
-    public void connectSuccess(BaseDeviceConfig baseDeviceConfig) {
-        Log.e("connectSuccess", "called");
+    public void initilizationSuccess() {
+//        openKeyCallBack.initializationSuccess();
+    }
+
+    @Override
+    public void initilizationFailure() {
+    }
+
+    @Override
+    public void openDoorSuccess(String msg) {
+        Log.e("OpenSucess", "called");
+        Api.logSDK(mContext, 1);
+        openKeyCallBack.stopScan(true, "");
+    }
+
+    @Override
+    public void openDoorFailure(String msg) {
+        openKeyCallBack.stopScan(false, "");
 
     }
 
     @Override
-    public void disconnect(BaseDeviceConfig baseDeviceConfig) {
-        Log.e("disconnect", "called");
+    public void fetchKeySuccess(ArrayList<String> roomList) {
+        //Set the values
 
+//        if (mRoomList == null) {
+//            mRoomList = new ArrayList<>();
+//        } else {
+//            mRoomList.clear();
+//        }
+//        ArrayList<String> tempRoomList = new ArrayList<>();
+//
+//        if (roomList != null) {
+//            Log.e("RoomList Size", response.getData().getPropertyLocks().size() + "");
+//            mRoomList.addAll(response.getData().getPropertyLocks());
+//            String jsonText = createGsonObj().toJson(mRoomList);
+//            Utilities.getInstance().saveValue(Constants.OKC_ROOM_LIST, jsonText, mContext);
+//            for (int i = 0; i < response.getData().getPropertyLocks().size(); i++) {
+//                tempRoomList.add(response.getData().getPropertyLocks().get(i).getTitle());
+//            }
+        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(roomList);
+//        }
     }
 
     @Override
-    public void writeSuccess(BaseDeviceConfig baseDeviceConfig) {
-        Log.e("writeSuccess", "called");
-
-    }
-
-    @Override
-    public void writeFailed(BaseDeviceConfig baseDeviceConfig) {
-        Log.e("writeFailed", "called");
-
-    }
-
-    @Override
-    public void finishNotify(BaseDeviceConfig baseDeviceConfig, String s) {
-        Log.e("finishNotify", "called");
-        Toast.makeText(mContext, "electricity is : " + s, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void bleStatus(int i) {
-        Log.e("bleStatus", "called");
-
-    }
-
-    @Override
-    public void locationStatus(int i) {
-        Log.e("locationStatus", "called");
-
-    }
-
-    @Override
-    public void busy() {
-        Log.e("busy", "called");
-
-    }
-
-    @Override
-    public void disable() {
-        Log.e("disable", "called");
-
+    public void fetchKeyFailure(String msg) {
+//        openKeyCallBack.initializationFailure(msg);
     }
 }

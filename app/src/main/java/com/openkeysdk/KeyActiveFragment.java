@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,16 +15,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.openkey.sdk.OpenKeyManager;
-import com.openkey.sdk.api.request.RetrofitCallback;
 import com.openkey.sdk.api.response.session.SessionResponse;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.ArrayList;
 
 public class KeyActiveFragment extends BaseFragment implements View.OnClickListener {
-
 
     private Button mBtnAuthenciate;
     private Button mBtnIntialize;
@@ -41,6 +39,9 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     private Handler handler;
     private static final int MY_PERMISSIONS_REQUEST = 999;
     private int MOBILE_KEY_STATUES = 0;
+
+    private ArrayList<String> okcRoomNumbers;
+    private String mOkCSelectedRoom;
     private Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -59,7 +60,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "duoc772vd3e5gb2mhescdeu27jgetmwmlwolixowmzb7ois6gf7cpacd7gn4tngc";
+    private String mToken = "3xu3cwsiwscmbpg3rjsjxyd7vh2r56737akvdbc6dh7rsjtejibel6mv2bceydhl";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -127,7 +128,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         isScanning = true;
         handler = new Handler();
         handler.postDelayed(stopper, 10000);
-        OpenKeyManager.getInstance(getActivity()).startScanning(this);
+        OpenKeyManager.getInstance().startScanning(this, mOkCSelectedRoom);
     }
 
     /**
@@ -164,12 +165,12 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         switch (MOBILE_KEY_STATUES) {
             case 3:
                 //If the key status is delivered and device have key then it will not call initialize
-                if (!OpenKeyManager.getInstance(getActivity()).isKeyAvailable(this))
-                    OpenKeyManager.getInstance(getActivity()).initialize(this);
+                if (!OpenKeyManager.getInstance().isKeyAvailable(this))
+                    OpenKeyManager.getInstance().initialize(this);
                 break;
 
             default:
-                OpenKeyManager.getInstance(getActivity()).initialize(this);
+                OpenKeyManager.getInstance().initialize(this);
                 break;
         }
     }
@@ -220,7 +221,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void sessionFailure(String errorDescription, String errorCode) {
-        Log.e("onFailure",":");
+        Log.e("onFailure", ":");
         hideMessage();
         showToast("Booking not found");
     }
@@ -228,7 +229,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void initializationSuccess() {
         hideMessage();
-        OpenKeyManager.getInstance(getActivity()).getKey(this);
+        OpenKeyManager.getInstance().getKey(this);
     }
 
     @Override
@@ -266,14 +267,28 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void isKeyAvailable(boolean haveKey, String description) {
 
-        if (getActivity()!=null)
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showMessage("");
-                showToast("DONE");
+        if (getActivity() != null)
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showMessage("");
+                    showToast("DONE");
+                }
+            });
+    }
+
+    @Override
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms) {
+        if (okcRoomNumbers == null) {
+            okcRoomNumbers = new ArrayList<>();
+        }
+        if (availableRooms.size() > 0) {
+            for (int i = 0; i < availableRooms.size() - 1; i++) {
+                okcRoomNumbers.add(availableRooms.get(i));
             }
-        });
+        }
+
+        mOkCSelectedRoom = okcRoomNumbers.get(0); // for example
     }
 
     public void showToast(String message) {
@@ -292,7 +307,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
             return;
         }
 
-        if (OpenKeyManager.getInstance(getActivity()).isKeyAvailable
+        if (OpenKeyManager.getInstance().isKeyAvailable
                 (this)) {
             if (mBluetoothAdapter.enable()) {
                 showMessage("Scanning..");
@@ -313,19 +328,18 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 mEdtTextToken.setText(mToken);
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance(getActivity()).authenticate(mToken,
-                            this,false);
+                    OpenKeyManager.getInstance().authenticate(mToken, this, true);
                 }
                 break;
 
             case R.id.buttonIntialize:
                 showMessage("Initializing...");
-                OpenKeyManager.getInstance(getActivity()).initialize(this);
+                OpenKeyManager.getInstance().initialize(this);
                 break;
 
             case R.id.buttonGetKey:
                 showMessage("Fetching key...");
-                OpenKeyManager.getInstance(getActivity()).getKey(this);
+                OpenKeyManager.getInstance().getKey(this);
                 break;
 
             case R.id.buttonOpenDoor:

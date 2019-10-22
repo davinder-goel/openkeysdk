@@ -1,4 +1,5 @@
 package com.openkey.sdk.api.request;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -43,6 +44,10 @@ public class Api {
      */
     public static void getSession(final Context context, final String token,
                                   final OpenKeyCallBack openKeyCallBack) {
+
+        if (context == null || token == null)
+            return;
+
         // Get the retrofit instance
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.getSession(TOKEN + token).enqueue(new Callback<SessionResponse>() {
@@ -55,27 +60,33 @@ public class Api {
                     openKeyCallBack.sessionResponse(response.body());
                 } else {
                     // get the error message from the response and return it to the callback
-                    openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED,response.code() + "");
+                    openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, response.code() + "");
                 }
             }
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
-                openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED,"");
+                openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, "");
             }
         });
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
     private static void saveData(SessionResponse bookingResponse, Context context) {
+        if (context == null)
+            return;
+
         if (bookingResponse != null && bookingResponse.getData() != null) {
             Utilities.getInstance(context).saveBookingToLocal(context, bookingResponse);
             GetBooking.getInstance().setBooking(bookingResponse);
             //Saved manufacturer in locally
+//            if (bookingResponse.getData().getHotel() != null &&
+//                    bookingResponse.getData().getHotel().getLockVendor() != null &&
+//                    bookingResponse.getData().getHotel().getLockVendor().getTitle() != null) {
             if (bookingResponse.getData().getHotel() != null &&
-                    bookingResponse.getData().getHotel().getLockVendor() != null &&
-                    bookingResponse.getData().getHotel().getLockVendor().getTitle() != null) {
-                String manufacturer = bookingResponse.getData().getHotel().getLockVendor().getTitle().toUpperCase();
+                    bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor() != null &&
+                    bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor().getTitle() != null) {
+                String manufacturer = bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor().getTitle().toUpperCase();
                 Utilities.getInstance().saveValue(Constants.MANUFACTURER, manufacturer, context);
             }
 
@@ -101,6 +112,10 @@ public class Api {
     * */
     @SuppressWarnings("unchecked")
     public static void getMobileKey(final Context context, final Callback callback) {
+
+        if (context == null)
+            return;
+
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
         services.getMobileKey(TOKEN + tokenStr).enqueue(new Callback<MobileKeyResponse>() {
@@ -137,19 +152,23 @@ public class Api {
     * */
     @SuppressWarnings("unchecked")
     public static void getKeyStatus(final Context context, final Callback callback) {
+
+        if (context == null)
+            return;
+
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
         final String bookingId = Utilities.getInstance().getValue(Constants.BOOKING_ID, "", context);
         services.getStatus(TOKEN + tokenStr, bookingId).enqueue(new Callback<KeyStatusResp>() {
             @Override
             public void onResponse(Call<KeyStatusResp> call, retrofit2.Response<KeyStatusResp> response) {
-                Log.e("onResponse","onResponse");
+                Log.e("onResponse", "onResponse");
             }
 
             @Override
             public void onFailure(Call<KeyStatusResp> call, Throwable t) {
                 callback.onFailure(call, t);
-                Log.e("onFailure","onFailure"+t.getMessage());
+                Log.e("onFailure", "onFailure" + t.getMessage());
             }
         });
     }
@@ -179,6 +198,9 @@ public class Api {
      */
     public static void logSDK(final Context context, int isDoorOpened) {
 
+        if (context == null)
+            return;
+
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
 
@@ -203,6 +225,10 @@ public class Api {
      * Update the status on server that Peronalization(Device is ready to get key from server) has been completed
      */
     public static void setPeronalizationComplete(final Context mContext, final OpenKeyCallBack openKeyCallBack) {
+
+        if (mContext == null)
+            return;
+
         Services services = Utilities.getInstance().getRetrofit(mContext).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
         services.setPeronalizationComplete(TOKEN + tokenStr).enqueue(new Callback<PersonlizationResponse>() {
@@ -255,7 +281,6 @@ public class Api {
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**
-     *
      * @param context
      * @param callback
      */
@@ -274,19 +299,22 @@ public class Api {
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**
-     *
      * @param context
      * @param callback
      */
     @SuppressWarnings("unchecked")
-    public static void getBooking(String authToken,final Context context,final Callback callback) {
+    public static void getBooking(String authToken, final Context context, final Callback callback) {
+
+        if (!(authToken != null && authToken.length() > 0 && context != null))
+            return;
+
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.getSession(TOKEN + authToken).enqueue(new Callback<SessionResponse>() {
             @Override
             public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse> response) {
                 if (response.isSuccessful())
                     saveData(response.body(), context);
-                    callback.onResponse(call, response);
+                callback.onResponse(call, response);
             }
 
             @Override
@@ -306,12 +334,17 @@ public class Api {
      */
 
     public static void setKeyStatus(final Context context, String status) {
+        if (context == null)
+            return;
+
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
         services.setKeyStatus(TOKEN + tokenStr, new KeyStatusRequest(status)).enqueue(new Callback<KeyStatusResponse>() {
             @Override
             public void onResponse(Call<KeyStatusResponse> call, retrofit2.Response<KeyStatusResponse> response) {
                 Log.e("onResponse", "onResponse");
+                Utilities.getInstance().saveValue(Constants.MOBILE_KEY_STATUS,
+                        3, context);
             }
 
             @Override

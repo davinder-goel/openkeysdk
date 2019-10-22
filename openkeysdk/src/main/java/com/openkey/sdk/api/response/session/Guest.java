@@ -17,6 +17,9 @@ public class Guest {
     @SerializedName("phone")
     @Expose
     private String phone;
+    @SerializedName("email")
+    @Expose
+    private String email;
     @SerializedName("last_action")
     @Expose
     private String lastAction;
@@ -60,6 +63,14 @@ public class Guest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getLastAction() {

@@ -1,9 +1,11 @@
 package com.openkeysdk;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
+
+import java.util.ArrayList;
 
 public class BaseFragment extends Fragment implements OpenKeyCallBack {
 
@@ -36,6 +38,11 @@ public class BaseFragment extends Fragment implements OpenKeyCallBack {
 
     @Override
     public void isKeyAvailable(boolean haveKey, String description) {
+
+    }
+
+    @Override
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms) {
 
     }
 }

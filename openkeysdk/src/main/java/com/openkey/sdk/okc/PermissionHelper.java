@@ -19,8 +19,10 @@ public class PermissionHelper {
             return;
         }
 
-        if (mRxPermissions == null) {
+        if (mRxPermissions == null && !activity.isDestroyed()) {
             mRxPermissions = new RxPermissions(activity);
+        } else {
+            return;
         }
 
         mRxPermissions.request(perms)

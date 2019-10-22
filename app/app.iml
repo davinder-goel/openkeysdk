@@ -4,6 +4,8 @@
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
         <option name="GRADLE_PROJECT_PATH" value=":app" />
+        <option name="LAST_SUCCESSFUL_SYNC_AGP_VERSION" value="3.4.2" />
+        <option name="LAST_KNOWN_AGP_VERSION" value="3.4.2" />
       </configuration>
     </facet>
     <facet type="android" name="Android">
@@ -17,30 +19,58 @@
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
-        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res" />
+        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res;file://$MODULE_DIR$/build/generated/res/resValues/debug" />
+        <option name="TEST_RES_FOLDERS_RELATIVE_PATH" value="" />
         <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
       </configuration>
     </facet>
+    <facet type="kotlin-language" name="Kotlin">
+      <configuration version="3" platform="JVM 1.6" allPlatforms="JVM [1.6]" useProjectSettings="false" pureKotlinSourceFolders="$MODULE_DIR$/src/debug/kotlin;/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/app/src/debug/java;/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/app/src/release/kotlin;/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/app/src/release/java;/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/app/src/debugAndroidTest/kotlin;/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/app/src/debugUnitTest/kotlin;/home/android/MyProjects/OpenKey/Openkey V5/V5 SDK/openkeysdkandroid/app/src/releaseUnitTest/kotlin">
+        <compilerSettings />
+        <compilerArguments>
+          <option name="destination" value="$MODULE_DIR$/build/tmp/kotlin-classes/debug" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c185013f67e114deef9f832c0e227a45/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/io.reactivex.rxjava2/rxjava/2.1.9/afd2ab255e6b94b064ea87c2ccd84ac0d163a427/rxjava-2.1.9.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.reactivestreams/reactive-streams/1.0.2/323964c36556eb0e6209f65c1cef72b53b461ab8/reactive-streams-1.0.2.jar:/home/android/.gradle/caches/transforms-2/files-2.1/a7a957baafe5ac2238d52c05e176754d/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/2ff5176ba065a8f37899efadbedaac83/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/d879ea93aa116ae62b2a5f852d27d1f8/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/61f90fadb917f4c3a01b8ac28be886e9/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/0a7efbbd72851165c36f576017ca9bde/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/ad6c7d3fe24beb935fcfbe12f15b5c06/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/75c20a0ce241aadad84a2a05a0b46bbf/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/8e8f801188d6e0423a860afd70c7aedd/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/5a412220e293a50be661e991eeacc2b0/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/26f82bed4387e37fbebf386cfe3fe2a0/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/f59da23af629b4a4d5ffa5fe71f5f2d5/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/3e81c221da3fadc6b5cb1ba3c081ae06/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/355ce1ff00408bc372d3f9cc37f15e59/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/741dbc84b8879ce383628f561a155062/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/558827edf3e1483df6c71d0289b90cf6/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/9744465901d0867a8e4dca91c46a9fba/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/8095f973c0155e655cfed8de53a7cbff/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/6ee65985711dbb99aad443bc7a00607d/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/8dea7fdbfe9f07319c3b6db88767d469/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/26d301b1b493295ccc8197891b0f6575/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/0f364084c00e45aad954ba8bf2762f71/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/2d205c99e1c2e962d70eea8f4fe7d463/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/7bae2eff3741d73355cf0c0f01931969/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/536dbcd73107118272277a04ced318fb/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/a17d9ab9678bad84f94443dca5cb74de/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/17b7dfb39759ac4dc858adeb9190192e/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/853a21183ff13916d2bbb308f4aa9938/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/androidx.collection/collection/1.1.0/1f27220b47669781457de0d600849a5de0e89909/collection-1.1.0.jar:/home/android/.gradle/caches/transforms-2/files-2.1/9df476ce8d4685b19db22c63240f26d2/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/05aafa3f1222bce2d4797684c65bb88b/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/9141411dfc5b9f359ecc5d1947578a51/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/e8562b3f02fd780183126a2f3ef06fed/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/4790caa4ff8e2e6df489ec98b21426ab/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/3f4d648222d1fce5021ee01dfcee1c70/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/bf42a3070ee4b16d3cdebf66273a9666/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/33023fd5a677fb0859c8078728115c14/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/f1efa0dbc5d58ff8f6fb2887717107c8/jars/classes.jar:/home/android/.gradle/caches/transforms-2/files-2.1/dd5069610cc7110d7efca936397f22c3/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/androidx.arch.core/core-common/2.1.0/b3152fc64428c9354344bd89848ecddc09b6f07e/core-common-2.1.0.jar:/home/android/.gradle/caches/modules-2/files-2.1/androidx.lifecycle/lifecycle-common/2.1.0/c67e7807d9cd6c329b9d0218b2ec4e505dd340b7/lifecycle-common-2.1.0.jar:/home/android/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation/1.1.0/e3a6fb2f40e3a3842e6b7472628ba4ce416ea4c8/annotation-1.1.0.jar:/home/android/.gradle/caches/transforms-2/files-2.1/5ecdfa548cb8a177cdcde3079c580717/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/androidx.constraintlayout/constraintlayout-solver/1.1.3/54abe9ffb22cc9019b0b6fcc10f185cc4e67b34e/constraintlayout-solver-1.1.3.jar:/home/android/.gradle/caches/modules-2/files-2.1/javax.annotation/javax.annotation-api/1.2/479c1e06db31c432330183f5cae684163f186146/javax.annotation-api-1.2.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/converter-gson/2.3.0/9e09011e9767bb76b5e27c9b8223476b93b14631/converter-gson-2.3.0.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.3.0/bcacde6a8ccedcc56c127403d26b76072fe6214d/retrofit-2.3.0.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.8.1/feab46062803513d6a8307c74b0084265855de1a/logging-interceptor-3.8.1.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.8.1/4d060ca3190df0eda4dc13415532a12e15ca5f11/okhttp-3.8.1.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.13.0/a9283170b7305c8d92d25aff02a6ab7e45d06cbe/okio-1.13.0.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.5/f645ed69d595b24d4cf8b3fbb64cc505bede8829/gson-2.8.5.jar:/home/android/.gradle/caches/transforms-2/files-2.1/35bb54685015e1e7d04fc246fc3294a1/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/18.0/cce0823396aa693798f8882e64213b1772032b09/guava-18.0.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.4/5fe28b9518e58819180a43a850fbc0dd24b7c050/commons-lang3-3.4.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.bouncycastle/bcprov-jdk15on/1.58/2c9aa1c4e3372b447ba5daabade4adf2a2264b12/bcprov-jdk15on-1.58.jar:/home/android/.gradle/caches/transforms-2/files-2.1/fc327bab6456baa360af4b3cc8c913c1/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-android/1.7.21/f4f6a07c00f3996d8db58c85a3d73377b40611eb/slf4j-android-1.7.21.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/da76ca59f6a57ee3102f8f9bd9cee742973efa8a/slf4j-api-1.7.25.jar:/home/android/.gradle/caches/transforms-2/files-2.1/7f21e9b000b0870441031c19edd4b5dc/jars/classes.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.31/e652770b6416c6d85934086899ffed3eccd35813/kotlin-stdlib-jdk7-1.3.31.jar:/home/android/.gradle/caches/transforms-2/files-2.1/d75ca08ac1c80a19c68a6d081c3a4443/jetified-kotlinx-coroutines-android-1.0.1.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core/1.0.1/f33e8dab753f33d1bbb07cca664fd6f13d993d7e/kotlinx-coroutines-core-1.0.1.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.31/11289d20fd95ae219333f3456072be9f081c30cc/kotlin-stdlib-1.3.31.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-common/1.0.1/679991d1b388fd9392eeb3d63b10b3f4c284f389/kotlinx-coroutines-core-common-1.0.1.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.31/20c34a04ea25cb1ef0139598bd67c764562cb170/kotlin-stdlib-common-1.3.31.jar:/home/android/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar:/home/android/.gradle/caches/transforms-2/files-2.1/3b9fed1c2d63349a315eb10b2a8cb17e/jars/classes.jar:/home/android/Android/Sdk/platforms/android-29/android.jar:/home/android/Android/Sdk/build-tools/28.0.3/core-lambda-stubs.jar" />
+          <option name="noStdlib" value="true" />
+          <option name="noReflect" value="true" />
+          <option name="moduleName" value="app_debug" />
+          <option name="languageVersion" value="1.3" />
+          <option name="apiVersion" value="1.3" />
+          <option name="pluginOptions">
+            <array>
+              <option value="plugin:org.jetbrains.kotlin.android:experimental=false" />
+              <option value="plugin:org.jetbrains.kotlin.android:enabled=true" />
+              <option value="plugin:org.jetbrains.kotlin.android:defaultCacheImplementation=hashMap" />
+            </array>
+          </option>
+          <option name="pluginClasspaths">
+            <array>
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.3.31/57bdeb88c9265052448a7a8422ed64ad92e9b262/kotlin-android-extensions-1.3.31.jar" />
+            </array>
+          </option>
+          <option name="errors">
+            <ArgumentParseErrors />
+          </option>
+        </compilerArguments>
+      </configuration>
+    </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
-    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
-    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/test/debug" />
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes" />
+    <output-test url="file://$MODULE_DIR$/build/intermediates/javac/debugUnitTest/compileDebugUnitTestJavaWithJavac/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/debug" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/aidl_source_output_dir/debug/compileDebugAidl/out" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/debug" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/renderscript_source_output_dir/debug/compileDebugRenderscript/out" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/debug" type="java-resource" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/androidTest/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/aidl_source_output_dir/debugAndroidTest/compileDebugAndroidTestAidl/out" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/renderscript_source_output_dir/debugAndroidTest/compileDebugAndroidTestRenderscript/out" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/debug" type="java-test-resource" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/test/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
@@ -84,84 +114,79 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/check-manifest" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaPrecompile" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/splits-support" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/tmp" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
-      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/reports" />
-      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 28 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="com.squareup.retrofit2:converter-gson:2.3.0@jar" level="project" />
-    <orderEntry type="library" name="android.arch.core:runtime-1.1.1" level="project" />
-    <orderEntry type="library" name="com.android.support:multidex-1.0.2" level="project" />
-    <orderEntry type="library" name="com.android.support:asynclayoutinflater-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:swiperefreshlayout-28.0.0" level="project" />
-    <orderEntry type="library" name="openkeysdk-release:@aar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-v4-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:drawerlayout-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:animated-vector-drawable-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:coordinatorlayout-28.0.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-stats-15.0.1" level="project" />
-    <orderEntry type="library" name="android.arch.lifecycle:livedata-1.1.1" level="project" />
-    <orderEntry type="library" name="com.google.guava:guava:18.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:cursoradapter-28.0.0" level="project" />
-    <orderEntry type="library" name="org.apache.commons:commons-lang3:3.4@jar" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-basement-15.0.1" level="project" />
-    <orderEntry type="library" name="com.android.support:localbroadcastmanager-28.0.0" level="project" />
-    <orderEntry type="library" name="org.slf4j:slf4j-android:1.7.21@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-ui-28.0.0" level="project" />
-    <orderEntry type="library" name="com.squareup.okhttp3:logging-interceptor:3.8.1@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-media-compat-28.0.0" level="project" />
-    <orderEntry type="library" name="android.arch.lifecycle:viewmodel-1.1.1" level="project" />
-    <orderEntry type="library" name="com.android.support:support-fragment-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-annotations:28.0.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-vector-drawable-28.0.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-gcm-15.0.1" level="project" />
-    <orderEntry type="library" name="com.android.support:collections:28.0.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:print-28.0.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="com.android.support:multidex-instrumentation-1.0.2" level="project" />
-    <orderEntry type="library" name="javax.annotation:javax.annotation-api:1.2@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:support-compat-28.0.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-base-15.0.1" level="project" />
-    <orderEntry type="library" name="com.android.support:viewpager-28.0.0" level="project" />
-    <orderEntry type="library" name="com.google.code.gson:gson:2.8.5@jar" level="project" />
-    <orderEntry type="library" name="com.mixpanel.android:mixpanel-android-4.9.8" level="project" />
-    <orderEntry type="library" name="com.squareup.okhttp3:okhttp:3.8.1@jar" level="project" />
-    <orderEntry type="library" name="android.arch.core:common:1.1.1@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:loader-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support.constraint:constraint-layout-1.1.2" level="project" />
-    <orderEntry type="library" name="org.bouncycastle:bcprov-jdk15on:1.54@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:versionedparcelable-28.0.0" level="project" />
-    <orderEntry type="library" name="com.squareup.okio:okio:1.13.0@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:documentfile-28.0.0" level="project" />
-    <orderEntry type="library" name="com.squareup.retrofit2:retrofit:2.3.0@jar" level="project" />
-    <orderEntry type="library" name="org.slf4j:slf4j-api:1.7.25@jar" level="project" />
-    <orderEntry type="library" name="android.arch.lifecycle:runtime-1.1.1" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-iid-15.0.1" level="project" />
-    <orderEntry type="library" name="com.android.support:slidingpanelayout-28.0.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-tasks-15.0.1" level="project" />
-    <orderEntry type="library" name="com.android.support:interpolator-28.0.0" level="project" />
-    <orderEntry type="library" name="android.arch.lifecycle:livedata-core-1.1.1" level="project" />
-    <orderEntry type="library" name="android.arch.lifecycle:common:1.1.1@jar" level="project" />
-    <orderEntry type="library" name="com.android.support:customview-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:appcompat-v7-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support:support-core-utils-28.0.0" level="project" />
-    <orderEntry type="library" name="com.android.support.constraint:constraint-layout-solver:1.1.2@jar" level="project" />
+    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.9@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.2@jar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.collection:collection:1.1.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.arch.core:core-common:2.1.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-common:2.1.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.annotation:annotation:1.1.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.constraintlayout:constraintlayout-solver:1.1.3@jar" level="project" />
+    <orderEntry type="library" name="Gradle: javax.annotation:javax.annotation-api:1.2@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.retrofit2:converter-gson:2.3.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.retrofit2:retrofit:2.3.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:logging-interceptor:3.8.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.8.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.13.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.5@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.4@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.bouncycastle:bcprov-jdk15on:1.58@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-android:1.7.21@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.31@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.3.31@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.0.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.3.31@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxandroid:2.0.2@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.appcompat:appcompat:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-gcm:16.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-iid:16.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base:16.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-stats:16.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks:16.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement:16.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.legacy:legacy-support-v4:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.media:media:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.legacy:legacy-support-core-ui:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.legacy:legacy-support-core-utils:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.fragment:fragment:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.appcompat:appcompat-resources:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.drawerlayout:drawerlayout:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.loader:loader:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.viewpager:viewpager:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.coordinatorlayout:coordinatorlayout:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.slidingpanelayout:slidingpanelayout:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.customview:customview:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.swiperefreshlayout:swiperefreshlayout:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.asynclayoutinflater:asynclayoutinflater:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.activity:activity:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.vectordrawable:vectordrawable-animated:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.vectordrawable:vectordrawable:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.core:core:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.cursoradapter:cursoradapter:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.versionedparcelable:versionedparcelable:1.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.documentfile:documentfile:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.print:print:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.interpolator:interpolator:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-viewmodel:2.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata:2.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-runtime:2.1.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.savedstate:savedstate:1.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.arch.core:core-runtime:2.0.0@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.constraintlayout:constraintlayout:1.1.3@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.mixpanel.android:mixpanel-android:4.9.8@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.multidex:multidex:2.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.clj.fastble:FastBleLib:2.3.4@aar" level="project" />
+    <orderEntry type="module" module-name="openkeysdk" />
   </component>
 </module>
