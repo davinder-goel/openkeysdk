@@ -1,6 +1,6 @@
 package com.openkey.sdk.kaba;
 
-import android.content.Context;
+import android.app.Application;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -45,7 +45,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         LegicNeonFileEventListener {
 
     private LegicMobileSdkManager mManager;
-    private Context mContext;
+    private Application mContext;
     private OpenKeyCallBack mOpenKeyCallBack;
     private String kabaRegistrationToken;
     private boolean isSynchronizationStarted;
@@ -82,7 +82,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     };
 
     //-----------------------------------------------------------------------------------------------------------------|
-    public Kaba(Context context, OpenKeyCallBack openKeyCallBack) {
+    public Kaba(Application context, OpenKeyCallBack openKeyCallBack) {
         mOpenKeyCallBack = openKeyCallBack;
         mContext = context;
         setupKaba();
@@ -92,8 +92,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     private void setupKaba() {
         try {
 
-            if (mManager!=null)
-                mManager=null;
+            if (mManager != null)
+                mManager = null;
 
             mManager = Utils.getSdkManager(mContext);
             registerListeners();
@@ -251,7 +251,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     //-----------------------------------------------------------------------------------------------------------------|
     public void synchronise() {
         Log.e("kaba synchronise", "Called");
-       // isLoginActionFired = true;
+        // isLoginActionFired = true;
         isSynchronizationStarted = true;
         mManager.synchronizeWithBackend();
     }
@@ -291,17 +291,18 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
             mOpenKeyCallBack.isKeyAvailable(false, com.openkey.sdk.Utilities.Response.FETCH_KEY_FAILED);
         } else {
             Log.e("kaba synchronise", "else");
-           // isLoginActionFired = true;
+            // isLoginActionFired = true;
             isSynchronizationStarted = true;
             mManager.synchronizeWithBackend();
         }
     }
+
     //-----------------------------------------------------------------------------------------------------------------|
     private void getAllFiles() {
         deactivateAllFiles();
         if (haveKey()) {
             failedCounter = 0;
-            OpenKeyManager.getInstance(mContext).updateKeyStatus(haveKey());
+            OpenKeyManager.getInstance().updateKeyStatus(haveKey());
             mOpenKeyCallBack.isKeyAvailable(true, "FETCH_KEY_SUCCESS");
             Log.e("key", ": device has kaba key");
         } else {
@@ -347,9 +348,12 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
             }
         } catch (LegicMobileSdkException e) {
             Log.e("Kaba", e.getLocalizedMessage());
+        } catch (Exception e) {
+            Log.e("Kaba null files", e.getLocalizedMessage());
         }
         return false;
     }
+
     //-----------------------------------------------------------------------------------------------------------------|
     private void logs(LegicNeonFile legicNeonFile) {
         String fileInfos = "Index:";
@@ -411,6 +415,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                 }
             } catch (LegicMobileSdkException e) {
                 Log.e("Kaba", e.getLocalizedMessage());
+            } catch (Exception e) {
+                Log.e("Kaba null activate file", e.getLocalizedMessage());
             }
 
         } catch (LegicMobileSdkException e) {

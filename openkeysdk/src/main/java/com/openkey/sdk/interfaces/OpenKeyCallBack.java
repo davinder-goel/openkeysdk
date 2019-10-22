@@ -2,6 +2,8 @@ package com.openkey.sdk.interfaces;
 
 import com.openkey.sdk.api.response.session.SessionResponse;
 
+import java.util.ArrayList;
+
 /**
  * @author OpenKey Inc.
  *         <p>
@@ -47,4 +49,12 @@ public interface OpenKeyCallBack {
      * @param haveKey is Key available
      */
     void isKeyAvailable(boolean haveKey, String description);
+
+    /**
+     * when we receive multiple rooms in a booking
+     * main for common areas like GYM, BAR etc
+     *
+     * @param availableRooms is Keys available
+     */
+    void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms);
 }

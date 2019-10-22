@@ -7,14 +7,24 @@ public class KeyStatusResponse {
 
     @SerializedName("success")
     @Expose
-    private Success success;
+    private Boolean success;
 
-    public Success getSuccess() {
+    public Boolean getSuccess() {
         return success;
     }
 
-    public void setSuccess(Success success) {
+    public void setSuccess(Boolean success) {
         this.success = success;
     }
+
+//    private Success success;
+//
+//    public Success getSuccess() {
+//        return success;
+//    }
+//
+//    public void setSuccess(Success success) {
+//        this.success = success;
+//    }
 
 }

@@ -11,6 +11,9 @@ public class HotelRoom {
     @SerializedName("hotel_id")
     @Expose
     private Integer hotelId;
+    @SerializedName("entrava")
+    @Expose
+    private String entrava;
     @SerializedName("title")
     @Expose
     private String title;
@@ -26,11 +29,9 @@ public class HotelRoom {
     @SerializedName("deleted")
     @Expose
     private Object deleted;
-
-    @SerializedName("entrava")
+    @SerializedName("guests_limit")
     @Expose
-
-    private String entrava;
+    private Integer guestsLimit;
 
     public String getEntrava() {
         return entrava;
@@ -96,4 +97,19 @@ public class HotelRoom {
         this.deleted = deleted;
     }
 
+    public Boolean getSuite() {
+        return isSuite;
+    }
+
+    public void setSuite(Boolean suite) {
+        isSuite = suite;
+    }
+
+    public Integer getGuestsLimit() {
+        return guestsLimit;
+    }
+
+    public void setGuestsLimit(Integer guestsLimit) {
+        this.guestsLimit = guestsLimit;
+    }
 }

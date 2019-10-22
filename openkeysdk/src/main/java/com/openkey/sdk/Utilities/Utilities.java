@@ -3,6 +3,8 @@ package com.openkey.sdk.Utilities;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Vibrator;
 import android.text.TextUtils;
@@ -35,7 +37,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import okhttp3.TlsVersion;
-import okhttp3.internal.platform.Platform;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
@@ -43,8 +44,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * @author OpenKey Inc.
- *         <p>
- *         This class will provide all the necessary  utility methods.
+ * <p>
+ * This class will provide all the necessary  utility methods.
  */
 
 public class Utilities {
@@ -56,7 +57,9 @@ public class Utilities {
     public static Utilities getInstance(Context... contexts) {
         if (utilities == null) {
             utilities = new Utilities();
-            prefs = new SharedPreferencesEncryption(contexts[0].getApplicationContext());
+
+            if (contexts != null && contexts.length > 0)
+                prefs = new SharedPreferencesEncryption(contexts[0].getApplicationContext());
         }
         return utilities;
 
@@ -67,7 +70,7 @@ public class Utilities {
             try {
                 SSLContext sc = SSLContext.getInstance("TLSv1.2");
                 sc.init(null, null, null);
-                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()), Platform.get().trustManager(sc.getSocketFactory()));
+                client.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()));
 
                 ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                         .tlsVersions(TlsVersion.TLS_1_2)
@@ -87,12 +90,27 @@ public class Utilities {
         return client;
     }
 
+    public boolean isOnline(Context ctx) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            return false;
+        }
+
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        } else
+            return false;
+
+    }
+
     /**
      * Clear values of shared preference.
      *
      * @param context the context
-     * If user logout then clear all the saved values from the
-     * shared preference file
+     *                If user logout then clear all the saved values from the
+     *                shared preference file
      */
     public void clearValueOfKey(Context context, String key) {
         if (context == null) return;
@@ -148,7 +166,6 @@ public class Utilities {
 
     /**
      * for vibration
-     *
      */
     @SuppressLint("MissingPermission")
     public void vibrate(Context context) {
@@ -161,8 +178,8 @@ public class Utilities {
      *
      * @param context the context
      * @param toast   String value which needs to shown in the toast.
-     * if you want to print a toast just call this method and pass
-     * what you want to be shown.
+     *                if you want to print a toast just call this method and pass
+     *                what you want to be shown.
      */
     public Toast showToast(Context context, String toast) {
         if (context != null && msg == null || msg.getView().getWindowVisibility() != View.VISIBLE) {
@@ -282,17 +299,17 @@ public class Utilities {
 //        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 //        // set your desired log level
 //        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient.Builder httpClient = getNewHttpClient().newBuilder();
+        OkHttpClient.Builder httpClient = getNewHttpClient(context).newBuilder();
 
 //        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 //        httpClient.readTimeout(30, TimeUnit.SECONDS);
 //        httpClient.connectTimeout(30, TimeUnit.SECONDS);
 
 
-        String url=Constants.BASE_URL_DEV;
+        String url = Constants.BASE_URL_DEV;
 
-        if (context!=null)
-            url=Utilities.getInstance().getValue(Constants.BASE_URL,Constants.BASE_URL_DEV,context);
+        if (context != null)
+            url = Utilities.getInstance().getValue(Constants.BASE_URL, Constants.BASE_URL_DEV, context);
 
         // add logging as last interceptor
 //        httpClient.addInterceptor(logging);
@@ -309,7 +326,7 @@ public class Utilities {
      *
      * @param responseBody Get message from the response body
      */
-    public String handleApiError(ResponseBody responseBody,Context context) {
+    public String handleApiError(ResponseBody responseBody, Context context) {
         Converter<ResponseBody, Status> errorConverter = getRetrofit(context)
                 .responseBodyConverter(Status.class, new Annotation[0]);
         try {
@@ -325,7 +342,8 @@ public class Utilities {
         return null;
     }
 
-    private OkHttpClient getNewHttpClient() {
+    private OkHttpClient getNewHttpClient(Context context) {
+        String UUID = Utilities.getInstance().getValue(Constants.UUID, "", context);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // set your desired log level
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -333,6 +351,21 @@ public class Utilities {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(logging);
+
+        client.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+
+                Request request = chain.request().newBuilder()
+                        .header("x-openkey-app", UUID)
+                        .header("Accept", "application/json")
+                        .header("Cache-Control", "no-cache")
+//                        .method(original.method(), original.body())
+                        .build();
+
+                return chain.proceed(request);
+            }
+        });
         return enableTls12OnPreLollipop(client).build();
     }
 
@@ -385,10 +418,12 @@ public class Utilities {
      * Get booking from the saved shared preference
      */
     public SessionResponse getBookingFromLocal(Context context) {
-        String bookingString = getValue(Constants.BOOKING, "", context);
-        if (!TextUtils.isEmpty(bookingString)) {
-            Gson gson = GetGson.getInstance();
-            return gson.fromJson(bookingString, SessionResponse.class);
+        if (context != null) {
+            String bookingString = getValue(Constants.BOOKING, "", context);
+            if (!TextUtils.isEmpty(bookingString)) {
+                Gson gson = GetGson.getInstance();
+                return gson.fromJson(bookingString, SessionResponse.class);
+            }
         }
         return null;
     }

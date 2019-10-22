@@ -77,7 +77,7 @@ public class Miwa {
                 openKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
                 return;
             }
-            Api.setPeronalizationComplete(mContext,openKeyCallBack);
+            Api.setPeronalizationComplete(mContext, openKeyCallBack);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             Log.d(TAG, Log.getStackTraceString(e));
@@ -94,7 +94,7 @@ public class Miwa {
         try {
             SQLiteDatabase sql = db.getReadableDatabase();
             List<Alv2Key> list = Alv2Key.list(sql);
-            if (list != null && list.size() > 0) {
+            if (list.size() > 0) {
                 selectedKey = list.get(0);
             }
         } finally {
@@ -105,11 +105,10 @@ public class Miwa {
 
     /**
      * if devive has a key for salto
-     *
      */
     private boolean deviceHasMiwaKey() {
         final String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY,
-                "",mContext);
+                "", mContext);
         return (key.length() > 0 && selectedKey != null);
     }
     //-----------------------------------------------------------------------------------------------------------------|
@@ -176,15 +175,15 @@ public class Miwa {
     //-----------------------------------------------------------------------------------------------------------------|
 
 
-
-    public void startScanning()
-    {
+    public void startScanning() {
         if (deviceHasMiwaKey()) {
             isDoorOpenedLogged = true;
+
             Log.e("startScanning", "deviceHasMiwaKey");
             alv2.startAuth(selectedKey.get_id(), ALV2_RSSI, RDFL_RSSI, TIMEOUT);
         } else {
             Log.e("startScanning", "failed");
+
         }
     }
     //-----------------------------------------------------------------------------------------------------------------|
@@ -206,6 +205,7 @@ public class Miwa {
                 if (code == Alv2ResultCode.SUCCESS) {
                     long id = intent.getLongExtra(Alv2Service.EXT_KEY_ID, 0);
                     Log.d(TAG, String.format(Locale.US, "SUCCESS: id=%d", id));
+
                     loadKeyData();
                 }
                 //showResult(code);
@@ -215,6 +215,7 @@ public class Miwa {
                 if (code == Alv2ResultCode.SUCCESS) {
                     openKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
                     if (isDoorOpenedLogged) {
+
                         Log.e("open", "SUCCESS");
                         isDoorOpenedLogged = false;
                         Api.logSDK(mContext, 1);

@@ -77,9 +77,15 @@ public class Hotel {
     @SerializedName("manager_phone")
     @Expose
     private String managerPhone;
+    @SerializedName("is_searchable")
+    @Expose
+    private Boolean isSearchable;
     @SerializedName("created")
     @Expose
     private String created;
+    @SerializedName("status")
+    @Expose
+    private Integer status;
     @SerializedName("modified")
     @Expose
     private String modified;
@@ -89,6 +95,12 @@ public class Hotel {
     @SerializedName("lock_vendor")
     @Expose
     private LockVendor lockVendor;
+    @SerializedName("lock_vendor_model_id")
+    @Expose
+    private Integer lockVendorModelId;
+    @SerializedName("lock_vendor_model")
+    @Expose
+    private LockVendorModel lockVendorModel;
 
     public Integer getId() {
         return id;
@@ -314,4 +326,35 @@ public class Hotel {
         this.lockVendor = lockVendor;
     }
 
+    public Boolean getSearchable() {
+        return isSearchable;
+    }
+
+    public void setSearchable(Boolean searchable) {
+        isSearchable = searchable;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getLockVendorModelId() {
+        return lockVendorModelId;
+    }
+
+    public void setLockVendorModelId(Integer lockVendorModelId) {
+        this.lockVendorModelId = lockVendorModelId;
+    }
+
+    public LockVendorModel getLockVendorModel() {
+        return lockVendorModel;
+    }
+
+    public void setLockVendorModel(LockVendorModel lockVendorModel) {
+        this.lockVendorModel = lockVendorModel;
+    }
 }
