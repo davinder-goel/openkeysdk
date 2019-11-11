@@ -60,7 +60,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "3xu3cwsiwscmbpg3rjsjxyd7vh2r56737akvdbc6dh7rsjtejibel6mv2bceydhl";
+    private String mToken = "tf34dcdrsqsjii4gctof2s5a3ajgtspjycygyxzcil46z7lnkcpfnqzogt6p5kg3";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -283,12 +283,13 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
             okcRoomNumbers = new ArrayList<>();
         }
         if (availableRooms.size() > 0) {
-            for (int i = 0; i < availableRooms.size() - 1; i++) {
+            for (int i = 0; i < availableRooms.size(); i++) {
                 okcRoomNumbers.add(availableRooms.get(i));
             }
+            mOkCSelectedRoom = okcRoomNumbers.get(0); // for example
+
         }
 
-        mOkCSelectedRoom = okcRoomNumbers.get(0); // for example
     }
 
     public void showToast(String message) {
@@ -328,7 +329,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 mEdtTextToken.setText(mToken);
                 mToken = mEdtTextToken.getText().toString().trim();
                 if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance().authenticate(mToken, this, true);
+                    OpenKeyManager.getInstance().authenticate(mToken, this, false);
                 }
                 break;
 
