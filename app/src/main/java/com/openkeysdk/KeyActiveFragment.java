@@ -60,7 +60,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "tf34dcdrsqsjii4gctof2s5a3ajgtspjycygyxzcil46z7lnkcpfnqzogt6p5kg3";
+    private String mToken = "dd3667bitnwaxsbxthyfxro2c6globkfjyllrobuasn2am6pin2qxuk5fzcko35f";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";

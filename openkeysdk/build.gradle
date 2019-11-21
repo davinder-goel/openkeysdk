@@ -48,7 +48,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
     implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'org.slf4j:slf4j-android:1.7.21'
-    implementation files('libs/assa_v7.2.2.jar')
+    implementation files('libs/assa_v7.3.1.jar')
     implementation 'com.google.android.gms:play-services-gcm:16.1.0'
     implementation files('libs/DoorlockApi_2.7.0.jar')
     implementation files('libs/DoorlockSdk_3.0.0.jar')
