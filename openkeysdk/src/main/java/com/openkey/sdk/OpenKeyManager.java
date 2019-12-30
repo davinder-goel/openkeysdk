@@ -274,9 +274,10 @@ public final class OpenKeyManager {
                 break;
 
             case MODULE:
-                okModule.fetchOkModuleRoomList();
+
                 updateKeyStatus(true);
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+                okModule.fetchOkModuleRoomList();
                 break;
 
             case OKMOBILEKEY:
@@ -285,6 +286,20 @@ public final class OpenKeyManager {
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 break;
         }
+    }
+
+
+    public void  startOkMobileScanning() {
+        okMobileKey.fetchOkMobileKeyRoomList();
+    }
+
+
+    public void  removeCallBack() {
+        okMobileKey.removeAllCallBack();
+    }
+
+    public void  connectOkMobileKey() {
+        okMobileKey.connectDevice();
     }
 
     //-----------------------------------------------------------------------------------------------------------------|

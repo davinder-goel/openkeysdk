@@ -42,7 +42,9 @@ public class BaseFragment extends Fragment implements OpenKeyCallBack {
     }
 
     @Override
-    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms) {
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms,Boolean isDeviceFound) {
 
     }
+
+
 }

@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
+import com.openkey.sdk.okmobilekey.OKMobileKey;
 
 import java.util.ArrayList;
 
@@ -42,6 +43,32 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     private ArrayList<String> okcRoomNumbers;
     private String mOkCSelectedRoom;
+
+    private Boolean mFoundClosest=false;
+
+
+
+    private Long SCANNING_TIME = 30000L;
+    private Handler mHandler = null;
+    private OKMobileKey okMobileKeyModule = null;
+
+
+    /*
+     * this is fpr sample only OnMobileKey SDK
+     * */
+   /* private Runnable runnables = new Runnable(){
+
+        @Override
+        public void run() {
+            mFoundClosest=false;
+            mBtnScan.setEnabled(false);
+            mBtnScan.setAlpha(0.7f);
+            OpenKeyManager.getInstance().startOkMobileScanning();
+        } };*/
+
+
+
+
     private Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -60,7 +87,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "dd3667bitnwaxsbxthyfxro2c6globkfjyllrobuasn2am6pin2qxuk5fzcko35f";
+    private String mToken = "6qsahlewj7pcocfe5qtpcvusupf23ut2pdprzldkeobcwsmzb6cgffsrstwsujat";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -278,7 +305,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms) {
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms,Boolean isDeviceFound) {
         if (okcRoomNumbers == null) {
             okcRoomNumbers = new ArrayList<>();
         }
@@ -290,8 +317,29 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
         }
 
+
+        /*
+         * this is fpr sample only OnMobileKey SDK
+         * */
+       // OpenKeyManager.getInstance().startOkMobileScanning();
     }
 
+   /* @Override
+    public void closestDevice(String room) {
+
+        *//*
+         * this is fpr sample only OnMobileKey SDK
+         * *//*
+       *//* mFoundClosest=true;
+        mBtnScan.setEnabled(true);
+        mBtnScan.setAlpha(1.0f);
+        if (mHandler == null) {
+            mHandler =new Handler();
+        }
+
+        mHandler.postDelayed(runnables, SCANNING_TIME);*//*
+    }
+*/
     public void showToast(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
@@ -345,6 +393,14 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
             case R.id.buttonOpenDoor:
                 openDoor();
+
+                /*
+                * this is fpr sample only OnMobileKey SDK
+                * */
+              /*  if(mFoundClosest){
+                    mHandler.removeCallbacks(runnables);
+                    OpenKeyManager.getInstance().connectOkMobileKey();
+                }*/
                 break;
         }
     }
