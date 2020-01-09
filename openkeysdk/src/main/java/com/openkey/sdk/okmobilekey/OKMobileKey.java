@@ -4,7 +4,6 @@ import android.app.Application;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.openkey.okmobilekeysdk.callbackmodule.OKMobileKeyCallBack;
@@ -141,7 +140,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     }
 
 
-    public void connectDevice() {
+    public void connectDevice(String roomTitle) {
         if(isRunning)
         {
             mCountDownTimer.cancel();
@@ -150,7 +149,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
                     mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
                 }
 
-        OKMobileKeyManager.Companion.getInstance(mApplication).connectDevices();
+        OKMobileKeyManager.Companion.getInstance(mApplication).connectDevices(roomTitle);
     }
 
     @Override

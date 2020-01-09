@@ -298,8 +298,8 @@ public final class OpenKeyManager {
         okMobileKey.removeAllCallBack();
     }
 
-    public void  connectOkMobileKey() {
-        okMobileKey.connectDevice();
+    public void connectOkMobileKey(String roomTitle) {
+        okMobileKey.connectDevice(roomTitle);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
