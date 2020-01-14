@@ -23,13 +23,8 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     private OpenKeyCallBack openKeyCallBack;
     private CountDownTimer mCountDownTimer;
     private Boolean isRunning= false;
-
     private Long SCANNING_TIME_OKMOBILEKEY = 30000L;
-
-
     private Handler mHandlerOkMobileKey = null;
-
-
     private Runnable runnableOkMobileKey = this::fetchOkMobileKeyRoomList;
 
 
@@ -43,7 +38,6 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     }
 
     public void countTimer() {
-
             mCountDownTimer = new CountDownTimer(120000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
@@ -141,11 +135,11 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
 
     public void connectDevice(String roomTitle) {
-        if(isRunning)
+        if (mCountDownTimer != null && isRunning)
         {
             mCountDownTimer.cancel();
         }
-                if(runnableOkMobileKey!=null){
+        if (mHandlerOkMobileKey != null && runnableOkMobileKey != null) {
                     mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
                 }
 
@@ -160,7 +154,6 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
     @Override
     public void openDoorSuccess(String msg) {
-        Log.e("OpenSucess", "called");
         Api.logSDK(mApplication, 1);
         openKeyCallBack.stopScan(true, "");
 
@@ -222,7 +215,6 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         if(mCountDownTimer!=null)
         {
             mCountDownTimer.cancel();
-            Log.e("timerrumming","true");
 
         }
         else{
@@ -238,6 +230,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
                 mHandlerOkMobileKey =   new Handler();
             }
             else{
+
                 mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
             }
 
