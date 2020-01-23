@@ -112,7 +112,7 @@ public class OKModule implements OKModuleCallBack {
     @Override
     public void fetchKeySuccess(ArrayList<String> roomList) {
 
-        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(roomList);
+        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(roomList,false);
 
     }
 
