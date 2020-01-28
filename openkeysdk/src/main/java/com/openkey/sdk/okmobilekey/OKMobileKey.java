@@ -23,7 +23,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     private OpenKeyCallBack openKeyCallBack;
     private CountDownTimer mCountDownTimer;
     private Boolean isRunning= false;
-    private Long SCANNING_TIME_OKMOBILEKEY = 30000L;
+    private Long SCANNING_TIME_OKMOBILEKEY = 15000L;
     private Handler mHandlerOkMobileKey = null;
     private Runnable runnableOkMobileKey = this::fetchOkMobileKeyRoomList;
 
@@ -38,7 +38,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     }
 
     public void countTimer() {
-            mCountDownTimer = new CountDownTimer(120000, 1000) {
+        mCountDownTimer = new CountDownTimer(60000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     Log.e("timer","tick");
@@ -176,7 +176,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         {
             mCountDownTimer.cancel();
         }
-        SCANNING_TIME_OKMOBILEKEY=15000L;
+
 
         if (mHandlerOkMobileKey == null) {
             mHandlerOkMobileKey =new Handler();
@@ -185,6 +185,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
             mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
         }
         Log.e("Timerstart", "15s");
+        SCANNING_TIME_OKMOBILEKEY = 2000L;
         mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
     }
 
@@ -222,9 +223,9 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         }
         if(b){
             Log.e("device found", "found");
-            Log.e("Timerstart", "30s");
+            Log.e("Timerstart", "15s");
 
-            SCANNING_TIME_OKMOBILEKEY=30000L;
+
 
             if (mHandlerOkMobileKey == null) {
                 mHandlerOkMobileKey =   new Handler();
@@ -233,7 +234,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
                 mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
             }
-
+            SCANNING_TIME_OKMOBILEKEY = 15000L;
             mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
         }
 
