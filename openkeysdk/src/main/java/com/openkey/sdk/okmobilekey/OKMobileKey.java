@@ -38,7 +38,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     }
 
     public void countTimer() {
-        mCountDownTimer = new CountDownTimer(60000, 1000) {
+        mCountDownTimer = new CountDownTimer(30000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     Log.e("timer","tick");
