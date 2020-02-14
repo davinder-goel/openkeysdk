@@ -127,7 +127,15 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
 
         try {
-            OKMobileKeyManager.Companion.getInstance(mApplication).scanDevices(title);
+
+            if (title.equalsIgnoreCase("RemoveCallback")) {
+                Log.e("startScanning", "remove call");
+                removeAllCallBack();
+            } else {
+                Log.e("startScanning", "connect devices");
+                connectDevice(title);
+            }
+
         } catch (NullPointerException ex) {
             ex.printStackTrace();
         }

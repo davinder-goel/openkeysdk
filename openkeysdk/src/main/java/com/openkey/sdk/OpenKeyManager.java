@@ -281,8 +281,14 @@ public final class OpenKeyManager {
                 break;
 
             case OKMOBILEKEY:
+
+                SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
+                if (sessionResponse != null && sessionResponse.getData().getMobileKeyStatusId() == 2) {
+                    updateKeyStatus(true);
+                }
+
                 okMobileKey.fetchOkMobileKeyRoomList();
-                updateKeyStatus(true);
+
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 break;
         }
@@ -294,13 +300,13 @@ public final class OpenKeyManager {
     }
 
 
-    public void  removeCallBack() {
+  /*  public void  removeCallBack() {
         okMobileKey.removeAllCallBack();
     }
 
     public void connectOkMobileKey(String roomTitle) {
         okMobileKey.connectDevice(roomTitle);
-    }
+    }*/
 
     //-----------------------------------------------------------------------------------------------------------------|
 
