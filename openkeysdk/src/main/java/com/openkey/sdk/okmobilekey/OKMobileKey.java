@@ -194,7 +194,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         }
         Log.e("Timerstart", "15s");
         SCANNING_TIME_OKMOBILEKEY = 2000L;
-        mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
+        //mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
     }
 
 
@@ -243,7 +243,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
                 mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
             }
             SCANNING_TIME_OKMOBILEKEY = 15000L;
-            mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
+            //mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
         }
 
     }
