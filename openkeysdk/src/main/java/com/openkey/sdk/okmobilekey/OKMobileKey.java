@@ -26,6 +26,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     private Long SCANNING_TIME_OKMOBILEKEY = 15000L;
     private Handler mHandlerOkMobileKey = null;
     private Runnable runnableOkMobileKey = this::fetchOkMobileKeyRoomList;
+    private String roomTitle;
 
 
 
@@ -151,12 +152,14 @@ public class OKMobileKey implements OKMobileKeyCallBack {
                     mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
                 }
 
-        OKMobileKeyManager.Companion.getInstance(mApplication).connectDevices(roomTitle);
+        this.roomTitle = roomTitle;
+
+        OKMobileKeyManager.Companion.getInstance(mApplication).scanDevices(roomTitle);
     }
 
     @Override
-    public void scanResult(String msg) {
-
+    public void scanResult(Boolean hasResults) {
+        OKMobileKeyManager.Companion.getInstance(mApplication).connectDevices(roomTitle);
     }
 
 
@@ -167,7 +170,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
         removeAllCallBack();
 
-        mCountDownTimer.start();
+        //mCountDownTimer.start();
     }
 
     @Override
