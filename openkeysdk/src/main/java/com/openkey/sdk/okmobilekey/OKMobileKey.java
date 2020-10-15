@@ -66,11 +66,11 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     private void initialize() {
         okMobileKeySDKInitialize();
         int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
-        Log.e("mobileKeyStatusId", ":" + mobileKeyStatusId);
+        Log.e("OkmobileKeyStatusId", ":" + mobileKeyStatusId);
         Log.e("haveKey()", ":" + haveKey());
         if (haveKey() && mobileKeyStatusId == 3) {
             Log.e("Keystatus ", ":" + mobileKeyStatusId);
-            Log.e("mobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
+            Log.e("OkmobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
             openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
         } else {
             if (mobileKeyStatusId == 1) {
