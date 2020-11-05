@@ -12,6 +12,7 @@ import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.assa.ASSA;
+import com.openkey.sdk.drk.DRKModule;
 import com.openkey.sdk.entrava.Entrava;
 import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
@@ -48,6 +49,7 @@ public final class OpenKeyManager {
     private OKModule okModule;
 
     private OKMobileKey okMobileKey;
+    private DRKModule drkModule;
 
     private OpenKeyCallBack mOpenKeyCallBack;
 
@@ -196,6 +198,9 @@ public final class OpenKeyManager {
             case OKMOBILEKEY:
                 okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
                 break;
+            case DRK:
+                drkModule = new DRKModule(mContext, openKeyCallBack);
+                break;
 
             case ENTRAVA:
             case ENTRAVATOUCH:
@@ -212,7 +217,7 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void getKey(@NonNull final OpenKeyCallBack openKeyCallBack) {
-        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null) {
+        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null && drkModule == null) {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
         }
@@ -291,11 +296,23 @@ public final class OpenKeyManager {
 
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 break;
+
+            case DRK:
+
+                SessionResponse sessionResponse1 = GetBooking.getInstance().getBooking();
+                if (sessionResponse1 != null && sessionResponse1.getData().getMobileKeyStatusId() == 2) {
+                    updateKeyStatus(true);
+                }
+
+                drkModule.fetchDrkRoomList();
+
+                mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+                break;
         }
     }
 
 
-    public void  startOkMobileScanning() {
+    public void startOkMobileScanning() {
         okMobileKey.fetchOkMobileKeyRoomList();
     }
 
@@ -317,7 +334,7 @@ public final class OpenKeyManager {
      * @return boolean
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
-        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null) {
+        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null && drkModule == null) {
             Log.e("Started", "INITIALIZATION_FAILED");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             initialize(openKeyCallBack);
@@ -357,6 +374,10 @@ public final class OpenKeyManager {
             case OKMOBILEKEY:
                 haveKey = okMobileKey.haveKey();
                 break;
+
+            case DRK:
+                haveKey = drkModule.haveKey();
+                break;
         }
         return haveKey;
     }
@@ -392,6 +413,9 @@ public final class OpenKeyManager {
 
                 case OKMOBILEKEY:
                     okMobileKey.startScanning(roomNumber);
+                    break;
+                case DRK:
+                    drkModule.startScanning(roomNumber);
                     break;
 
                 case ASSA:

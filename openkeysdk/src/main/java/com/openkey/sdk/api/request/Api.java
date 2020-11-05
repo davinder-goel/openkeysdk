@@ -278,6 +278,22 @@ public class Api {
         services.initializePersonalizationForKaba(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
 
+    /**
+     * @param context
+     * @param callback
+     */
+    @SuppressWarnings("unchecked")
+    public static void setInitializePersonalizationForDRK(final Context context, final Callback callback
+            , OpenKeyCallBack openKeyCallBack) {
+        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
+
+        if (context == null || tokenStr == null && openKeyCallBack != null)
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+
+        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
+        services.initializePersonalizationForDRK(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
+    }
+
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**

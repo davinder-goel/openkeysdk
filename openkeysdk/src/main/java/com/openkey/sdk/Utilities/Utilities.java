@@ -436,6 +436,4 @@ public class Utilities {
         }
         return MANUFACTURER.valueOf(manufacturerStr);
     }
-
-
 }
