@@ -198,6 +198,7 @@ public final class OpenKeyManager {
             case OKMOBILEKEY:
                 okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
                 break;
+
             case DRK:
                 drkModule = new DRKModule(mContext, openKeyCallBack);
                 break;
@@ -414,6 +415,7 @@ public final class OpenKeyManager {
                 case OKMOBILEKEY:
                     okMobileKey.startScanning(roomNumber);
                     break;
+
                 case DRK:
                     drkModule.startScanning(roomNumber);
                     break;

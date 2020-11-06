@@ -16,6 +16,9 @@ public class DrkData {
     @SerializedName("code")
     @Expose
     private String code;
+    @SerializedName("vendor")
+    @Expose
+    private String vendor;
 
     public String getCode() {
         return code;
@@ -23,5 +26,13 @@ public class DrkData {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
     }
 }
