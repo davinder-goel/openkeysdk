@@ -143,7 +143,6 @@ public class DRKModule implements OKDrkCallBack {
 
     }
 
-
     /* fetch roomlist from server*/
     public void fetchDrkRoomList() {
 //        removeAllCallBack();
@@ -222,6 +221,8 @@ public class DRKModule implements OKDrkCallBack {
 ////                SCANNING_TIME_OKMOBILEKEY = 15000L;
 //
 //            }
+        } else {
+            openKeyCallBack.initializationFailure("error in fetch key");
         }
     }
 
@@ -256,6 +257,8 @@ public class DRKModule implements OKDrkCallBack {
             } else {
                 openKeyCallBack.initializationFailure(resultReturn.getError().name());
             }
+            openKeyCallBack.initializationFailure("Drk personalization error");
+        } else {
             openKeyCallBack.initializationFailure("Drk personalization error");
         }
     }

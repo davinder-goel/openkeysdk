@@ -7,6 +7,7 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 
 import com.assaabloy.mobilekeys.api.ApiConfiguration;
+import com.assaabloy.mobilekeys.api.BuildConfig;
 import com.assaabloy.mobilekeys.api.MobileKey;
 import com.assaabloy.mobilekeys.api.MobileKeys;
 import com.assaabloy.mobilekeys.api.MobileKeysApi;
@@ -26,7 +27,6 @@ import com.assaabloy.mobilekeys.api.ble.ScanConfiguration;
 import com.assaabloy.mobilekeys.api.ble.ScanMode;
 import com.assaabloy.mobilekeys.api.ble.SeamlessOpeningTrigger;
 import com.assaabloy.mobilekeys.api.ble.TapOpeningTrigger;
-import com.openkey.sdk.BuildConfig;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.OpenkeyLog;
@@ -107,6 +107,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * Configure and initialize the ASSA SDK
      */
@@ -178,6 +179,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * To get the current startSetup status
      *
