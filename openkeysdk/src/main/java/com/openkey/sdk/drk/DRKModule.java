@@ -148,7 +148,7 @@ public class DRKModule implements OKDrkCallBack {
 //        removeAllCallBack();
 //        String keyToken = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mApplication);
         DrkManager.Companion.getInstance(mApplication).syncDevices();
-//        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(null, true);
+        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(null, true);
 
     }
 
@@ -200,7 +200,7 @@ public class DRKModule implements OKDrkCallBack {
     public void fetchDeviceDRKResult(@Nullable ResultReturn resultReturn) {
         if (resultReturn != null && resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
 
-            openKeyCallBack.getOKCandOkModuleMobileKeysResponse(resultReturn.getDrkRoomList(), true);
+            openKeyCallBack.getOKCandOkModuleMobileKeysResponse(resultReturn.getDrkRoomList(), false);
 //            if (mCountDownTimer != null) {
 //                mCountDownTimer.cancel();
 //
@@ -257,7 +257,7 @@ public class DRKModule implements OKDrkCallBack {
             } else {
                 openKeyCallBack.initializationFailure(resultReturn.getError().name());
             }
-            openKeyCallBack.initializationFailure("Drk personalization error");
+//            openKeyCallBack.initializationFailure("Drk personalization error");
         } else {
             openKeyCallBack.initializationFailure("Drk personalization error");
         }
@@ -275,7 +275,7 @@ public class DRKModule implements OKDrkCallBack {
         if (resultReturn != null && resultReturn.getSuccess() != null &&
                 resultReturn.getSuccess() &&
                 resultReturn.getSyncData() != null && resultReturn.getSyncData().getData() != null) {
-            for (int i = 0; i < resultReturn.getSyncData().getData().size() - 1; i++) {
+            for (int i = 0; i < resultReturn.getSyncData().getData().size(); i++) {
                 DrkManager.Companion.getInstance(mApplication).fetchKeys(resultReturn.getSyncData().getData().get(i).getId());
             }
         } else {
