@@ -229,7 +229,7 @@ public class DRKModule implements OKDrkCallBack {
     @Override
     public void initializeResult(@Nullable ResultReturn resultReturn) {
         if (resultReturn != null && resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
-            Api.setInitializePersonalizationForDRK(mApplication, drkToken, openKeyCallBack);
+            getDrkRegistrationId();
         } else {
             openKeyCallBack.initializationFailure("Initialization failure");
         }
