@@ -156,9 +156,7 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
-        Log.e("initialize", "called");
         if (mContext == null) {
-            Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
         }
@@ -299,15 +297,7 @@ public final class OpenKeyManager {
                 break;
 
             case DRK:
-
-                SessionResponse sessionResponse1 = GetBooking.getInstance().getBooking();
-                if (sessionResponse1 != null && sessionResponse1.getData().getMobileKeyStatusId() == 2) {
-                    updateKeyStatus(true);
-                }
-
-                drkModule.fetchDrkRoomList();
-
-                mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+                drkModule.fetchKeys();
                 break;
         }
     }
@@ -398,6 +388,7 @@ public final class OpenKeyManager {
             Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
         }
+        Log.e("OKMGR", "Start Scanning");
 //
 //        if (manufacturer == MANUFACTURER.OKC && !BleHelper.getInstance().isBleOpend()) {
 //            okc.okcSDKInitialize();
@@ -417,7 +408,8 @@ public final class OpenKeyManager {
                     break;
 
                 case DRK:
-                    drkModule.startScanning(roomNumber);
+                    Log.e("OKMGR", "OPENING " + roomNumber);
+                    drkModule.open(roomNumber);
                     break;
 
                 case ASSA:

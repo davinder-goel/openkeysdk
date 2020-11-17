@@ -18,31 +18,27 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.Array;
+import java.util.ArrayList;
+
+import kotlin.reflect.KFunction;
 import retrofit2.Call;
 import retrofit2.Callback;
 
 public class DRKModule implements OKDrkCallBack {
     private Application mApplication;
-    private OpenKeyCallBack openKeyCallBack;
-    private CountDownTimer mCountDownTimer;
-    private Boolean isRunning = false;
-    private Handler mHandlerOkMobileKey = null;
-    private String mDrkRegId;
-
-    //    private Runnable runnableOkMobileKey = this::fetchOkMobileKeyRoomList;
-    private String roomTitle;
+    private OpenKeyCallBack callBack;
+    private String state;
     private Callback<DRKToken> drkToken = new Callback<DRKToken>() {
         @Override
         public void onResponse(Call<DRKToken> call, retrofit2.Response<DRKToken> response) {
             if (response.isSuccessful()) {
                 DRKToken token = response.body();
                 if (token != null && token.getData() != null && token.getData().getCode() != null) {
-                    Utilities.getInstance().saveValue(Constants.DRK_REGISTRATION_TOKEN, token.getData().getCode(), mApplication);
-//                    DrkManager.Companion.getInstance(mApplication).personalize(token.getData().getCode());
-                    startDrkProcessing();
+                    startDrkProcessing(token.getData().getCode());
                 } else {
                     // Show the message  from the error body if response is not successful
-                    openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+                    callBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
                 }
             }
 
@@ -50,202 +46,25 @@ public class DRKModule implements OKDrkCallBack {
 
         @Override
         public void onFailure(Call<DRKToken> call, Throwable t) {
-            openKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+            callBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
 
         }
     };
-//
-//    public void countTimer() {
-//        mCountDownTimer = new CountDownTimer(30000, 1000) {
-//
-//            public void onTick(long millisUntilFinished) {
-//                Log.e("timer", "tick");
-//                isRunning = true;
-//            }
-//
-//            public void onFinish() {
-//                Log.e("timer", "finish");
-//                removeAllCallBack();
-//                isRunning = false;
-//                fetchOkMobileKeyRoomList();
-//                mCountDownTimer.cancel();
-//            }
-//
-//        };
-//    }
 
-    //-----------------------------------------------------------------------------------------------------------------|
-
-    //-----------------------------------------------------------------------------------------------------------------|
     public DRKModule(Application application, OpenKeyCallBack OpenKeyCallBack) {
-        this.openKeyCallBack = OpenKeyCallBack;
+        this.callBack = OpenKeyCallBack;
         this.mApplication = application;
         initialize();
-//        countTimer();
     }
 
-    /*
-     * initialize  sdk for OKModule
-     *
-     * */
-    private void initialize() {
-        drkSDKInitialize();
-    }
-
-
-    private void startDrkProcessing() {
-        mDrkRegId = Utilities.getInstance().getValue(Constants.DRK_REGISTRATION_TOKEN, "", mApplication);
-        if (mDrkRegId.length() > 0) {
-//            startDrk();
-            DrkManager.Companion.getInstance(mApplication).personalize(mDrkRegId);
-        } else {
-            getDrkRegistrationId();
-        }
-    }
-
-    private void getDrkRegistrationId() {
-        Api.setInitializePersonalizationForDRK(mApplication, drkToken, openKeyCallBack);
-    }
-
-    private void startDrk() {
-        int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
-        Log.e("OkmobileKeyStatusId", ":" + mobileKeyStatusId);
-        Log.e("haveKey()", ":" + haveKey());
-        if (haveKey() && mobileKeyStatusId == 3) {
-            Log.e("Keystatus ", ":" + mobileKeyStatusId);
-            Log.e("OkmobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
-            openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
-        } else {
-            if (mobileKeyStatusId == 1) {
-                Log.e("Keystatus ", ":" + mobileKeyStatusId);
-                Log.e("mobileKeyStatusId", "is: " + haveKey());
-                Api.setPeronalizationComplete(mApplication, openKeyCallBack);
-            } else {
-                Log.e("Keystatus ", ":" + mobileKeyStatusId);
-                openKeyCallBack.initializationSuccess();
-            }
-        }
-    }
-
-    private void drkSDKInitialize() {
-        String uuid = Utilities.getInstance().getValue(Constants.UUID, "", mApplication);
-        boolean environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, false, mApplication);
-        DrkManager.Companion.getInstance(mApplication).registerDRKModuleCallback(this);
-        DrkManager.Companion.getInstance(mApplication).DRKInit(environmentType, uuid);
-    }
-
-    /**
-     * if device has a key for okmodule
-     */
-    public boolean haveKey() {
-        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mApplication);
-        return key != null && key.length() > 0;
-
-    }
-
-    /* fetch roomlist from server*/
-    public void fetchDrkRoomList() {
-//        removeAllCallBack();
-//        String keyToken = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mApplication);
-        DrkManager.Companion.getInstance(mApplication).syncDevices();
-        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(null, true);
-
-    }
-
-//
-//    public void removeAllCallBack() {
-//        if (mCountDownTimer != null) {
-//            mCountDownTimer.cancel();
-//        }
-//        if (runnableOkMobileKey != null && mHandlerOkMobileKey != null) {
-//            mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
-//        }
-//    }
-
-
-    /**
-     * start OKModule scanning for open lock when scanning animation on going
-     */
-    public void startScanning(String title) {
-        try {
-//            if (title.equalsIgnoreCase("RemoveCallback")) {
-//                Log.e("startScanning", "remove call");
-////                removeAllCallBack();
-//            } else {
-//                Log.e("startScanning", "connect devices");
-            connectDevice(title);
-//            }
-
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-
-    public void connectDevice(String roomTitle) {
-//        if (mCountDownTimer != null && isRunning) {
-//            mCountDownTimer.cancel();
-//        }
-//        if (mHandlerOkMobileKey != null && runnableOkMobileKey != null) {
-//            mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
-//        }
-//
-        this.roomTitle = roomTitle;
-
-        DrkManager.Companion.getInstance(mApplication).scanDevices(roomTitle);
-    }
-
-
-    @Override
-    public void fetchDeviceDRKResult(@Nullable ResultReturn resultReturn) {
-        if (resultReturn != null && resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
-
-            openKeyCallBack.getOKCandOkModuleMobileKeysResponse(resultReturn.getDrkRoomList(), false);
-//            if (mCountDownTimer != null) {
-//                mCountDownTimer.cancel();
-//
-//            } else {
-//                Log.e("timerrumming", "false");
-//            }
-//            if (resultReturn.getSuccess()) {
-//                Log.e("device found", "found");
-//                Log.e("Timerstart", "15s");
-//
-//
-//                if (mHandlerOkMobileKey == null) {
-//                    mHandlerOkMobileKey = new Handler();
-//                } else {
-//
-//                    mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
-//                }
-////                SCANNING_TIME_OKMOBILEKEY = 15000L;
-//
-//            }
-        } else {
-            openKeyCallBack.initializationFailure("error in fetch key");
-        }
-    }
 
     @Override
     public void initializeResult(@Nullable ResultReturn resultReturn) {
         if (resultReturn != null && resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
-            getDrkRegistrationId();
+            state = "personalizationCheck";
+            DrkManager.Companion.getInstance(mApplication).isPersonalized();
         } else {
-            openKeyCallBack.initializationFailure("Initialization failure");
-        }
-    }
-
-    @Override
-    public void openResult(@Nullable ResultReturn resultReturn) {
-        if (resultReturn != null && resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
-            Api.logSDK(mApplication, 1);
-            openKeyCallBack.stopScan(true, "");
-        } else {
-            if (Utilities.getInstance(mApplication).isOnline(mApplication)) {
-                openKeyCallBack.stopScan(false, "");
-            } else {
-                Toast.makeText(mApplication, "Network connection failed, Please check your network connection.", Toast.LENGTH_SHORT).show();
-            }
+            callBack.initializationFailure("Initialization failure");
         }
     }
 
@@ -255,31 +74,111 @@ public class DRKModule implements OKDrkCallBack {
             if (resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
                 startDrk();
             } else {
-                openKeyCallBack.initializationFailure(resultReturn.getError().name());
+                if (state.equals("personalizationCheck")) {
+                    state = "personalizing";
+                    getDrkRegistrationId();
+                } else {
+                    callBack.initializationFailure(resultReturn.getError().name());
+                }
             }
-//            openKeyCallBack.initializationFailure("Drk personalization error");
         } else {
-            openKeyCallBack.initializationFailure("Drk personalization error");
+            callBack.initializationFailure("Drk personalization error");
         }
     }
 
-    @Override
-    public void scanningResult(@Nullable ResultReturn resultReturn) {
-        if (resultReturn != null && resultReturn.getSuccess() != null && resultReturn.getSuccess()) {
-            DrkManager.Companion.getInstance(mApplication).connectDevices(roomTitle);
-        }
+    /**
+     * if device has a key for okmodule
+     */
+    public boolean haveKey() {
+        String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mApplication);
+        return key != null && key.length() > 0;
     }
 
-    @Override
+    public void fetchKeys() {
+        DrkManager.Companion.getInstance(mApplication).sync();
+    }
+
     public void syncResult(@Nullable ResultReturn resultReturn) {
         if (resultReturn != null && resultReturn.getSuccess() != null &&
                 resultReturn.getSuccess() &&
-                resultReturn.getSyncData() != null && resultReturn.getSyncData().getData() != null) {
-            for (int i = 0; i < resultReturn.getSyncData().getData().size(); i++) {
-                DrkManager.Companion.getInstance(mApplication).fetchKeys(resultReturn.getSyncData().getData().get(i).getId());
+                resultReturn.getData() != null) {
+            Utilities.getInstance().saveValue(Constants.MOBILE_KEY, 1, mApplication);
+            callBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+            int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
+            if (mobileKeyStatusId != 3) {
+                Api.setKeyStatus(mApplication, Constants.KEY_DELIVERED);
+            }
+            DrkManager.Companion.getInstance(mApplication).fetchRoomList();
+        } else {
+            callBack.isKeyAvailable(false, "Key is available");
+        }
+    }
+
+    @Override
+    public void fetchResults(@Nullable ResultReturn resultReturn) {
+        if (resultReturn != null && resultReturn.getSuccess() != null &&
+                resultReturn.getSuccess() &&
+                resultReturn.getDrkRoomList() != null) {
+            callBack.getOKCandOkModuleMobileKeysResponse(resultReturn.getDrkRoomList(), false);
+        } else {
+            callBack.getOKCandOkModuleMobileKeysResponse(new ArrayList<String>(), false);
+        }
+    }
+
+    public void open(String roomTitle) {
+        DrkManager.Companion.getInstance(mApplication).open(roomTitle);
+    }
+
+    @Override
+    public void openResult(@Nullable ResultReturn resultReturn) {
+        if (resultReturn != null &&
+                resultReturn.getSuccess() != null &&
+                resultReturn.getSuccess()
+        ) {
+            if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
+                callBack.stopScan(true,"Door Opened");
+                Api.logSDK(mApplication, 1);
+            } else {
+                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
             }
         } else {
-            Toast.makeText(mApplication, "Something went wrong, please try after some time.", Toast.LENGTH_SHORT).show();
+            callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+        }
+    }
+
+    /*
+     * initialize  sdk for OKModule
+     *
+     * */
+    private void initialize() {
+        String uuid = Utilities.getInstance().getValue(Constants.UUID, "", mApplication);
+        boolean environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, false, mApplication);
+        DrkManager.Companion.getInstance(mApplication).registerCallback(this);
+        DrkManager.Companion.getInstance(mApplication).initialize(environmentType, uuid);
+    }
+
+    private void startDrk() {
+        int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
+        if (haveKey() && mobileKeyStatusId == 3) {
+           fetchKeys();
+        } else {
+            if (mobileKeyStatusId == 1) {
+                Api.setPeronalizationComplete(mApplication, callBack);
+            } else {
+                callBack.initializationSuccess();
+            }
+        }
+    }
+
+    private void getDrkRegistrationId() {
+        Api.setInitializePersonalizationForDRK(mApplication, drkToken, callBack);
+    }
+
+    private void startDrkProcessing(String mDrkRegId) {
+        if (mDrkRegId.length() > 0) {
+            DrkManager.Companion.getInstance(mApplication).personalize(mDrkRegId);
+        } else {
+            callBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
         }
     }
 }
