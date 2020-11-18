@@ -7,7 +7,6 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 
 import com.assaabloy.mobilekeys.api.ApiConfiguration;
-import com.assaabloy.mobilekeys.api.BuildConfig;
 import com.assaabloy.mobilekeys.api.MobileKey;
 import com.assaabloy.mobilekeys.api.MobileKeys;
 import com.assaabloy.mobilekeys.api.MobileKeysApi;
@@ -27,6 +26,7 @@ import com.assaabloy.mobilekeys.api.ble.ScanConfiguration;
 import com.assaabloy.mobilekeys.api.ble.ScanMode;
 import com.assaabloy.mobilekeys.api.ble.SeamlessOpeningTrigger;
 import com.assaabloy.mobilekeys.api.ble.TapOpeningTrigger;
+import com.openkey.sdk.BuildConfig;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.OpenkeyLog;
@@ -123,8 +123,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                     new SeamlessOpeningTrigger()}, LOCK_SERVICE_CODE).build();
 
             ApiConfiguration apiConfiguration = new ApiConfiguration.Builder()
-                    .setApplicationId(BuildConfig.APPLICATION_ID)
-                    .setApplicationDescription(BuildConfig.VERSION_NAME)
+                    .setApplicationId(BuildConfig.LIBRARY_PACKAGE_NAME)
+                    .setApplicationDescription("1.0")
                     .build();
             scanConfiguration.setScanMode(ScanMode.OPTIMIZE_PERFORMANCE);
             scanConfiguration.setRssiSensitivity(RssiSensitivity.NORMAL);
