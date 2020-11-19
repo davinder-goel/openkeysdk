@@ -224,6 +224,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     @Override
     public void fetchKeySuccess(@Nullable ArrayList<String> arrayList, boolean b) {
         openKeyCallBack.getOKCandOkModuleMobileKeysResponse(arrayList,b);
+//        Api.setKeyStatus(mApplication,Constants.KEY_DELIVERED);
         if(mCountDownTimer!=null)
         {
             mCountDownTimer.cancel();

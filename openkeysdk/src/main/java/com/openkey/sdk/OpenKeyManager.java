@@ -286,10 +286,10 @@ public final class OpenKeyManager {
 
             case OKMOBILEKEY:
 
-                SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
-                if (sessionResponse != null && sessionResponse.getData().getMobileKeyStatusId() == 2) {
-                    updateKeyStatus(true);
-                }
+//                SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
+//                if (sessionResponse != null && sessionResponse.getData().getMobileKeyStatusId() == 2) {
+                updateKeyStatus(true);
+//                }
 
                 okMobileKey.fetchOkMobileKeyRoomList();
 
