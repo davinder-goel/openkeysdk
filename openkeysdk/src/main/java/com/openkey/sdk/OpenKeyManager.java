@@ -2,6 +2,7 @@ package com.openkey.sdk;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -198,7 +199,11 @@ public final class OpenKeyManager {
                 break;
 
             case DRK:
-                drkModule = new DRKModule(mContext, openKeyCallBack);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    drkModule = new DRKModule(mContext, openKeyCallBack);
+                } else {
+                    mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
+                }
                 break;
 
             case ENTRAVA:
@@ -297,7 +302,11 @@ public final class OpenKeyManager {
                 break;
 
             case DRK:
-                drkModule.fetchKeys();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    drkModule.fetchKeys();
+                } else {
+                    mOpenKeyCallBack.isKeyAvailable(false, "Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
+                }
                 break;
         }
     }
