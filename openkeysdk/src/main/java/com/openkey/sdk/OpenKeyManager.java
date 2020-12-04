@@ -161,13 +161,13 @@ public final class OpenKeyManager {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
         }
+        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
 
         final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", mContext);
         if (manufacturerStr.isEmpty()) {
             openKeyCallBack.initializationFailure(Response.BOOKING_NOT_FOUNT);
             return;
         }
-
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
         switch (manufacturer) {
             case ASSA:
@@ -195,11 +195,17 @@ public final class OpenKeyManager {
                 break;
 
             case OKMOBILEKEY:
+                if (tokenStr != null && tokenStr.length() > 0 && mContext != null) {
+                    Api.getSession(mContext, tokenStr, null);
+                }
                 okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
                 break;
 
             case DRK:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (tokenStr != null && tokenStr.length() > 0 && mContext != null) {
+                        Api.getSession(mContext, tokenStr, null);
+                    }
                     drkModule = new DRKModule(mContext, openKeyCallBack);
                 } else {
                     mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");

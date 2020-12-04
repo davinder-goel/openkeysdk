@@ -31,8 +31,8 @@ import static com.openkey.sdk.Utilities.Constants.TOKEN;
 
 /**
  * @author OpenKey Inc.
- *         <p>
- *         This class will hold all the api calls made from the SDK
+ * <p>
+ * This class will hold all the api calls made from the SDK
  */
 public class Api {
 
@@ -57,16 +57,23 @@ public class Api {
                 if (response.isSuccessful()) {
                     Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, token, context);
                     saveData(response.body(), context);
-                    openKeyCallBack.sessionResponse(response.body());
+                    if (openKeyCallBack != null) {
+                        openKeyCallBack.sessionResponse(response.body());
+                    }
                 } else {
-                    // get the error message from the response and return it to the callback
-                    openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, response.code() + "");
+                    if (openKeyCallBack != null) {
+
+                        // get the error message from the response and return it to the callback
+                        openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, response.code() + "");
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
-                openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, "");
+                if (openKeyCallBack != null) {
+                    openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, "");
+                }
             }
         });
     }
@@ -108,8 +115,8 @@ public class Api {
     //-----------------------------------------------------------------------------------------------------------------|
 
     /*
-    * Getting the key from server
-    * */
+     * Getting the key from server
+     * */
     @SuppressWarnings("unchecked")
     public static void getMobileKey(final Context context, final Callback callback) {
 
@@ -148,8 +155,8 @@ public class Api {
 
 
     /*
-    * Getting the key status either key issued from backend or not
-    * */
+     * Getting the key status either key issued from backend or not
+     * */
     @SuppressWarnings("unchecked")
     public static void getKeyStatus(final Context context, final Callback callback) {
 

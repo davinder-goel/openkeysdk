@@ -375,7 +375,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-//                mEdtTextToken.setText(mToken);
+                mEdtTextToken.setText(mToken);
                 String token = mEdtTextToken.getText().toString().trim();
                 if (token.length() > 0) {
                     OpenKeyManager.getInstance().authenticate(token, this, false);
