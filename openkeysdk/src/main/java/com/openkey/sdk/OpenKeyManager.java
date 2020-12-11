@@ -195,7 +195,7 @@ public final class OpenKeyManager {
                 break;
 
             case OKMOBILEKEY:
-                if (tokenStr != null && tokenStr.length() > 0 && mContext != null) {
+                if (tokenStr != null && tokenStr.length() > 0) {
                     Api.getSession(mContext, tokenStr, null);
                 }
                 okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
@@ -203,7 +203,7 @@ public final class OpenKeyManager {
 
             case DRK:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (tokenStr != null && tokenStr.length() > 0 && mContext != null) {
+                    if (tokenStr != null && tokenStr.length() > 0) {
                         Api.getSession(mContext, tokenStr, null);
                     }
                     drkModule = new DRKModule(mContext, openKeyCallBack);

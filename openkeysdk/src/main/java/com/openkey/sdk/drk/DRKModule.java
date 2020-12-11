@@ -1,10 +1,7 @@
 package com.openkey.sdk.drk;
 
 import android.app.Application;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.openkey.okdrksdk.callbackmodule.OKDrkCallBack;
 import com.openkey.okdrksdk.enums.ResultReturn;
@@ -18,10 +15,8 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Array;
 import java.util.ArrayList;
 
-import kotlin.reflect.KFunction;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -116,6 +111,8 @@ public class DRKModule implements OKDrkCallBack {
 
     @Override
     public void fetchResults(@Nullable ResultReturn resultReturn) {
+        Log.e("Call fecth key response", resultReturn + "");
+        Log.e("Call fecth key response", resultReturn.getDrkRoomList().size() + "");
         if (resultReturn != null && resultReturn.getSuccess() != null &&
                 resultReturn.getSuccess() &&
                 resultReturn.getDrkRoomList() != null) {
@@ -136,7 +133,7 @@ public class DRKModule implements OKDrkCallBack {
                 resultReturn.getSuccess()
         ) {
             if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
-                callBack.stopScan(true,"Door Opened");
+                callBack.stopScan(true, "Door Opened");
                 Api.logSDK(mApplication, 1);
             } else {
                 callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
@@ -160,7 +157,7 @@ public class DRKModule implements OKDrkCallBack {
     private void startDrk() {
         int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
         if (haveKey() && mobileKeyStatusId == 3) {
-           fetchKeys();
+            fetchKeys();
         } else {
             if (mobileKeyStatusId == 1) {
                 Api.setPeronalizationComplete(mApplication, callBack);
