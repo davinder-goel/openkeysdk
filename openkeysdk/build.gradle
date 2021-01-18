@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
@@ -59,7 +59,7 @@ dependencies {
     implementation(name: 'Alv2Service_v1.3.4', ext: 'aar')
     implementation files('libs/okc_sdk_v1.4.jar')
     implementation files('libs/OKMobileKey_sdk_v1.3.jar')
-    implementation files('libs/drk_release_v1.9.jar')
+    implementation files('libs/drk_release_v1.10.jar')
     api 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
