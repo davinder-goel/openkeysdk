@@ -118,6 +118,7 @@ public class DRKModule implements OKDrkCallBack {
                 resultReturn.getDrkRoomList() != null) {
             callBack.getOKCandOkModuleMobileKeysResponse(resultReturn.getDrkRoomList(), false);
         } else {
+            Log.e("fecth key response else", "called");
             callBack.getOKCandOkModuleMobileKeysResponse(new ArrayList<String>(), false);
         }
     }
