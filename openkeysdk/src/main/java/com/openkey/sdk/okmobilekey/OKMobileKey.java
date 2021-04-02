@@ -23,9 +23,10 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     private OpenKeyCallBack openKeyCallBack;
     private CountDownTimer mCountDownTimer;
     private Boolean isRunning= false;
-    private Long SCANNING_TIME_OKMOBILEKEY = 30000L;
+    private Long SCANNING_TIME_OKMOBILEKEY = 15000L;
     private Handler mHandlerOkMobileKey = null;
     private Runnable runnableOkMobileKey = this::fetchOkMobileKeyRoomList;
+    private String roomTitle;
 
 
 
@@ -38,7 +39,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     }
 
     public void countTimer() {
-            mCountDownTimer = new CountDownTimer(120000, 1000) {
+        mCountDownTimer = new CountDownTimer(30000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     Log.e("timer","tick");
@@ -65,19 +66,14 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     private void initialize() {
         okMobileKeySDKInitialize();
         int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
-        Log.e("mobileKeyStatusId", ":" + mobileKeyStatusId);
+        Log.e("OkmobileKeyStatusId", ":" + mobileKeyStatusId);
         Log.e("haveKey()", ":" + haveKey());
         if (haveKey() && mobileKeyStatusId == 3) {
-            Log.e("Keystatus ", ":" + mobileKeyStatusId);
-            Log.e("mobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
             openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
         } else {
             if (mobileKeyStatusId == 1) {
-                Log.e("Keystatus ", ":" + mobileKeyStatusId);
-                Log.e("mobileKeyStatusId", "is: " + haveKey());
                 Api.setPeronalizationComplete(mApplication, openKeyCallBack);
             } else {
-                Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 openKeyCallBack.initializationSuccess();
             }
         }
@@ -127,7 +123,15 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
 
         try {
-            OKMobileKeyManager.Companion.getInstance(mApplication).scanDevices(title);
+
+            if (title.equalsIgnoreCase("RemoveCallback")) {
+                Log.e("startScanning", "remove call");
+                removeAllCallBack();
+            } else {
+                Log.e("startScanning", "connect devices");
+                connectDevice(title);
+            }
+
         } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
@@ -143,12 +147,14 @@ public class OKMobileKey implements OKMobileKeyCallBack {
                     mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
                 }
 
-        OKMobileKeyManager.Companion.getInstance(mApplication).connectDevices(roomTitle);
+        this.roomTitle = roomTitle;
+
+        OKMobileKeyManager.Companion.getInstance(mApplication).scanDevices(roomTitle);
     }
 
     @Override
-    public void scanResult(String msg) {
-
+    public void scanResult(Boolean hasResults) {
+        OKMobileKeyManager.Companion.getInstance(mApplication).connectDevices(roomTitle);
     }
 
 
@@ -159,7 +165,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
         removeAllCallBack();
 
-        mCountDownTimer.start();
+        //mCountDownTimer.start();
     }
 
     @Override
@@ -176,7 +182,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         {
             mCountDownTimer.cancel();
         }
-        SCANNING_TIME_OKMOBILEKEY=15000L;
+
 
         if (mHandlerOkMobileKey == null) {
             mHandlerOkMobileKey =new Handler();
@@ -185,7 +191,8 @@ public class OKMobileKey implements OKMobileKeyCallBack {
             mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
         }
         Log.e("Timerstart", "15s");
-        mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
+        SCANNING_TIME_OKMOBILEKEY = 2000L;
+        //mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
     }
 
 
@@ -212,6 +219,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     @Override
     public void fetchKeySuccess(@Nullable ArrayList<String> arrayList, boolean b) {
         openKeyCallBack.getOKCandOkModuleMobileKeysResponse(arrayList,b);
+//        Api.setKeyStatus(mApplication,Constants.KEY_DELIVERED);
         if(mCountDownTimer!=null)
         {
             mCountDownTimer.cancel();
@@ -222,9 +230,9 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         }
         if(b){
             Log.e("device found", "found");
-            Log.e("Timerstart", "30s");
+            Log.e("Timerstart", "15s");
 
-            SCANNING_TIME_OKMOBILEKEY=30000L;
+
 
             if (mHandlerOkMobileKey == null) {
                 mHandlerOkMobileKey =   new Handler();
@@ -233,8 +241,8 @@ public class OKMobileKey implements OKMobileKeyCallBack {
 
                 mHandlerOkMobileKey.removeCallbacks(runnableOkMobileKey);
             }
-
-            mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
+            SCANNING_TIME_OKMOBILEKEY = 15000L;
+            //mHandlerOkMobileKey.postDelayed(runnableOkMobileKey, SCANNING_TIME_OKMOBILEKEY);
         }
 
     }

@@ -2,6 +2,7 @@ package com.openkey.sdk.api.service;
 
 import com.openkey.sdk.api.model.KeyStatusRequest;
 import com.openkey.sdk.api.model.SdkLogRequest;
+import com.openkey.sdk.api.response.DRKToken;
 import com.openkey.sdk.api.response.Mobile_key_status.KeyStatusResp;
 import com.openkey.sdk.api.response.invitation_code.InvitationCode;
 import com.openkey.sdk.api.response.key_status.KeyStatusResponse;
@@ -51,6 +52,10 @@ public interface Services {
 
     @GET("sdk/v5/sessions/initializePersonalization.json")
     Call<KabaToken> initializePersonalizationForKaba(@Header("Authorization") String Authorization);
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    @GET("sdk/v5/sessions/initializePersonalization.json")
+    Call<DRKToken> initializePersonalizationForDRK(@Header("Authorization") String Authorization);
     //-----------------------------------------------------------------------------------------------------------------|
 
     @POST("sdk/v5/sessions/setMobileKeyStatus")

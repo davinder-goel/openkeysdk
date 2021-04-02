@@ -44,8 +44,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     private ArrayList<String> okcRoomNumbers;
     private String mOkCSelectedRoom;
 
-    private Boolean mFoundClosest=false;
-
+    private Boolean mFoundClosest = false;
 
 
     private Long SCANNING_TIME = 30000L;
@@ -67,8 +66,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         } };*/
 
 
-
-
     private Runnable stopper = new Runnable() {
         @Override
         public void run() {
@@ -87,7 +84,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "6qsahlewj7pcocfe5qtpcvusupf23ut2pdprzldkeobcwsmzb6cgffsrstwsujat";
+    private String mToken = "3vijg7xlmgd4uwqrzsxspgmi26bnwcro7lwnrguwtzq7s4z5vuwhgw26dlm3nbfb";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -256,6 +253,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void initializationSuccess() {
         hideMessage();
+        showToast("initialization success");
         OpenKeyManager.getInstance().getKey(this);
     }
 
@@ -270,6 +268,9 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (isLockOpened) {
+                    showMessage("Door opened Successfully.");
+                }
                 hideMessage();
             }
         });
@@ -293,7 +294,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void isKeyAvailable(boolean haveKey, String description) {
-
+        Log.e("isKeyAvailable app", "Called");
         if (getActivity() != null)
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -305,11 +306,15 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms,Boolean isDeviceFound) {
+    public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms, Boolean isDeviceFound) {
+        Log.e("Fetch rooms", availableRooms + " called");
         if (okcRoomNumbers == null) {
             okcRoomNumbers = new ArrayList<>();
+        } else {
+            okcRoomNumbers.clear();
         }
-        if (availableRooms.size() > 0) {
+
+        if (availableRooms != null && availableRooms.size() > 0) {
             for (int i = 0; i < availableRooms.size(); i++) {
                 okcRoomNumbers.add(availableRooms.get(i));
             }
@@ -321,16 +326,16 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         /*
          * this is fpr sample only OnMobileKey SDK
          * */
-       // OpenKeyManager.getInstance().startOkMobileScanning();
+        // OpenKeyManager.getInstance().startOkMobileScanning();
     }
 
-   /* @Override
-    public void closestDevice(String room) {
+    /* @Override
+     public void closestDevice(String room) {
 
-        *//*
-         * this is fpr sample only OnMobileKey SDK
-         * *//*
-       *//* mFoundClosest=true;
+         *//*
+     * this is fpr sample only OnMobileKey SDK
+     * *//*
+     *//* mFoundClosest=true;
         mBtnScan.setEnabled(true);
         mBtnScan.setAlpha(1.0f);
         if (mHandler == null) {
@@ -374,10 +379,12 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-                mEdtTextToken.setText(mToken);
-                mToken = mEdtTextToken.getText().toString().trim();
-                if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance().authenticate(mToken, this, false);
+//                mEdtTextToken.setText(mToken);
+                String token = mEdtTextToken.getText().toString().trim();
+                if (token.length() > 0) {
+                    OpenKeyManager.getInstance().authenticate(token, this, false);
+                } else {
+                    showMessage("Please enter sdk token first.");
                 }
                 break;
 
@@ -395,8 +402,8 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 openDoor();
 
                 /*
-                * this is fpr sample only OnMobileKey SDK
-                * */
+                 * this is fpr sample only OnMobileKey SDK
+                 * */
               /*  if(mFoundClosest){
                     mHandler.removeCallbacks(runnables);
                     OpenKeyManager.getInstance().connectOkMobileKey();

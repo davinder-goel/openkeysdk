@@ -28,7 +28,6 @@
         android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="SDK Token"
-        android:text="Token oh2u2dajaz3rrusuqyqwffvbwar4lv7ndn75kbhiyx7hvz32atndb24atmfgs5xk"
         android:inputType="textPersonName"
         android:textColor="@android:color/black"
         android:textColorHint="@android:color/darker_gray"
@@ -92,5 +91,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonGetKey" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

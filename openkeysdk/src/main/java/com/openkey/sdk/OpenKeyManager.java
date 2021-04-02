@@ -2,6 +2,7 @@ package com.openkey.sdk;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import com.openkey.sdk.Utilities.Utilities;
 import com.openkey.sdk.api.request.Api;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.assa.ASSA;
+import com.openkey.sdk.drk.DRKModule;
 import com.openkey.sdk.entrava.Entrava;
 import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
@@ -48,6 +50,7 @@ public final class OpenKeyManager {
     private OKModule okModule;
 
     private OKMobileKey okMobileKey;
+    private DRKModule drkModule;
 
     private OpenKeyCallBack mOpenKeyCallBack;
 
@@ -154,19 +157,17 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
-        Log.e("initialize", "called");
         if (mContext == null) {
-            Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
         }
+        final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
 
         final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", mContext);
         if (manufacturerStr.isEmpty()) {
             openKeyCallBack.initializationFailure(Response.BOOKING_NOT_FOUNT);
             return;
         }
-
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
         switch (manufacturer) {
             case ASSA:
@@ -194,7 +195,21 @@ public final class OpenKeyManager {
                 break;
 
             case OKMOBILEKEY:
+                if (tokenStr != null && tokenStr.length() > 0) {
+                    Api.getSession(mContext, tokenStr, null);
+                }
                 okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
+                break;
+
+            case DRK:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (tokenStr != null && tokenStr.length() > 0) {
+                        Api.getSession(mContext, tokenStr, null);
+                    }
+                    drkModule = new DRKModule(mContext, openKeyCallBack);
+                } else {
+                    mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
+                }
                 break;
 
             case ENTRAVA:
@@ -212,7 +227,7 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void getKey(@NonNull final OpenKeyCallBack openKeyCallBack) {
-        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null) {
+        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null && drkModule == null) {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
         }
@@ -281,26 +296,40 @@ public final class OpenKeyManager {
                 break;
 
             case OKMOBILEKEY:
-                okMobileKey.fetchOkMobileKeyRoomList();
+
+//                SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
+//                if (sessionResponse != null && sessionResponse.getData().getMobileKeyStatusId() == 2) {
                 updateKeyStatus(true);
+//                }
+
+                okMobileKey.fetchOkMobileKeyRoomList();
+
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
+                break;
+
+            case DRK:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    drkModule.fetchKeys();
+                } else {
+                    mOpenKeyCallBack.isKeyAvailable(false, "Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
+                }
                 break;
         }
     }
 
 
-    public void  startOkMobileScanning() {
+    public void startOkMobileScanning() {
         okMobileKey.fetchOkMobileKeyRoomList();
     }
 
 
-    public void  removeCallBack() {
+  /*  public void  removeCallBack() {
         okMobileKey.removeAllCallBack();
     }
 
     public void connectOkMobileKey(String roomTitle) {
         okMobileKey.connectDevice(roomTitle);
-    }
+    }*/
 
     //-----------------------------------------------------------------------------------------------------------------|
 
@@ -311,7 +340,7 @@ public final class OpenKeyManager {
      * @return boolean
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
-        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null) {
+        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null && drkModule == null) {
             Log.e("Started", "INITIALIZATION_FAILED");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             initialize(openKeyCallBack);
@@ -351,6 +380,10 @@ public final class OpenKeyManager {
             case OKMOBILEKEY:
                 haveKey = okMobileKey.haveKey();
                 break;
+
+            case DRK:
+                haveKey = drkModule.haveKey();
+                break;
         }
         return haveKey;
     }
@@ -370,6 +403,7 @@ public final class OpenKeyManager {
             Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
         }
+        Log.e("OKMGR", "Start Scanning");
 //
 //        if (manufacturer == MANUFACTURER.OKC && !BleHelper.getInstance().isBleOpend()) {
 //            okc.okcSDKInitialize();
@@ -386,6 +420,11 @@ public final class OpenKeyManager {
 
                 case OKMOBILEKEY:
                     okMobileKey.startScanning(roomNumber);
+                    break;
+
+                case DRK:
+                    Log.e("OKMGR", "OPENING " + roomNumber);
+                    drkModule.open(roomNumber);
                     break;
 
                 case ASSA:

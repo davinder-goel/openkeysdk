@@ -11,5 +11,6 @@ package com.openkey.sdk.enums;
 /**
  * Enum for lock type
  */
-public enum MANUFACTURER {ASSA, SALTO, KABA, MIWA, ENTRAVA, ENTRAVATOUCH, OKC, MODULE,OKMOBILEKEY
+public enum MANUFACTURER {
+    ASSA, SALTO, KABA, MIWA, ENTRAVA, ENTRAVATOUCH, OKC, MODULE, OKMOBILEKEY, DRK
 }
