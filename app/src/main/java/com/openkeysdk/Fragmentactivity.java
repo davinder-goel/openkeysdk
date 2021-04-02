@@ -23,7 +23,8 @@ public class Fragmentactivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        OpenKeyManager.getInstance().init(getApplication(), "45144534-f181-4011-b142-5d53162a95c8");
+//        OpenKeyManager.getInstance().init(getApplication(), "45144534-f181-4011-b142-5d53162a95c8");
+        OpenKeyManager.getInstance().init(getApplication(), "9200bfc9-4182-469a-a76d-0eff86673d57");
         checkPermissions();
         requestPermission();
         getSupportFragmentManager().beginTransaction().add(R.id.action_container, new KeyActiveFragment(), "").commitAllowingStateLoss();

@@ -107,6 +107,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * Configure and initialize the ASSA SDK
      */
@@ -122,8 +123,8 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                     new SeamlessOpeningTrigger()}, LOCK_SERVICE_CODE).build();
 
             ApiConfiguration apiConfiguration = new ApiConfiguration.Builder()
-                    .setApplicationId(BuildConfig.APPLICATION_ID)
-                    .setApplicationDescription(BuildConfig.VERSION_NAME)
+                    .setApplicationId(BuildConfig.LIBRARY_PACKAGE_NAME)
+                    .setApplicationDescription("1.0")
                     .build();
             scanConfiguration.setScanMode(ScanMode.OPTIMIZE_PERFORMANCE);
             scanConfiguration.setRssiSensitivity(RssiSensitivity.NORMAL);
@@ -178,6 +179,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
+
     /**
      * To get the current startSetup status
      *

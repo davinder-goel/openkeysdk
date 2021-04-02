@@ -18,6 +18,7 @@ public class Constants {
     public final static String INVITATION_CODE = "invitation_code";
     public static final String MOBILE_KEY = "mobile_key";
     public static final String KABA_REGISTRATION_TOKEN = "kaba_registration";
+    public static final String DRK_REGISTRATION_TOKEN = "drk_registration";
     public static final String OKC_KEY_TOKEN = "guest_sdk_okc_token";
     public static final String OKC_ROOM_LIST = "guest_sdk_okc_ROOM_LIST";
 
