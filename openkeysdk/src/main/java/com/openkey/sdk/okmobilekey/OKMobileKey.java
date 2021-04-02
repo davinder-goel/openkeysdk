@@ -69,16 +69,11 @@ public class OKMobileKey implements OKMobileKeyCallBack {
         Log.e("OkmobileKeyStatusId", ":" + mobileKeyStatusId);
         Log.e("haveKey()", ":" + haveKey());
         if (haveKey() && mobileKeyStatusId == 3) {
-            Log.e("Keystatus ", ":" + mobileKeyStatusId);
-            Log.e("OkmobileKeyStatusId ", "haveKey:" + mobileKeyStatusId);
             openKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
         } else {
             if (mobileKeyStatusId == 1) {
-                Log.e("Keystatus ", ":" + mobileKeyStatusId);
-                Log.e("mobileKeyStatusId", "is: " + haveKey());
                 Api.setPeronalizationComplete(mApplication, openKeyCallBack);
             } else {
-                Log.e("Keystatus ", ":" + mobileKeyStatusId);
                 openKeyCallBack.initializationSuccess();
             }
         }
@@ -224,6 +219,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     @Override
     public void fetchKeySuccess(@Nullable ArrayList<String> arrayList, boolean b) {
         openKeyCallBack.getOKCandOkModuleMobileKeysResponse(arrayList,b);
+//        Api.setKeyStatus(mApplication,Constants.KEY_DELIVERED);
         if(mCountDownTimer!=null)
         {
             mCountDownTimer.cancel();

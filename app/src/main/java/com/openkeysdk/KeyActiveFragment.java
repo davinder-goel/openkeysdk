@@ -84,7 +84,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "3hbr2mextjbk2ulcwe6efmr4hwsdwlsuzmocptvqk2ljuepxnfvqy4kz5wl6biwu";
+    private String mToken = "3vijg7xlmgd4uwqrzsxspgmi26bnwcro7lwnrguwtzq7s4z5vuwhgw26dlm3nbfb";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -268,6 +268,9 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (isLockOpened) {
+                    showMessage("Door opened Successfully.");
+                }
                 hideMessage();
             }
         });
@@ -304,9 +307,13 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void getOKCandOkModuleMobileKeysResponse(ArrayList<String> availableRooms, Boolean isDeviceFound) {
+        Log.e("Fetch rooms", availableRooms + " called");
         if (okcRoomNumbers == null) {
             okcRoomNumbers = new ArrayList<>();
+        } else {
+            okcRoomNumbers.clear();
         }
+
         if (availableRooms != null && availableRooms.size() > 0) {
             for (int i = 0; i < availableRooms.size(); i++) {
                 okcRoomNumbers.add(availableRooms.get(i));
@@ -372,10 +379,12 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-                mEdtTextToken.setText(mToken);
-                mToken = mEdtTextToken.getText().toString().trim();
-                if (mToken.length() > 0) {
-                    OpenKeyManager.getInstance().authenticate(mToken, this, false);
+//                mEdtTextToken.setText(mToken);
+                String token = mEdtTextToken.getText().toString().trim();
+                if (token.length() > 0) {
+                    OpenKeyManager.getInstance().authenticate(token, this, false);
+                } else {
+                    showMessage("Please enter sdk token first.");
                 }
                 break;
 

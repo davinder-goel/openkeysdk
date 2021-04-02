@@ -348,8 +348,8 @@ public class Utilities {
         // set your desired log level
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder client = new OkHttpClient.Builder()
-                .readTimeout(30, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
                 .addInterceptor(logging);
 
         client.addInterceptor(new Interceptor() {
@@ -436,6 +436,4 @@ public class Utilities {
         }
         return MANUFACTURER.valueOf(manufacturerStr);
     }
-
-
 }
