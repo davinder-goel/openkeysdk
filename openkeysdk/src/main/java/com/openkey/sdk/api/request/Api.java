@@ -61,8 +61,8 @@ public class Api {
                         openKeyCallBack.sessionResponse(response.body());
                     }
                 } else {
+                    Utilities.getInstance().clearValueOfKey(context, Constants.MOBILE_KEY_STATUS);
                     if (openKeyCallBack != null) {
-
                         // get the error message from the response and return it to the callback
                         openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, response.code() + "");
                     }
@@ -335,14 +335,21 @@ public class Api {
         services.getSession(TOKEN + authToken).enqueue(new Callback<SessionResponse>() {
             @Override
             public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse> response) {
-                if (response.isSuccessful())
+                if (response.isSuccessful()) {
                     saveData(response.body(), context);
-                callback.onResponse(call, response);
+                } else {
+                    Utilities.getInstance().clearValueOfKey(context, Constants.MOBILE_KEY_STATUS);
+                }
+                if (callback != null) {
+                    callback.onResponse(call, response);
+                }
             }
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
-                callback.onFailure(call, t);
+                if (callback != null) {
+                    callback.onFailure(call, t);
+                }
             }
         });
     }

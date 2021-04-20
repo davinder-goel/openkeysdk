@@ -169,54 +169,68 @@ public final class OpenKeyManager {
             return;
         }
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
-        switch (manufacturer) {
-            case ASSA:
-                assa = new ASSA(mContext, openKeyCallBack);
-                break;
 
-            case SALTO:
-                salto = new Salto(mContext, openKeyCallBack);
-                break;
+        if (tokenStr != null && tokenStr.length() > 0) {
+            getSession(tokenStr, new Callback() {
+                @Override
+                public void onResponse(Call call, retrofit2.Response response) {
+                    switch (manufacturer) {
+                        case ASSA:
+                            assa = new ASSA(mContext, openKeyCallBack);
+                            break;
 
-            case KABA:
-                kaba = new Kaba(mContext, openKeyCallBack);
-                break;
+                        case SALTO:
+                            salto = new Salto(mContext, openKeyCallBack);
+                            break;
 
-            case MIWA:
-                miwa = new Miwa(mContext, openKeyCallBack);
-                break;
+                        case KABA:
+                            kaba = new Kaba(mContext, openKeyCallBack);
+                            break;
 
-            case OKC:
-                okc = new OKC(mContext, openKeyCallBack);
-                break;
+                        case MIWA:
+                            miwa = new Miwa(mContext, openKeyCallBack);
+                            break;
 
-            case MODULE:
-                okModule = new OKModule(mContext, openKeyCallBack);
-                break;
+                        case OKC:
+                            okc = new OKC(mContext, openKeyCallBack);
+                            break;
 
-            case OKMOBILEKEY:
-                if (tokenStr != null && tokenStr.length() > 0) {
-                    Api.getSession(mContext, tokenStr, null);
-                }
-                okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
-                break;
+                        case MODULE:
+                            okModule = new OKModule(mContext, openKeyCallBack);
+                            break;
 
-            case DRK:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (tokenStr != null && tokenStr.length() > 0) {
-                        Api.getSession(mContext, tokenStr, null);
+                        case OKMOBILEKEY:
+                            if (tokenStr != null && tokenStr.length() > 0) {
+                                Api.getSession(mContext, tokenStr, null);
+                            }
+                            okMobileKey = new OKMobileKey(mContext, openKeyCallBack);
+                            break;
+
+                        case DRK:
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                if (tokenStr != null && tokenStr.length() > 0) {
+                                    Api.getSession(mContext, tokenStr, null);
+                                }
+                                drkModule = new DRKModule(mContext, openKeyCallBack);
+                            } else {
+                                mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
+                            }
+                            break;
+
+                        case ENTRAVA:
+                        case ENTRAVATOUCH:
+                            entrava = new Entrava(mContext, openKeyCallBack);
+                            break;
                     }
-                    drkModule = new DRKModule(mContext, openKeyCallBack);
-                } else {
-                    mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
                 }
-                break;
 
-            case ENTRAVA:
-            case ENTRAVATOUCH:
-                entrava = new Entrava(mContext, openKeyCallBack);
-                break;
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    openKeyCallBack.initializationFailure(Response.BOOKING_NOT_FOUNT);
+                }
+            });
         }
+
     }
 
     /**
