@@ -137,10 +137,18 @@ public class DRKModule implements OKDrkCallBack {
                 callBack.stopScan(true, "Door Opened");
                 Api.logSDK(mApplication, 1);
             } else {
-                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+                if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+                    callBack.stopScan(false, "Timeout: Lock not found");
+                } else {
+                    callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+                }
             }
         } else {
-            callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+            if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+                callBack.stopScan(false, "Timeout: Lock not found");
+            } else {
+                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+            }
         }
     }
 

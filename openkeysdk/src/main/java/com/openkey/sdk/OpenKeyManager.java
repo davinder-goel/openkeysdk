@@ -3,6 +3,7 @@ package com.openkey.sdk;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -51,11 +52,16 @@ public final class OpenKeyManager {
 
     private OKMobileKey okMobileKey;
     private DRKModule drkModule;
-
+    private Handler handler;
     private OpenKeyCallBack mOpenKeyCallBack;
 
     private boolean mEnvironmentType;
+    private Runnable runnableTimeOut = new Runnable() {
+        @Override
+        public void run() {
 
+        }
+    };
     //-----------------------------------------------------------------------------------------------------------------|
     //-----------------------------------------------------------------------------------------------------------------|
     /*
@@ -104,7 +110,7 @@ public final class OpenKeyManager {
      */
     public void init(Application context, String UUID) throws NullPointerException {
         if (context == null) throw new NullPointerException(Response.NULL_CONTEXT);
-
+        handler = new Handler();
         mContext = context;
         Utilities.getInstance(mContext);
         Utilities.getInstance().saveValue(Constants.UUID, UUID, mContext);
@@ -404,6 +410,18 @@ public final class OpenKeyManager {
 
     //-----------------------------------------------------------------------------------------------------------------|
 
+    private void timeOut(OpenKeyCallBack openKeyCallBack) {
+        if (handler == null) {
+            handler = new Handler();
+        }
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                openKeyCallBack.stopScan(false, "Timeout: Lock not found");
+            }
+        }, 6 * 1000);
+    }
+
     /**
      * start scanning if passes the initial checks
      * and device have a key
@@ -424,6 +442,7 @@ public final class OpenKeyManager {
 //        }
 
         if (isKeyAvailable(openKeyCallBack)) {
+            timeOut(openKeyCallBack);
             switch (manufacturer) {
                 case OKC:
                     okc.startScanning(roomNumber);
