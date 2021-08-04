@@ -129,25 +129,27 @@ public class DRKModule implements OKDrkCallBack {
 
     @Override
     public void openResult(@Nullable ResultReturn resultReturn) {
-        if (resultReturn != null &&
-                resultReturn.getSuccess() != null &&
-                resultReturn.getSuccess()
-        ) {
-            if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
-                callBack.stopScan(true, "Door Opened");
-                Api.logSDK(mApplication, 1);
+        if (!Constants.IS_SCANNING_STOPPED) {
+            if (resultReturn != null &&
+                    resultReturn.getSuccess() != null &&
+                    resultReturn.getSuccess()
+            ) {
+                if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
+                    callBack.stopScan(true, "Door Opened");
+                    Api.logSDK(mApplication, 1);
+                } else {
+                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+                        callBack.stopScan(false, "Timeout: Lock not found");
+                    } else {
+                        callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+                    }
+                }
             } else {
                 if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
                     callBack.stopScan(false, "Timeout: Lock not found");
                 } else {
                     callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
                 }
-            }
-        } else {
-            if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
-                callBack.stopScan(false, "Timeout: Lock not found");
-            } else {
-                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
             }
         }
     }
@@ -186,5 +188,10 @@ public class DRKModule implements OKDrkCallBack {
         } else {
             callBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
         }
+    }
+
+    @Override
+    public void deleteDRKResult(@Nullable ResultReturn resultReturn) {
+        Log.e("Delete DRK", resultReturn.getMessage() + "");
     }
 }

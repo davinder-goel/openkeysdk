@@ -493,19 +493,19 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                                      RfInterface rfInterface) {
 
         deactivateAllFiles();
-
-        final BLEDataHandler dataHandler = new BLEDataHandler(data);
-        if (dataHandler.isAccessGranted()) {
-            mOpenKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
-            if (isLoginActionFired) {
-                isLoginActionFired = false;
-                Api.logSDK(mContext, 1);
-            }
-        } else {
-            mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
+        if (!Constants.IS_SCANNING_STOPPED) {
+            final BLEDataHandler dataHandler = new BLEDataHandler(data);
+            if (dataHandler.isAccessGranted()) {
+                mOpenKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
+                if (isLoginActionFired) {
+                    isLoginActionFired = false;
+                    Api.logSDK(mContext, 1);
+                }
+            } else {
+                mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
 //            Api.logSDK(mContext, 0);
+            }
         }
-
         Log.e("Kaba", "LC message event data: " + Utils.dataToByteString(data) + " mode: " + lcMessageMode
                 + " on interface " + rfInterface);
     }

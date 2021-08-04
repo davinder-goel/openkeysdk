@@ -417,9 +417,16 @@ public final class OpenKeyManager {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+//                switch (manufacturer) {
+//                    case ASSA:
+//                        assa.breakBleConnection();
+//                        break;
+//                }
+                Constants.IS_SCANNING_STOPPED = true;
+                Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
                 openKeyCallBack.stopScan(false, "Timeout: Lock not found");
             }
-        }, 6 * 1000);
+        }, 10 * 1000);
     }
 
     /**
@@ -430,7 +437,8 @@ public final class OpenKeyManager {
      */
     public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber) {
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
-
+        Constants.IS_SCANNING_STOPPED = false;
+        Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
         if (mContext == null) {
             Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
@@ -464,7 +472,9 @@ public final class OpenKeyManager {
                     if (assa.isSetupComplete()) {
                         assa.startScanning();
                     } else {
-                        openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+                        if (!Constants.IS_SCANNING_STOPPED) {
+                            openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+                        }
                     }
                     break;
                 case SALTO:
@@ -488,7 +498,9 @@ public final class OpenKeyManager {
             }
         } else {
             Log.e("startScanning", "key not available");
-            openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
+            if (!Constants.IS_SCANNING_STOPPED) {
+                openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
+            }
         }
     }
 
