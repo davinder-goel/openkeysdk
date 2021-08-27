@@ -29,6 +29,8 @@ import com.openkey.sdk.singleton.GetBooking;
 import retrofit2.Call;
 import retrofit2.Callback;
 
+import static com.openkey.sdk.enums.MANUFACTURER.SALTO;
+
 /**
  * @author OpenKey Inc.
  * <p>
@@ -59,7 +61,11 @@ public final class OpenKeyManager {
     private Runnable runnableTimeOut = new Runnable() {
         @Override
         public void run() {
-
+            if (!Constants.IS_SCANNING_STOPPED && mOpenKeyCallBack != null) {
+                Constants.IS_SCANNING_STOPPED = true;
+                Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
+                mOpenKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+            }
         }
     };
     //-----------------------------------------------------------------------------------------------------------------|
@@ -410,23 +416,11 @@ public final class OpenKeyManager {
 
     //-----------------------------------------------------------------------------------------------------------------|
 
-    private void timeOut(OpenKeyCallBack openKeyCallBack) {
+    private void timeOut(int time) {
         if (handler == null) {
             handler = new Handler();
         }
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-//                switch (manufacturer) {
-//                    case ASSA:
-//                        assa.breakBleConnection();
-//                        break;
-//                }
-                Constants.IS_SCANNING_STOPPED = true;
-                Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
-                openKeyCallBack.stopScan(false, "Timeout: Lock not found");
-            }
-        }, 10 * 1000);
+        handler.postDelayed(runnableTimeOut, time * 1000);
     }
 
     /**
@@ -450,7 +444,12 @@ public final class OpenKeyManager {
 //        }
 
         if (isKeyAvailable(openKeyCallBack)) {
-            timeOut(openKeyCallBack);
+            if (manufacturer.equals(SALTO)) {
+                Log.e("VENDOR", "SALTO");
+                timeOut(10);
+            } else {
+                timeOut(10);
+            }
             switch (manufacturer) {
                 case OKC:
                     okc.startScanning(roomNumber);
@@ -473,6 +472,7 @@ public final class OpenKeyManager {
                         assa.startScanning();
                     } else {
                         if (!Constants.IS_SCANNING_STOPPED) {
+                            Constants.IS_SCANNING_STOPPED = true;
                             openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
                         }
                     }
@@ -493,7 +493,48 @@ public final class OpenKeyManager {
                 case ENTRAVATOUCH:
                     entrava.startImGateScanningService();
                     break;
+            }
+        } else {
+            Log.e("startScanning", "key not available");
+            if (!Constants.IS_SCANNING_STOPPED) {
+                openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
+            }
+        }
+    }
 
+    /**
+     * start scanning if passes the initial checks
+     * and device have a key
+     *
+     * @param openKeyCallBack Call back for response purpose
+     */
+    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber, String subModule) {
+        manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
+        Constants.IS_SCANNING_STOPPED = false;
+        Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
+        if (mContext == null) {
+            Log.e("Context", "null");
+            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
+        }
+        Log.e("OKMGR", "Start Scanning");
+//
+//        if (manufacturer == MANUFACTURER.OKC && !BleHelper.getInstance().isBleOpend()) {
+//            okc.okcSDKInitialize();
+//        }
+
+        if (isKeyAvailable(openKeyCallBack)) {
+            if (manufacturer.equals(SALTO)) {
+                Log.e("VENDOR", "SALTO");
+                timeOut(10);
+            } else {
+                timeOut(10);
+            }
+            switch (manufacturer) {
+                case DRK:
+                    Log.e("OKMGR", "OPENING " + roomNumber);
+                    drkModule.open(roomNumber, subModule);
+//                    drkModule.open(roomNumber);
+                    break;
 
             }
         } else {
@@ -504,6 +545,12 @@ public final class OpenKeyManager {
         }
     }
 
+    public void removeTimeoutHandler() {
+        Log.e("removeTimeoutHandler", "called");
+        if (handler != null) {
+            handler.removeCallbacks(runnableTimeOut);
+        }
+    }
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**

@@ -329,6 +329,11 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         // OpenKeyManager.getInstance().startOkMobileScanning();
     }
 
+    @Override
+    public void fetchDrkSubModules(ArrayList<String> availableRooms) {
+
+    }
+
     /* @Override
      public void closestDevice(String room) {
 

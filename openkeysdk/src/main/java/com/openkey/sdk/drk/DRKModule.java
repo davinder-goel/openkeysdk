@@ -6,6 +6,7 @@ import android.util.Log;
 import com.openkey.okdrksdk.callbackmodule.OKDrkCallBack;
 import com.openkey.okdrksdk.enums.ResultReturn;
 import com.openkey.okdrksdk.ok_manager.DrkManager;
+import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
@@ -124,12 +125,20 @@ public class DRKModule implements OKDrkCallBack {
     }
 
     public void open(String roomTitle) {
-        DrkManager.Companion.getInstance(mApplication).open(roomTitle);
+        DrkManager.Companion.getInstance(mApplication).findSubModule(roomTitle, null);
+//        DrkManager.Companion.getInstance(mApplication).open(roomTitle);
+    }
+
+    //
+    public void open(String roomTitle, String subModule) {
+        DrkManager.Companion.getInstance(mApplication).findSubModule(roomTitle, subModule);
     }
 
     @Override
     public void openResult(@Nullable ResultReturn resultReturn) {
         if (!Constants.IS_SCANNING_STOPPED) {
+            OpenKeyManager.getInstance().removeTimeoutHandler();
+            Constants.IS_SCANNING_STOPPED = true;
             if (resultReturn != null &&
                     resultReturn.getSuccess() != null &&
                     resultReturn.getSuccess()
@@ -193,5 +202,12 @@ public class DRKModule implements OKDrkCallBack {
     @Override
     public void deleteDRKResult(@Nullable ResultReturn resultReturn) {
         Log.e("Delete DRK", resultReturn.getMessage() + "");
+    }
+
+    @Override
+    public void fetchSubModuleResults(@Nullable ResultReturn resultReturn) {
+        Log.e("okSDK: fetch sub Rooms", resultReturn.getMessage() + "::" + resultReturn.getDrkSubModuleList().size());
+        callBack.fetchDrkSubModules(resultReturn.getDrkSubModuleList());
+        Constants.IS_SCANNING_STOPPED = true;
     }
 }

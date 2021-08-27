@@ -11,6 +11,7 @@ package com.openkey.sdk.salto;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
@@ -139,6 +140,8 @@ public final class Salto {
                     @Override
                     public void onSuccess(int opResult) {
                         if (!Constants.IS_SCANNING_STOPPED) {
+                            OpenKeyManager.getInstance().removeTimeoutHandler();
+                            Constants.IS_SCANNING_STOPPED = true;
                             if (opResult == OpResult.AUTH_SUCCESS_ACCESS_GRANTED) {
                                 openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
                                 Api.logSDK(mContext, 1);
@@ -152,15 +155,20 @@ public final class Salto {
                     @Override
                     public void onFailure(JustinException e) {
                         e.printStackTrace();
-                        if (!Constants.IS_SCANNING_STOPPED) {
-                            openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+                        if (!Constants.IS_SCANNING_STOPPED && e.getErrorCode() == 410) {
+                            Constants.IS_SCANNING_STOPPED = true;
+                            OpenKeyManager.getInstance().removeTimeoutHandler();
+                            openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
 //                        Api.logSDK(mContext, 0);
+
                         }
                     }
                 });
 
             } catch (JustinException e) {
                 if (!Constants.IS_SCANNING_STOPPED) {
+                    Constants.IS_SCANNING_STOPPED = true;
+                    OpenKeyManager.getInstance().removeTimeoutHandler();
                     openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
                 }
                 //                Api.logSDK(mContext, 0);
@@ -169,6 +177,8 @@ public final class Salto {
         } else {
             // if key is not decrypted by any  reason then show key error
             if (!Constants.IS_SCANNING_STOPPED) {
+                Constants.IS_SCANNING_STOPPED = true;
+                OpenKeyManager.getInstance().removeTimeoutHandler();
                 openKeyCallBack.stopScan(false, Response.KEY_NOT_CORRECT);
             }
 //            Api.logSDK(mContext, 0);

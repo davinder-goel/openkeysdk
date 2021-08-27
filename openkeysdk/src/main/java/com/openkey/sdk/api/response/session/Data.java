@@ -3,6 +3,8 @@ package com.openkey.sdk.api.response.session;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Data {
 
     @SerializedName("id")
@@ -52,6 +54,11 @@ public class Data {
     @SerializedName("hotel")
     @Expose
     private Hotel hotel;
+
+    @SerializedName("additional_rooms")
+    @Expose
+    private ArrayList<AdditionalRoom> additionalRooms = null;
+
     @SerializedName("hotel_room")
     @Expose
     private HotelRoom hotelRoom;
@@ -197,4 +204,19 @@ public class Data {
         this.mobileKeyStatus = mobileKeyStatus;
     }
 
+    public Boolean getPersonalized() {
+        return isPersonalized;
+    }
+
+    public void setPersonalized(Boolean personalized) {
+        isPersonalized = personalized;
+    }
+
+    public ArrayList<AdditionalRoom> getAdditionalRooms() {
+        return additionalRooms;
+    }
+
+    public void setAdditionalRooms(ArrayList<AdditionalRoom> additionalRooms) {
+        this.additionalRooms = additionalRooms;
+    }
 }

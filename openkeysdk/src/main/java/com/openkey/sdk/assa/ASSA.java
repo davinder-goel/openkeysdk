@@ -249,7 +249,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
     @Override
     public void onReaderConnectionFailed(Reader reader, OpeningType openingType, OpeningStatus openingStatus) {
-        responseCallBack(false, openingStatus.name() + "");
+        responseCallBack(false, openingStatus.name() + "", false);
         OpenkeyLog.e("onReaderConnectionFailed");
 
     }
@@ -261,7 +261,12 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
         final boolean isReaderOpened = openingResult.getOpeningStatus().equals(OpeningStatus.SUCCESS);
         final boolean isLockOpened = isLockOpened(openingResult);
-        responseCallBack(isLockOpened, openingResult.getOpeningStatus().name());
+        byte[] payload = openingResult.getStatusPayload();
+        boolean isV1Board = false;
+        if (isReaderOpened && !ByteArrayHelper.containsData(payload)) {
+            isV1Board = true;
+        }
+        responseCallBack(isLockOpened, openingResult.getOpeningStatus().name(), isV1Board);
         OpenkeyLog.e("ASSA isLockOpened" + isLockOpened + "");
         OpenkeyLog.e("ASSA isReaderOpened" + isReaderOpened + "");
         OpenkeyLog.e("ASSA openingResult" + openingResult + "");
@@ -293,13 +298,21 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      *
      * @param isOpened is lock opened or not
      */
-    private void responseCallBack(boolean isOpened, String description) {
+    private void responseCallBack(boolean isOpened, String description, boolean isV1Board) {
         if (!Constants.IS_SCANNING_STOPPED) {
+            Constants.IS_SCANNING_STOPPED = true;
+//            if (isV1Board) {
+//                openKeyCallBack.stopScan(false, "Timeout");
+//            } else {
             if (isOpened) {
                 openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
             } else {
-//                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-                openKeyCallBack.stopScan(false, description);
+                if (isV1Board) {
+                    openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+                } else {
+                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+//                    openKeyCallBack.stopScan(false, description);
+                }
             }
         }
         ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
@@ -344,7 +357,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         controller.stopScanning();
         controller.disableHce();
         OpenkeyLog.e("stopScanning" + ":called");
-        responseCallBack(false, Response.LOCK_OPENING_FAILURE);
+        responseCallBack(false, Response.LOCK_OPENING_FAILURE, false);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
