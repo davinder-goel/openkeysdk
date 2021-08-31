@@ -417,9 +417,9 @@ public final class OpenKeyManager {
     //-----------------------------------------------------------------------------------------------------------------|
 
     private void timeOut(int time) {
-        if (handler == null) {
+//        if (handler == null) {
             handler = new Handler();
-        }
+//        }
         handler.postDelayed(runnableTimeOut, time * 1000);
     }
 

@@ -147,18 +147,18 @@ public class DRKModule implements OKDrkCallBack {
                     callBack.stopScan(true, "Door Opened");
                     Api.logSDK(mApplication, 1);
                 } else {
-                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
-                        callBack.stopScan(false, "Timeout: Lock not found");
-                    } else {
-                        callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
-                    }
+//                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+//                        callBack.stopScan(false, "Timeout: Lock not found");
+//                    } else {
+                    callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+//                    }
                 }
             } else {
-                if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
-                    callBack.stopScan(false, "Timeout: Lock not found");
-                } else {
-                    callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
-                }
+//                if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+//                    callBack.stopScan(false, "Timeout: Lock not found");
+//                } else {
+                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+//                }
             }
         }
     }
@@ -207,6 +207,7 @@ public class DRKModule implements OKDrkCallBack {
     @Override
     public void fetchSubModuleResults(@Nullable ResultReturn resultReturn) {
         Log.e("okSDK: fetch sub Rooms", resultReturn.getMessage() + "::" + resultReturn.getDrkSubModuleList().size());
+        OpenKeyManager.getInstance().removeTimeoutHandler();
         callBack.fetchDrkSubModules(resultReturn.getDrkSubModuleList());
         Constants.IS_SCANNING_STOPPED = true;
     }
