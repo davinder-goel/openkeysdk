@@ -300,6 +300,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      */
     private void responseCallBack(boolean isOpened, String description, boolean isV1Board) {
         if (!Constants.IS_SCANNING_STOPPED) {
+            OpenKeyManager.getInstance().removeTimeoutHandler();
             Constants.IS_SCANNING_STOPPED = true;
 //            if (isV1Board) {
 //                openKeyCallBack.stopScan(false, "Timeout");

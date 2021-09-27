@@ -473,6 +473,7 @@ public final class OpenKeyManager {
                     } else {
                         if (!Constants.IS_SCANNING_STOPPED) {
                             Constants.IS_SCANNING_STOPPED = true;
+                            removeTimeoutHandler();
                             openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
                         }
                     }
@@ -497,6 +498,7 @@ public final class OpenKeyManager {
         } else {
             Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
+                removeTimeoutHandler();
                 openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
             }
         }
@@ -540,6 +542,7 @@ public final class OpenKeyManager {
         } else {
             Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
+                removeTimeoutHandler();
                 openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
             }
         }

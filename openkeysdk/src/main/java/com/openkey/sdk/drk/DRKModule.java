@@ -138,11 +138,12 @@ public class DRKModule implements OKDrkCallBack {
     public void openResult(@Nullable ResultReturn resultReturn) {
         if (!Constants.IS_SCANNING_STOPPED) {
             OpenKeyManager.getInstance().removeTimeoutHandler();
-            Constants.IS_SCANNING_STOPPED = true;
+
             if (resultReturn != null &&
                     resultReturn.getSuccess() != null &&
                     resultReturn.getSuccess()
             ) {
+                Constants.IS_SCANNING_STOPPED = true;
                 if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
                     callBack.stopScan(true, "Door Opened");
                     Api.logSDK(mApplication, 1);
@@ -154,10 +155,11 @@ public class DRKModule implements OKDrkCallBack {
 //                    }
                 }
             } else {
+                Log.e("openResult", "OKSDK DrkModule 157");
 //                if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
 //                    callBack.stopScan(false, "Timeout: Lock not found");
 //                } else {
-                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+//                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
 //                }
             }
         }
