@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -145,12 +146,21 @@ public class DRKModule implements OKDrkCallBack {
             ) {
                 Constants.IS_SCANNING_STOPPED = true;
                 if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "DRK Lock opening success");
+                        Sentry.captureMessage("openingStatus->DRK Lock opening success");
+                    });
                     callBack.stopScan(true, "Door Opened");
                     Api.logSDK(mApplication, 1);
                 } else {
 //                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
 //                        callBack.stopScan(false, "Timeout: Lock not found");
 //                    } else {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "DRK Module could not be opened");
+                        Sentry.captureMessage("openingStatus->DRK Module could not be opened");
+
+                    });
                     callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
 //                    }
                 }

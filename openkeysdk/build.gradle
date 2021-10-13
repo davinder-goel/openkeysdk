@@ -2,6 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
+repositories {
+    mavenCentral()
+}
+
 android {
     compileSdkVersion 30
     defaultConfig {
@@ -68,6 +72,7 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.58'
 
     implementation 'com.github.leonardoxh:keystore-ultimate:1.3.0'
+    implementation 'io.sentry:sentry-android:5.2.2'
 
 
 }

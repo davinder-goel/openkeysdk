@@ -39,6 +39,7 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import java.util.List;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -302,15 +303,27 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         if (!Constants.IS_SCANNING_STOPPED) {
             OpenKeyManager.getInstance().removeTimeoutHandler();
             Constants.IS_SCANNING_STOPPED = true;
-//            if (isV1Board) {
-//                openKeyCallBack.stopScan(false, "Timeout");
-//            } else {
             if (isOpened) {
+                Sentry.configureScope(scope -> {
+                    scope.setTag("openingStatus", "ASSA Lock Open Success");
+                    Sentry.captureMessage("openingStatus->ASSA Lock Open Success");
+                });
                 openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
             } else {
                 if (isV1Board) {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "ASSA V1 Case");
+                        Sentry.captureMessage("openingStatus->ASSA V1 Case");
+
+                    });
+
                     openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
                 } else {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "ASSA lock opening failure");
+                        Sentry.captureMessage("openingStatus->ASSA lock opening failure");
+
+                    });
                     openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
 //                    openKeyCallBack.stopScan(false, description);
                 }

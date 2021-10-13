@@ -55,6 +55,10 @@ public class Data {
     @Expose
     private Hotel hotel;
 
+    @SerializedName("hotel_common_areas")
+    @Expose
+    private ArrayList<HotelCommonArea> hotelCommonAreas = null;
+
     @SerializedName("additional_rooms")
     @Expose
     private ArrayList<AdditionalRoom> additionalRooms = null;
@@ -210,6 +214,14 @@ public class Data {
 
     public void setPersonalized(Boolean personalized) {
         isPersonalized = personalized;
+    }
+
+    public ArrayList<HotelCommonArea> getHotelCommonAreas() {
+        return hotelCommonAreas;
+    }
+
+    public void setHotelCommonAreas(ArrayList<HotelCommonArea> hotelCommonAreas) {
+        this.hotelCommonAreas = hotelCommonAreas;
     }
 
     public ArrayList<AdditionalRoom> getAdditionalRooms() {

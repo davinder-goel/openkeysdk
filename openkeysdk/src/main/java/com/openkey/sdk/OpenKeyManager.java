@@ -26,6 +26,7 @@ import com.openkey.sdk.okmodule.OKModule;
 import com.openkey.sdk.salto.Salto;
 import com.openkey.sdk.singleton.GetBooking;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -62,6 +63,10 @@ public final class OpenKeyManager {
         @Override
         public void run() {
             if (!Constants.IS_SCANNING_STOPPED && mOpenKeyCallBack != null) {
+                Sentry.configureScope(scope -> {
+                    scope.setTag("timeout", manufacturer.toString() + "");
+                    Sentry.captureMessage("timeout->" + manufacturer.toString());
+                });
                 Constants.IS_SCANNING_STOPPED = true;
                 Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
                 mOpenKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
@@ -116,6 +121,10 @@ public final class OpenKeyManager {
      */
     public void init(Application context, String UUID) throws NullPointerException {
         if (context == null) throw new NullPointerException(Response.NULL_CONTEXT);
+        Sentry.configureScope(scope -> {
+            scope.setTag("uuid", UUID);
+            Sentry.captureMessage("UUID->" + UUID);
+        });
         handler = new Handler();
         mContext = context;
         Utilities.getInstance(mContext);
@@ -418,7 +427,7 @@ public final class OpenKeyManager {
 
     private void timeOut(int time) {
 //        if (handler == null) {
-            handler = new Handler();
+        handler = new Handler();
 //        }
         handler.postDelayed(runnableTimeOut, time * 1000);
     }
@@ -448,7 +457,7 @@ public final class OpenKeyManager {
                 Log.e("VENDOR", "SALTO");
                 timeOut(10);
             } else {
-                timeOut(10);
+                timeOut(6);
             }
             switch (manufacturer) {
                 case OKC:
@@ -474,6 +483,10 @@ public final class OpenKeyManager {
                         if (!Constants.IS_SCANNING_STOPPED) {
                             Constants.IS_SCANNING_STOPPED = true;
                             removeTimeoutHandler();
+                            Sentry.configureScope(scope -> {
+                                scope.setTag("stopScan", "ASSA endpoints not generated");
+                                Sentry.captureMessage("stopScan->ASSA endpoints not generated");
+                            });
                             openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
                         }
                     }
@@ -499,6 +512,10 @@ public final class OpenKeyManager {
             Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
                 removeTimeoutHandler();
+                Sentry.configureScope(scope -> {
+                    scope.setTag("stopScan", "Key Not Found");
+                    Sentry.captureMessage("stopScan->Key not found");
+                });
                 openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
             }
         }
@@ -529,7 +546,7 @@ public final class OpenKeyManager {
                 Log.e("VENDOR", "SALTO");
                 timeOut(10);
             } else {
-                timeOut(10);
+                timeOut(6);
             }
             switch (manufacturer) {
                 case DRK:
@@ -543,6 +560,11 @@ public final class OpenKeyManager {
             Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
                 removeTimeoutHandler();
+                Sentry.configureScope(scope -> {
+                    scope.setTag("stopScan", "Key Not Found");
+                    Sentry.captureMessage("stopScan->Key not found");
+
+                });
                 openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
             }
         }
