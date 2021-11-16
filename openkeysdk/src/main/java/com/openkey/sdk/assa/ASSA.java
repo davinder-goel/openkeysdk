@@ -1,5 +1,7 @@
 package com.openkey.sdk.assa;
 
+import static com.openkey.sdk.Utilities.Constants.SCANNING_TIME;
+
 import android.app.Application;
 import android.app.Notification;
 import android.os.Handler;
@@ -42,8 +44,6 @@ import java.util.List;
 import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
-
-import static com.openkey.sdk.Utilities.Constants.SCANNING_TIME;
 
 
 public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListener {
@@ -314,7 +314,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                     Sentry.configureScope(scope -> {
                         scope.setTag("openingStatus", "ASSA V1 Case");
                         Sentry.captureMessage("openingStatus->ASSA V1 Case");
-
                     });
 
                     openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);

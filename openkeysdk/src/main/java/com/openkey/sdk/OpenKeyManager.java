@@ -1,5 +1,7 @@
 package com.openkey.sdk;
 
+import static com.openkey.sdk.enums.MANUFACTURER.SALTO;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
@@ -29,8 +31,6 @@ import com.openkey.sdk.singleton.GetBooking;
 import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
-
-import static com.openkey.sdk.enums.MANUFACTURER.SALTO;
 
 /**
  * @author OpenKey Inc.
@@ -457,7 +457,7 @@ public final class OpenKeyManager {
                 Log.e("VENDOR", "SALTO");
                 timeOut(10);
             } else {
-                timeOut(6);
+                timeOut(10);
             }
             switch (manufacturer) {
                 case OKC:
@@ -546,7 +546,7 @@ public final class OpenKeyManager {
                 Log.e("VENDOR", "SALTO");
                 timeOut(10);
             } else {
-                timeOut(6);
+                timeOut(10);
             }
             switch (manufacturer) {
                 case DRK:
