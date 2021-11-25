@@ -84,7 +84,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "3vijg7xlmgd4uwqrzsxspgmi26bnwcro7lwnrguwtzq7s4z5vuwhgw26dlm3nbfb";
+    private String mToken = "5sqpazdpnkn345lvb3xxv7qrskkgtauki7m2m77tqxhqdji5abjmpdxkhq3f3lbu";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -329,6 +329,11 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         // OpenKeyManager.getInstance().startOkMobileScanning();
     }
 
+    @Override
+    public void fetchDrkSubModules(ArrayList<String> availableRooms) {
+
+    }
+
     /* @Override
      public void closestDevice(String room) {
 
@@ -379,7 +384,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-//                mEdtTextToken.setText(mToken);
+                mEdtTextToken.setText(mToken);
                 String token = mEdtTextToken.getText().toString().trim();
                 if (token.length() > 0) {
                     OpenKeyManager.getInstance().authenticate(token, this, false);

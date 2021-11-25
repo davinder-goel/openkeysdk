@@ -6,6 +6,7 @@ import android.util.Log;
 import com.openkey.okdrksdk.callbackmodule.OKDrkCallBack;
 import com.openkey.okdrksdk.enums.ResultReturn;
 import com.openkey.okdrksdk.ok_manager.DrkManager;
+import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
 import com.openkey.sdk.Utilities.Utilities;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -124,23 +126,52 @@ public class DRKModule implements OKDrkCallBack {
     }
 
     public void open(String roomTitle) {
-        DrkManager.Companion.getInstance(mApplication).open(roomTitle);
+        DrkManager.Companion.getInstance(mApplication).findSubModule(roomTitle, null);
+//        DrkManager.Companion.getInstance(mApplication).open(roomTitle);
+    }
+
+    //
+    public void open(String roomTitle, String subModule) {
+        DrkManager.Companion.getInstance(mApplication).findSubModule(roomTitle, subModule);
     }
 
     @Override
     public void openResult(@Nullable ResultReturn resultReturn) {
-        if (resultReturn != null &&
-                resultReturn.getSuccess() != null &&
-                resultReturn.getSuccess()
-        ) {
-            if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
-                callBack.stopScan(true, "Door Opened");
-                Api.logSDK(mApplication, 1);
+        if (!Constants.IS_SCANNING_STOPPED) {
+            OpenKeyManager.getInstance().removeTimeoutHandler();
+
+            if (resultReturn != null &&
+                    resultReturn.getSuccess() != null &&
+                    resultReturn.getSuccess()
+            ) {
+                Constants.IS_SCANNING_STOPPED = true;
+                if (resultReturn.isDoorOpened() != null && resultReturn.isDoorOpened()) {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "DRK Lock opening success");
+                        Sentry.captureMessage("openingStatus->DRK Lock opening success");
+                    });
+                    callBack.stopScan(true, "Door Opened");
+                    Api.logSDK(mApplication, 1);
+                } else {
+//                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+//                        callBack.stopScan(false, "Timeout: Lock not found");
+//                    } else {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "DRK Module could not be opened");
+                        Sentry.captureMessage("openingStatus->DRK Module could not be opened");
+
+                    });
+                    callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+//                    }
+                }
             } else {
-                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+                Log.e("openResult", "OKSDK DrkModule 157");
+//                if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {
+//                    callBack.stopScan(false, "Timeout: Lock not found");
+//                } else {
+//                callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
+//                }
             }
-        } else {
-            callBack.stopScan(false, "MODULE COULD NOT BE OPENED");
         }
     }
 
@@ -178,5 +209,18 @@ public class DRKModule implements OKDrkCallBack {
         } else {
             callBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
         }
+    }
+
+    @Override
+    public void deleteDRKResult(@Nullable ResultReturn resultReturn) {
+        Log.e("Delete DRK", resultReturn.getMessage() + "");
+    }
+
+    @Override
+    public void fetchSubModuleResults(@Nullable ResultReturn resultReturn) {
+        Log.e("okSDK: fetch sub Rooms", resultReturn.getMessage() + "::" + resultReturn.getDrkSubModuleList().size());
+        OpenKeyManager.getInstance().removeTimeoutHandler();
+        callBack.fetchDrkSubModules(resultReturn.getDrkSubModuleList());
+        Constants.IS_SCANNING_STOPPED = true;
     }
 }

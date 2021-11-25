@@ -34,7 +34,8 @@ public class Constants {
     public static final String BASE_URL = "base_url";
     public static final String TOKEN = "Token ";
     public static final String ENVIRONMENT_TYPE = "environment_type";
-    public static final long SCANNING_TIME = 12000;
+    public static final long SCANNING_TIME = 6000;
+    public static boolean IS_SCANNING_STOPPED = false;
 
     // KEY_DELIVERED=0;
     // PENDING_KEY_SERVER_REQUEST=1;
@@ -56,10 +57,12 @@ public class Constants {
 //    public static String BASE_URL_DEV = "https://connector.openkey.co/";
     //    public static  String BASE_URL_DEV = "https://partner.openkey.co/";
     public static String BASE_URL_DEV = "https://apidev.openkey.co/";
+//    public static String BASE_URL_DEV = "https://apistage.openkey.co/";
+
+    //    public static String BASE_URL_STAGE = "https://apistage.openkey.co/";
     //Live
     public static String BASE_URL_LIVE = "https://connector.openkey.co/";
 //    public static String BASE_URL_LIVE = "https://developer.openkey.co/";
-
 
 
 }
