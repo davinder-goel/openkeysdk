@@ -366,7 +366,8 @@ public class Utilities {
                 return chain.proceed(request);
             }
         });
-        return enableTls12OnPreLollipop(client).build();
+//        return enableTls12OnPreLollipop(client).build();
+        return client.build();
     }
 
     /**

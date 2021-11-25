@@ -1,8 +1,11 @@
 package com.openkey.sdk;
 
+import static com.openkey.sdk.enums.MANUFACTURER.SALTO;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -25,6 +28,7 @@ import com.openkey.sdk.okmodule.OKModule;
 import com.openkey.sdk.salto.Salto;
 import com.openkey.sdk.singleton.GetBooking;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -51,11 +55,24 @@ public final class OpenKeyManager {
 
     private OKMobileKey okMobileKey;
     private DRKModule drkModule;
-
+    private Handler handler;
     private OpenKeyCallBack mOpenKeyCallBack;
 
     private boolean mEnvironmentType;
-
+    private Runnable runnableTimeOut = new Runnable() {
+        @Override
+        public void run() {
+            if (!Constants.IS_SCANNING_STOPPED && mOpenKeyCallBack != null) {
+                Sentry.configureScope(scope -> {
+                    scope.setTag("timeout", manufacturer.toString() + "");
+                    Sentry.captureMessage("timeout->" + manufacturer.toString());
+                });
+                Constants.IS_SCANNING_STOPPED = true;
+                Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
+                mOpenKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+            }
+        }
+    };
     //-----------------------------------------------------------------------------------------------------------------|
     //-----------------------------------------------------------------------------------------------------------------|
     /*
@@ -104,7 +121,11 @@ public final class OpenKeyManager {
      */
     public void init(Application context, String UUID) throws NullPointerException {
         if (context == null) throw new NullPointerException(Response.NULL_CONTEXT);
-
+        Sentry.configureScope(scope -> {
+            scope.setTag("uuid", UUID);
+            Sentry.captureMessage("UUID->" + UUID);
+        });
+        handler = new Handler();
         mContext = context;
         Utilities.getInstance(mContext);
         Utilities.getInstance().saveValue(Constants.UUID, UUID, mContext);
@@ -404,6 +425,13 @@ public final class OpenKeyManager {
 
     //-----------------------------------------------------------------------------------------------------------------|
 
+    private void timeOut(int time) {
+//        if (handler == null) {
+        handler = new Handler();
+//        }
+        handler.postDelayed(runnableTimeOut, time * 1000);
+    }
+
     /**
      * start scanning if passes the initial checks
      * and device have a key
@@ -412,7 +440,8 @@ public final class OpenKeyManager {
      */
     public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber) {
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
-
+        Constants.IS_SCANNING_STOPPED = false;
+        Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
         if (mContext == null) {
             Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
@@ -424,6 +453,12 @@ public final class OpenKeyManager {
 //        }
 
         if (isKeyAvailable(openKeyCallBack)) {
+            if (manufacturer.equals(SALTO)) {
+                Log.e("VENDOR", "SALTO");
+                timeOut(10);
+            } else {
+                timeOut(10);
+            }
             switch (manufacturer) {
                 case OKC:
                     okc.startScanning(roomNumber);
@@ -445,7 +480,15 @@ public final class OpenKeyManager {
                     if (assa.isSetupComplete()) {
                         assa.startScanning();
                     } else {
-                        openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+                        if (!Constants.IS_SCANNING_STOPPED) {
+                            Constants.IS_SCANNING_STOPPED = true;
+                            removeTimeoutHandler();
+                            Sentry.configureScope(scope -> {
+                                scope.setTag("stopScan", "ASSA endpoints not generated");
+                                Sentry.captureMessage("stopScan->ASSA endpoints not generated");
+                            });
+                            openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+                        }
                     }
                     break;
                 case SALTO:
@@ -464,15 +507,75 @@ public final class OpenKeyManager {
                 case ENTRAVATOUCH:
                     entrava.startImGateScanningService();
                     break;
+            }
+        } else {
+            Log.e("startScanning", "key not available");
+            if (!Constants.IS_SCANNING_STOPPED) {
+                removeTimeoutHandler();
+                Sentry.configureScope(scope -> {
+                    scope.setTag("stopScan", "Key Not Found");
+                    Sentry.captureMessage("stopScan->Key not found");
+                });
+                openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
+            }
+        }
+    }
 
+    /**
+     * start scanning if passes the initial checks
+     * and device have a key
+     *
+     * @param openKeyCallBack Call back for response purpose
+     */
+    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber, String subModule) {
+        manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
+        Constants.IS_SCANNING_STOPPED = false;
+        Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
+        if (mContext == null) {
+            Log.e("Context", "null");
+            openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
+        }
+        Log.e("OKMGR", "Start Scanning");
+//
+//        if (manufacturer == MANUFACTURER.OKC && !BleHelper.getInstance().isBleOpend()) {
+//            okc.okcSDKInitialize();
+//        }
+
+        if (isKeyAvailable(openKeyCallBack)) {
+            if (manufacturer.equals(SALTO)) {
+                Log.e("VENDOR", "SALTO");
+                timeOut(10);
+            } else {
+                timeOut(10);
+            }
+            switch (manufacturer) {
+                case DRK:
+                    Log.e("OKMGR", "OPENING " + roomNumber);
+                    drkModule.open(roomNumber, subModule);
+//                    drkModule.open(roomNumber);
+                    break;
 
             }
         } else {
             Log.e("startScanning", "key not available");
-            openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
+            if (!Constants.IS_SCANNING_STOPPED) {
+                removeTimeoutHandler();
+                Sentry.configureScope(scope -> {
+                    scope.setTag("stopScan", "Key Not Found");
+                    Sentry.captureMessage("stopScan->Key not found");
+
+                });
+                openKeyCallBack.stopScan(false, Response.NO_KEY_FOUND);
+            }
         }
     }
 
+    public void removeTimeoutHandler() {
+        Log.e("removeTimeoutHandler", "called");
+        if (handler != null) {
+            handler.removeCallbacks(runnableTimeOut);
+        }
+    }
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**

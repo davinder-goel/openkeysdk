@@ -33,6 +33,7 @@ import com.openkey.sdk.singleton.GetBooking;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -493,19 +494,28 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                                      RfInterface rfInterface) {
 
         deactivateAllFiles();
+        if (!Constants.IS_SCANNING_STOPPED) {
+            final BLEDataHandler dataHandler = new BLEDataHandler(data);
+            if (dataHandler.isAccessGranted()) {
+                mOpenKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
+                if (isLoginActionFired) {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "KABA Lock opening success");
+                        Sentry.captureMessage("openingStatus->KABA Lock opening success");
+                    });
+                    isLoginActionFired = false;
+                    Api.logSDK(mContext, 1);
+                }
+            } else {
+                Sentry.configureScope(scope -> {
+                    scope.setTag("openingStatus", "KABA Lock opening failure");
+                    Sentry.captureMessage("openingStatus->KABA Lock opening failure");
 
-        final BLEDataHandler dataHandler = new BLEDataHandler(data);
-        if (dataHandler.isAccessGranted()) {
-            mOpenKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
-            if (isLoginActionFired) {
-                isLoginActionFired = false;
-                Api.logSDK(mContext, 1);
-            }
-        } else {
-            mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
+                });
+                mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
 //            Api.logSDK(mContext, 0);
+            }
         }
-
         Log.e("Kaba", "LC message event data: " + Utils.dataToByteString(data) + " mode: " + lcMessageMode
                 + " on interface " + rfInterface);
     }

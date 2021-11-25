@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -47,6 +48,11 @@ public class Api {
 
         if (context == null || token == null)
             return;
+        Sentry.configureScope(scope -> {
+            scope.setTag("token", TOKEN + token);
+            Sentry.captureMessage("token->" + TOKEN + token);
+
+        });
 
         // Get the retrofit instance
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
@@ -84,6 +90,12 @@ public class Api {
             return;
 
         if (bookingResponse != null && bookingResponse.getData() != null) {
+            Sentry.configureScope(scope -> {
+                scope.setTag("sessionID", bookingResponse.getData().getId().toString() + "");
+                scope.setTag("mobileKeyStatus", bookingResponse.getData().getMobileKeyStatusId().toString() + "");
+                Sentry.captureMessage("sessionID->" + bookingResponse.getData().getId().toString());
+
+            });
             Utilities.getInstance(context).saveBookingToLocal(context, bookingResponse);
             GetBooking.getInstance().setBooking(bookingResponse);
             //Saved manufacturer in locally
@@ -95,6 +107,11 @@ public class Api {
                     bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor().getTitle() != null) {
                 String manufacturer = bookingResponse.getData().getHotel().getLockVendorModel().getLockVendor().getTitle().toUpperCase();
                 Utilities.getInstance().saveValue(Constants.MANUFACTURER, manufacturer, context);
+                Sentry.configureScope(scope -> {
+                    scope.setTag("manufacturer", manufacturer);
+                    Sentry.captureMessage("manufacturer->" + manufacturer);
+
+                });
             }
 
             if (bookingResponse.getData().getGuest() != null &&

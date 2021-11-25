@@ -45,6 +45,14 @@
                 android:resource="@xml/seos_hce_service" />
         </service>
 
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="https://bfe36e5336084d9384dc770316643332@o1011064.ingest.sentry.io/5977858" />
+
+        <meta-data
+            android:name="io.sentry.ndk.enable"
+            android:value="false" />
+
         <!-- Bluetooth service, disable if not needed -->
         <service android:name="com.assaabloy.mobilekeys.api.ble.BleScanService" />
 

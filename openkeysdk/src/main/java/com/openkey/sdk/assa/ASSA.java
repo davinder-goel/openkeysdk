@@ -1,5 +1,7 @@
 package com.openkey.sdk.assa;
 
+import static com.openkey.sdk.Utilities.Constants.SCANNING_TIME;
+
 import android.app.Application;
 import android.app.Notification;
 import android.os.Handler;
@@ -39,10 +41,9 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import java.util.List;
 
+import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
-
-import static com.openkey.sdk.Utilities.Constants.SCANNING_TIME;
 
 
 public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListener {
@@ -249,7 +250,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
     @Override
     public void onReaderConnectionFailed(Reader reader, OpeningType openingType, OpeningStatus openingStatus) {
-        responseCallBack(false);
+        responseCallBack(false, openingStatus.name() + "", false);
         OpenkeyLog.e("onReaderConnectionFailed");
 
     }
@@ -261,7 +262,12 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
         final boolean isReaderOpened = openingResult.getOpeningStatus().equals(OpeningStatus.SUCCESS);
         final boolean isLockOpened = isLockOpened(openingResult);
-        responseCallBack(isLockOpened);
+        byte[] payload = openingResult.getStatusPayload();
+        boolean isV1Board = false;
+        if (isReaderOpened && !ByteArrayHelper.containsData(payload)) {
+            isV1Board = true;
+        }
+        responseCallBack(isLockOpened, openingResult.getOpeningStatus().name(), isV1Board);
         OpenkeyLog.e("ASSA isLockOpened" + isLockOpened + "");
         OpenkeyLog.e("ASSA isReaderOpened" + isReaderOpened + "");
         OpenkeyLog.e("ASSA openingResult" + openingResult + "");
@@ -293,13 +299,35 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
      *
      * @param isOpened is lock opened or not
      */
-    private void responseCallBack(boolean isOpened) {
-        if (isOpened) {
-            openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
-        } else {
-            openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-        }
+    private void responseCallBack(boolean isOpened, String description, boolean isV1Board) {
+        if (!Constants.IS_SCANNING_STOPPED) {
+            OpenKeyManager.getInstance().removeTimeoutHandler();
+            Constants.IS_SCANNING_STOPPED = true;
+            if (isOpened) {
+                Sentry.configureScope(scope -> {
+                    scope.setTag("openingStatus", "ASSA Lock Open Success");
+                    Sentry.captureMessage("openingStatus->ASSA Lock Open Success");
+                });
+                openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
+            } else {
+                if (isV1Board) {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "ASSA V1 Case");
+                        Sentry.captureMessage("openingStatus->ASSA V1 Case");
+                    });
 
+                    openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+                } else {
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("openingStatus", "ASSA lock opening failure");
+                        Sentry.captureMessage("openingStatus->ASSA lock opening failure");
+
+                    });
+                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+//                    openKeyCallBack.stopScan(false, description);
+                }
+            }
+        }
         ReaderConnectionController controller = MobileKeysApi.getInstance().getReaderConnectionController();
         controller.stopScanning();
         controller.disableHce();
@@ -327,6 +355,11 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         mHandlerStopScanning.postDelayed(scanningStopCallBack, SCANNING_TIME);
     }
 
+    public void breakBleConnection() {
+        ReaderConnectionController controller = mobileKeysFactory.getReaderConnectionController();
+        controller.stopScanning();
+    }
+
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**
@@ -337,7 +370,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         controller.stopScanning();
         controller.disableHce();
         OpenkeyLog.e("stopScanning" + ":called");
-        responseCallBack(false);
+        responseCallBack(false, Response.LOCK_OPENING_FAILURE, false);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|

@@ -3,6 +3,8 @@ package com.openkey.sdk.api.response.session;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+
 public class Data {
 
     @SerializedName("id")
@@ -52,12 +54,25 @@ public class Data {
     @SerializedName("hotel")
     @Expose
     private Hotel hotel;
+
+    @SerializedName("hotel_common_areas")
+    @Expose
+    private ArrayList<HotelCommonArea> hotelCommonAreas = null;
+
+    @SerializedName("additional_rooms")
+    @Expose
+    private ArrayList<AdditionalRoom> additionalRooms = null;
+
     @SerializedName("hotel_room")
     @Expose
     private HotelRoom hotelRoom;
     @SerializedName("mobile_key_status")
     @Expose
     private MobileKeyStatus mobileKeyStatus;
+
+    @SerializedName("hotel_pms_booking")
+    @Expose
+    private HotelPmsBooking hotelPmsBooking;
 
     public Integer getId() {
         return id;
@@ -197,4 +212,35 @@ public class Data {
         this.mobileKeyStatus = mobileKeyStatus;
     }
 
+    public Boolean getPersonalized() {
+        return isPersonalized;
+    }
+
+    public void setPersonalized(Boolean personalized) {
+        isPersonalized = personalized;
+    }
+
+    public ArrayList<HotelCommonArea> getHotelCommonAreas() {
+        return hotelCommonAreas;
+    }
+
+    public void setHotelCommonAreas(ArrayList<HotelCommonArea> hotelCommonAreas) {
+        this.hotelCommonAreas = hotelCommonAreas;
+    }
+
+    public ArrayList<AdditionalRoom> getAdditionalRooms() {
+        return additionalRooms;
+    }
+
+    public void setAdditionalRooms(ArrayList<AdditionalRoom> additionalRooms) {
+        this.additionalRooms = additionalRooms;
+    }
+
+    public HotelPmsBooking getHotelPmsBooking() {
+        return hotelPmsBooking;
+    }
+
+    public void setHotelPmsBooking(HotelPmsBooking hotelPmsBooking) {
+        this.hotelPmsBooking = hotelPmsBooking;
+    }
 }
