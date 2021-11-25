@@ -70,6 +70,10 @@ public class Data {
     @Expose
     private MobileKeyStatus mobileKeyStatus;
 
+    @SerializedName("hotel_pms_booking")
+    @Expose
+    private HotelPmsBooking hotelPmsBooking;
+
     public Integer getId() {
         return id;
     }
@@ -230,5 +234,13 @@ public class Data {
 
     public void setAdditionalRooms(ArrayList<AdditionalRoom> additionalRooms) {
         this.additionalRooms = additionalRooms;
+    }
+
+    public HotelPmsBooking getHotelPmsBooking() {
+        return hotelPmsBooking;
+    }
+
+    public void setHotelPmsBooking(HotelPmsBooking hotelPmsBooking) {
+        this.hotelPmsBooking = hotelPmsBooking;
     }
 }

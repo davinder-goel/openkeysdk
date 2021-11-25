@@ -56,8 +56,8 @@ public class Constants {
     //DEV BASE URL
 //    public static String BASE_URL_DEV = "https://connector.openkey.co/";
     //    public static  String BASE_URL_DEV = "https://partner.openkey.co/";
-//    public static String BASE_URL_DEV = "https://apidev.openkey.co/";
-    public static String BASE_URL_DEV = "https://apistage.openkey.co/";
+    public static String BASE_URL_DEV = "https://apidev.openkey.co/";
+//    public static String BASE_URL_DEV = "https://apistage.openkey.co/";
 
     //    public static String BASE_URL_STAGE = "https://apistage.openkey.co/";
     //Live
