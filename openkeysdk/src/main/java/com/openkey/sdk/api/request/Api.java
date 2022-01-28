@@ -1,5 +1,8 @@
 package com.openkey.sdk.api.request;
 
+import static android.content.ContentValues.TAG;
+import static com.openkey.sdk.Utilities.Constants.TOKEN;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -26,9 +29,6 @@ import java.util.Locale;
 import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
-
-import static android.content.ContentValues.TAG;
-import static com.openkey.sdk.Utilities.Constants.TOKEN;
 
 /**
  * @author OpenKey Inc.
@@ -262,11 +262,11 @@ public class Api {
 
                     PersonlizationResponse personlizationResponse = response.body();
                     if (personlizationResponse != null && personlizationResponse.getData() != null
-                            && personlizationResponse.getData().getKeyIssued())
+                            && personlizationResponse.getData().getKeyIssued()) {
                         openKeyCallBack.initializationSuccess();
-                    else
+                    } else {
                         openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
-
+                    }
                     Log.e(TAG, "Personalization Status updated on server");
                 } else if (response.code() == 403) {
                     openKeyCallBack.initializationFailure("403");
@@ -280,6 +280,7 @@ public class Api {
             @Override
             public void onFailure(Call<PersonlizationResponse> call, Throwable t) {
                 openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+                Log.e(TAG, t.getLocalizedMessage() + "");
                 Log.e(TAG, "Personalization Status failed to update on server");
             }
         });

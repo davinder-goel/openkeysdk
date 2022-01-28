@@ -99,7 +99,7 @@ public class DRKModule implements OKDrkCallBack {
         if (resultReturn != null && resultReturn.getSuccess() != null &&
                 resultReturn.getSuccess() &&
                 resultReturn.getData() != null) {
-            Utilities.getInstance().saveValue(Constants.MOBILE_KEY, 1, mApplication);
+//            Utilities.getInstance().saveValue(Constants.MOBILE_KEY, 1, mApplication);
             callBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
             int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS, 0, mApplication);
             if (mobileKeyStatusId != 3) {

@@ -22,7 +22,6 @@ import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.kaba.Kaba;
 import com.openkey.sdk.miwa.Miwa;
-import com.openkey.sdk.okc.OKC;
 import com.openkey.sdk.okmobilekey.OKMobileKey;
 import com.openkey.sdk.okmodule.OKModule;
 import com.openkey.sdk.salto.Salto;
@@ -50,7 +49,6 @@ public final class OpenKeyManager {
     private Kaba kaba;
     private Entrava entrava;
     private Miwa miwa;
-    private OKC okc;
     private OKModule okModule;
 
     private OKMobileKey okMobileKey;
@@ -212,10 +210,6 @@ public final class OpenKeyManager {
                             miwa = new Miwa(mContext, openKeyCallBack);
                             break;
 
-                        case OKC:
-                            okc = new OKC(mContext, openKeyCallBack);
-                            break;
-
                         case MODULE:
                             okModule = new OKModule(mContext, openKeyCallBack);
                             break;
@@ -262,7 +256,7 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public synchronized void getKey(@NonNull final OpenKeyCallBack openKeyCallBack) {
-        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null && drkModule == null) {
+        if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okModule == null && okMobileKey == null && drkModule == null) {
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
         }
@@ -317,12 +311,6 @@ public final class OpenKeyManager {
                 entrava.issueEntravaKey();
                 break;
 
-            case OKC:
-                okc.fetchOkcRoomList();
-                updateKeyStatus(true);
-                mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
-                break;
-
             case MODULE:
 
                 updateKeyStatus(true);
@@ -375,13 +363,14 @@ public final class OpenKeyManager {
      * @return boolean
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
-        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okc == null && okModule == null && okMobileKey == null && drkModule == null) {
+        boolean haveKey = false;
+        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okModule == null && okMobileKey == null && drkModule == null) {
             Log.e("Started", "INITIALIZATION_FAILED");
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             initialize(openKeyCallBack);
-
+            return haveKey;
         }
-        boolean haveKey = false;
+
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
         switch (manufacturer) {
             case ASSA:
@@ -405,9 +394,6 @@ public final class OpenKeyManager {
                 haveKey = entrava.haveKey();
                 break;
 
-            case OKC:
-                haveKey = okc.haveKey();
-                break;
             case MODULE:
                 haveKey = okModule.haveKey();
                 break;
@@ -447,22 +433,16 @@ public final class OpenKeyManager {
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
         }
         Log.e("OKMGR", "Start Scanning");
-//
-//        if (manufacturer == MANUFACTURER.OKC && !BleHelper.getInstance().isBleOpend()) {
-//            okc.okcSDKInitialize();
-//        }
 
         if (isKeyAvailable(openKeyCallBack)) {
             if (manufacturer.equals(SALTO)) {
                 Log.e("VENDOR", "SALTO");
                 timeOut(10);
             } else {
-                timeOut(10);
+                timeOut(6);
             }
             switch (manufacturer) {
-                case OKC:
-                    okc.startScanning(roomNumber);
-                    break;
+
                 case MODULE:
                     okModule.startScanning(roomNumber);
                     break;
@@ -536,17 +516,13 @@ public final class OpenKeyManager {
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
         }
         Log.e("OKMGR", "Start Scanning");
-//
-//        if (manufacturer == MANUFACTURER.OKC && !BleHelper.getInstance().isBleOpend()) {
-//            okc.okcSDKInitialize();
-//        }
 
         if (isKeyAvailable(openKeyCallBack)) {
             if (manufacturer.equals(SALTO)) {
                 Log.e("VENDOR", "SALTO");
                 timeOut(10);
             } else {
-                timeOut(10);
+                timeOut(6);
             }
             switch (manufacturer) {
                 case DRK:
