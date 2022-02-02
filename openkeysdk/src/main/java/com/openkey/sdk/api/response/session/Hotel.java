@@ -62,6 +62,9 @@ public class Hotel {
     @SerializedName("phone")
     @Expose
     private String phone;
+    @SerializedName("sms_phone")
+    @Expose
+    private String smsPhone;
     @SerializedName("email")
     @Expose
     private String email;
@@ -356,5 +359,13 @@ public class Hotel {
 
     public void setLockVendorModel(LockVendorModel lockVendorModel) {
         this.lockVendorModel = lockVendorModel;
+    }
+
+    public String getSmsPhone() {
+        return smsPhone;
+    }
+
+    public void setSmsPhone(String smsPhone) {
+        this.smsPhone = smsPhone;
     }
 }

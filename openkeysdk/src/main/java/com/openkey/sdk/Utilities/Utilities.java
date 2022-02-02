@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.openkey.sdk.api.response.Status;
 import com.openkey.sdk.api.response.session.SessionResponse;
-import com.openkey.sdk.cryptography.SharedPreferencesEncryption;
+import com.openkey.sdk.cryptography.EncryptedSharedPref;
 import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.singleton.GetGson;
@@ -59,7 +59,7 @@ public class Utilities {
             utilities = new Utilities();
 
             if (contexts != null && contexts.length > 0)
-                prefs = new SharedPreferencesEncryption(contexts[0].getApplicationContext());
+                prefs = new EncryptedSharedPref(contexts[0].getApplicationContext());
         }
         return utilities;
 

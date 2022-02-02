@@ -22,7 +22,7 @@ public class AdditionalRoom {
     private String pmsTitle;
     @SerializedName("battery_level")
     @Expose
-    private Integer batteryLevel;
+    private Float batteryLevel;
     @SerializedName("is_suite")
     @Expose
     private Boolean isSuite;
@@ -82,11 +82,11 @@ public class AdditionalRoom {
         this.pmsTitle = pmsTitle;
     }
 
-    public Integer getBatteryLevel() {
+    public Float getBatteryLevel() {
         return batteryLevel;
     }
 
-    public void setBatteryLevel(Integer batteryLevel) {
+    public void setBatteryLevel(Float batteryLevel) {
         this.batteryLevel = batteryLevel;
     }
 
