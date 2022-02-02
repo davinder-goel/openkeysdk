@@ -180,6 +180,10 @@ public final class OpenKeyManager {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
             return;
         }
+        if (!Utilities.getInstance().isOnline(mContext)) {
+            Log.d("Exception", "No internet connection found.");
+            return;
+        }
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
 
         final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", mContext);
@@ -246,6 +250,40 @@ public final class OpenKeyManager {
             });
         }
 
+    }
+
+    /**
+     * Initialize SDK with unique number.
+     * <p>
+     * the unique identification number for setting up device with
+     *
+     * @param openKeyCallBack Call back for response purpose
+     */
+    public synchronized void initObject(@NonNull OpenKeyCallBack openKeyCallBack) {
+        if (mContext == null) {
+            return;
+        }
+
+        final String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", mContext);
+        if (manufacturerStr.isEmpty()) {
+            return;
+        }
+        manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
+        Log.e("Create Object", manufacturer.toString() + "");
+        switch (manufacturer) {
+            case ASSA:
+                assa = new ASSA(mContext, openKeyCallBack);
+                break;
+
+            case SALTO:
+                salto = new Salto(mContext, openKeyCallBack);
+                break;
+
+            case KABA:
+                kaba = new Kaba(mContext, openKeyCallBack);
+                break;
+
+        }
     }
 
     /**
@@ -364,11 +402,12 @@ public final class OpenKeyManager {
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
         boolean haveKey = false;
-        if (assa == null && salto == null && kaba == null && miwa == null && entrava == null && okModule == null && okMobileKey == null && drkModule == null) {
-            Log.e("Started", "INITIALIZATION_FAILED");
-            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
-            initialize(openKeyCallBack);
-            return haveKey;
+        if (assa == null && salto == null && kaba == null) {
+            initObject(openKeyCallBack);
+//            Log.e("Started", "INITIALIZATION_FAILED");
+//            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+//        initialize(openKeyCallBack);
+//            return haveKey;
         }
 
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
@@ -403,7 +442,12 @@ public final class OpenKeyManager {
                 break;
 
             case DRK:
-                haveKey = drkModule.haveKey();
+                if (drkModule == null) {
+                    initialize(openKeyCallBack);
+                    haveKey = false;
+                } else {
+                    haveKey = drkModule.haveKey();
+                }
                 break;
         }
         return haveKey;
@@ -424,7 +468,8 @@ public final class OpenKeyManager {
      *
      * @param openKeyCallBack Call back for response purpose
      */
-    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber) {
+    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String
+            roomNumber) {
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
         Constants.IS_SCANNING_STOPPED = false;
         Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
@@ -507,7 +552,8 @@ public final class OpenKeyManager {
      *
      * @param openKeyCallBack Call back for response purpose
      */
-    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String roomNumber, String subModule) {
+    public synchronized void startScanning(@NonNull OpenKeyCallBack openKeyCallBack, String
+            roomNumber, String subModule) {
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
         Constants.IS_SCANNING_STOPPED = false;
         Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
