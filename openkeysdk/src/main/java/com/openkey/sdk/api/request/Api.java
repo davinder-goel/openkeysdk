@@ -46,8 +46,10 @@ public class Api {
     public static void getSession(final Context context, final String token,
                                   final OpenKeyCallBack openKeyCallBack) {
 
-        if (context == null || token == null)
+        if (context == null || token == null || Constants.IS_SESSION_API_ALREADY_CALLED) {
             return;
+        }
+        Constants.IS_SESSION_API_ALREADY_CALLED = true;
         Sentry.configureScope(scope -> {
             scope.setTag("token", TOKEN + token);
             Sentry.captureMessage("token->" + TOKEN + token);
@@ -60,6 +62,7 @@ public class Api {
             @Override
             public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse>
                     response) {
+                Constants.IS_SESSION_API_ALREADY_CALLED = false;
                 if (response.isSuccessful()) {
                     Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, token, context);
                     saveData(response.body(), context);
@@ -77,6 +80,7 @@ public class Api {
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
+                Constants.IS_SESSION_API_ALREADY_CALLED = false;
                 if (openKeyCallBack != null) {
                     openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, "");
                 }
@@ -250,8 +254,9 @@ public class Api {
      */
     public static void setPeronalizationComplete(final Context mContext, final OpenKeyCallBack openKeyCallBack) {
 
-        if (mContext == null)
+        if (mContext == null) {
             return;
+        }
 
         Services services = Utilities.getInstance().getRetrofit(mContext).create(Services.class);
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", mContext);
@@ -272,14 +277,14 @@ public class Api {
                     openKeyCallBack.initializationFailure("403");
                 } else {
                     // tell user, startSetup is success
-                    openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+                    openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED + " setPersonalization=" + response.code());
                     Log.e(TAG, "Personalization failed");
                 }
             }
 
             @Override
             public void onFailure(Call<PersonlizationResponse> call, Throwable t) {
-                openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+                openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED + " setPersonalization=failure");
                 Log.e(TAG, t.getLocalizedMessage() + "");
                 Log.e(TAG, "Personalization Status failed to update on server");
             }
@@ -296,8 +301,10 @@ public class Api {
             , OpenKeyCallBack openKeyCallBack) {
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
 
-        if (context == null || tokenStr == null && openKeyCallBack != null)
+        if (context == null || tokenStr == null && openKeyCallBack != null) {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+            return;
+        }
 
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.initializePersonalizationForKaba(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
@@ -312,8 +319,10 @@ public class Api {
             , OpenKeyCallBack openKeyCallBack) {
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
 
-        if (context == null || tokenStr == null && openKeyCallBack != null)
+        if (context == null || tokenStr == null && openKeyCallBack != null) {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+            return;
+        }
 
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.initializePersonalizationForDRK(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
@@ -330,9 +339,10 @@ public class Api {
             , OpenKeyCallBack openKeyCallBack) {
         final String tokenStr = Utilities.getInstance().getValue(Constants.AUTH_SIGNATURE, "", context);
 
-        if (context == null || tokenStr == null)
+        if (context == null || tokenStr == null) {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
-
+            return;
+        }
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.initializePersonalization(TOKEN + tokenStr).enqueue(new RetrofitCallback(callback));
     }
@@ -345,14 +355,19 @@ public class Api {
      */
     @SuppressWarnings("unchecked")
     public static void getBooking(String authToken, final Context context, final Callback callback) {
+//
+//        if (!(authToken != null && authToken.length() > 0 && context != null)){
+//            return;}
 
-        if (!(authToken != null && authToken.length() > 0 && context != null))
+        if (authToken == null || context == null || Constants.IS_SESSION_API_ALREADY_CALLED) {
             return;
-
+        }
+        Constants.IS_SESSION_API_ALREADY_CALLED = true;
         Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
         services.getSession(TOKEN + authToken).enqueue(new Callback<SessionResponse>() {
             @Override
             public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse> response) {
+                Constants.IS_SESSION_API_ALREADY_CALLED = false;
                 if (response.isSuccessful()) {
                     saveData(response.body(), context);
                 } else {
@@ -365,6 +380,7 @@ public class Api {
 
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
+                Constants.IS_SESSION_API_ALREADY_CALLED = false;
                 if (callback != null) {
                     callback.onFailure(call, t);
                 }

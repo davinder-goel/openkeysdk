@@ -434,8 +434,10 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         getMobileKeys().endpointUpdate(new MobileKeysCallback() {
             @Override
             public void handleMobileKeysTransactionCompleted() {
-                if (mContext == null)
+                if (mContext == null) {
                     openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
+                    return;
+                }
 
                 boolean haveKey = haveKey();
                 OpenKeyManager.getInstance().updateKeyStatus(haveKey);

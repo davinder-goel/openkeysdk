@@ -10,6 +10,7 @@ package com.openkey.sdk.salto;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
@@ -175,6 +176,7 @@ public final class Salto {
                                 Sentry.captureMessage("stopScan->SALTO Timeout");
 
                             });
+                            Log.e("timeout", "salto scanning");
                             openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
 //                        Api.logSDK(mContext, 0);
 

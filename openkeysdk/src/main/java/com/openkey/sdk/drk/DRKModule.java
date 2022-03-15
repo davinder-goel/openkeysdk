@@ -150,7 +150,11 @@ public class DRKModule implements OKDrkCallBack {
                         scope.setTag("openingStatus", "DRK Lock opening success");
                         Sentry.captureMessage("openingStatus->DRK Lock opening success");
                     });
-                    callBack.stopScan(true, "Door Opened");
+                    String msg = "Door Opened";
+                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("ECU Success")) {
+                        msg = resultReturn.getMessage();
+                    }
+                    callBack.stopScan(true, msg);
                     Api.logSDK(mApplication, 1);
                 } else {
 //                    if (resultReturn.getMessage() != null && resultReturn.getMessage().equals("no lock found")) {

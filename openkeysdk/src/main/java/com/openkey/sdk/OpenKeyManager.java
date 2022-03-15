@@ -1,5 +1,7 @@
 package com.openkey.sdk;
 
+import static com.openkey.sdk.enums.MANUFACTURER.DRK;
+
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
@@ -53,6 +55,7 @@ public final class OpenKeyManager {
     private OKMobileKey okMobileKey;
     private DRKModule drkModule;
     private Handler handler;
+    private Handler keyTimeoutHandler;
     private OpenKeyCallBack mOpenKeyCallBack;
 
     private boolean mEnvironmentType;
@@ -68,6 +71,13 @@ public final class OpenKeyManager {
                 Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
                 mOpenKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
             }
+        }
+    };
+
+    private Runnable runnableTimeOutKeyDownload = new Runnable() {
+        @Override
+        public void run() {
+
         }
     };
     //-----------------------------------------------------------------------------------------------------------------|
@@ -94,6 +104,21 @@ public final class OpenKeyManager {
         }
     };
 
+    /**
+     * to implement key download failure callback after 60 seconds
+     */
+    void keyDownloadTimeout() {
+        if (keyTimeoutHandler == null) {
+            keyTimeoutHandler = new Handler();
+        }
+        keyTimeoutHandler.postDelayed(runnableTimeOutKeyDownload, 60 * 1000);
+    }
+
+    void removeDownloadTimeoutHandler() {
+        if (keyTimeoutHandler != null) {
+            keyTimeoutHandler.removeCallbacks(runnableTimeOutKeyDownload);
+        }
+    }
 
     //-----------------------------------------------------------------------------------------------------------------|
 
@@ -142,9 +167,11 @@ public final class OpenKeyManager {
         //Set configuration
         setConfiguration(environmentType);
 
-        if (authToken != null && authToken.length() > 0 && mContext != null)
+        if (authToken != null && authToken.length() > 0 && mContext != null) {
             Api.getSession(mContext, authToken, openKeyCallBack);
-        else openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
+        } else {
+            openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
+        }
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
@@ -176,7 +203,7 @@ public final class OpenKeyManager {
      */
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
         if (mContext == null) {
-            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
+            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED + " Context=null");
             return;
         }
         if (!Utilities.getInstance().isOnline(mContext)) {
@@ -378,11 +405,7 @@ public final class OpenKeyManager {
                 break;
 
             case DRK:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    drkModule.fetchKeys();
-                } else {
-                    mOpenKeyCallBack.isKeyAvailable(false, "Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
-                }
+                drkModule.fetchKeys();
                 break;
         }
     }
@@ -493,7 +516,11 @@ public final class OpenKeyManager {
         Log.e("OKMGR", "Start Scanning");
 
         if (isKeyAvailable(openKeyCallBack)) {
-            timeOut(10);
+            if (manufacturer.equals(DRK)) {
+                timeOut(15);
+            } else {
+                timeOut(15);
+            }
             switch (manufacturer) {
                 case OKC:
                     okc.startScanning(roomNumber);
@@ -575,7 +602,7 @@ public final class OpenKeyManager {
         Log.e("OKMGR", "Start Scanning");
 
         if (isKeyAvailable(openKeyCallBack)) {
-            timeOut(10);
+            timeOut(15);
             switch (manufacturer) {
                 case DRK:
                     Log.e("OKMGR", "OPENING " + roomNumber);
