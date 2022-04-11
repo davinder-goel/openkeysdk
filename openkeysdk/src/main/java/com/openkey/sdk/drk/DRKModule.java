@@ -88,6 +88,7 @@ public class DRKModule implements OKDrkCallBack {
      */
     public boolean haveKey() {
         String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mApplication);
+       Log.e("DRK KEy", key + "");
         return key != null && key.length() > 0;
     }
 

@@ -313,6 +313,10 @@ public final class OpenKeyManager {
                 kaba = new Kaba(mContext, openKeyCallBack);
                 break;
 
+            case DRK:
+                drkModule = new DRKModule(mContext, openKeyCallBack);
+                break;
+
         }
     }
 
@@ -434,7 +438,7 @@ public final class OpenKeyManager {
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
         boolean haveKey = false;
-        if (assa == null && salto == null && kaba == null) {
+        if (assa == null && salto == null && kaba == null && drkModule == null) {
             initObject(openKeyCallBack);
 //            Log.e("Started", "INITIALIZATION_FAILED");
 //            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
@@ -443,6 +447,7 @@ public final class OpenKeyManager {
         }
 
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
+        Log.e("manufacturer isKeyAvailable", manufacturer.toString() + "");
         switch (manufacturer) {
             case ASSA:
                 haveKey = assa.haveKey();
@@ -479,6 +484,7 @@ public final class OpenKeyManager {
 
             case DRK:
                 if (drkModule == null) {
+                    Log.e("drkModule", "null");
                     initialize(openKeyCallBack);
                     haveKey = false;
                 } else {
