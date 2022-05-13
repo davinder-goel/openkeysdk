@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.openkey.okdrksdk.callbackmodule.OKDrkCallBack;
+import com.openkey.okdrksdk.enums.EnvironmentTypeDrk;
 import com.openkey.okdrksdk.enums.ResultReturn;
 import com.openkey.okdrksdk.ok_manager.DrkManager;
 import com.openkey.sdk.OpenKeyManager;
@@ -88,7 +89,7 @@ public class DRKModule implements OKDrkCallBack {
      */
     public boolean haveKey() {
         String key = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mApplication);
-       Log.e("DRK KEy", key + "");
+        Log.e("DRK KEy", key + "");
         return key != null && key.length() > 0;
     }
 
@@ -186,9 +187,22 @@ public class DRKModule implements OKDrkCallBack {
      * */
     private void initialize() {
         String uuid = Utilities.getInstance().getValue(Constants.UUID, "", mApplication);
-        boolean environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, false, mApplication);
+        String environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, null, mApplication);
         DrkManager.Companion.getInstance(mApplication).registerCallback(this);
-        DrkManager.Companion.getInstance(mApplication).initialize(environmentType, uuid);
+        switch (environmentType) {
+            case "LIVE": {
+                DrkManager.Companion.getInstance(mApplication).initialize(EnvironmentTypeDrk.LIVE);
+                break;
+            }
+            case "STAGE": {
+                DrkManager.Companion.getInstance(mApplication).initialize(EnvironmentTypeDrk.STAGE);
+                break;
+            }
+            default: {
+                DrkManager.Companion.getInstance(mApplication).initialize(EnvironmentTypeDrk.DEV);
+                break;
+            }
+        }
     }
 
     private void startDrk() {

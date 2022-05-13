@@ -53,9 +53,13 @@ public class OKModule implements OKModuleCallBack {
     }
 
     private void okModuleSDKInitialize() {
-        boolean environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, false, mApplication);
+        String environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, null, mApplication);
         OKModuleManager.Companion.getInstance(mApplication).registerOKModuleCallback(this);
-        OKModuleManager.Companion.getInstance(mApplication).OKInit(environmentType);
+        if ("LIVE".equals(environmentType)) {
+            OKModuleManager.Companion.getInstance(mApplication).OKInit(true);
+        } else {
+            OKModuleManager.Companion.getInstance(mApplication).OKInit(false);
+        }
     }
 
     /**
@@ -112,7 +116,7 @@ public class OKModule implements OKModuleCallBack {
     @Override
     public void fetchKeySuccess(ArrayList<String> roomList) {
 
-        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(roomList,false);
+        openKeyCallBack.getOKCandOkModuleMobileKeysResponse(roomList, false);
 
     }
 

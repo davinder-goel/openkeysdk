@@ -80,9 +80,13 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     }
 
     private void okMobileKeySDKInitialize() {
-        boolean environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, false, mApplication);
+        String environmentType = Utilities.getInstance().getValue(Constants.ENVIRONMENT_TYPE, null, mApplication);
         OKMobileKeyManager.Companion.getInstance(mApplication).registerOKMobileKeyModuleCallback(this);
-        OKMobileKeyManager.Companion.getInstance(mApplication).OKInit(environmentType);
+        if ("LIVE".equals(environmentType)) {
+            OKMobileKeyManager.Companion.getInstance(mApplication).OKInit(true);
+        } else {
+            OKMobileKeyManager.Companion.getInstance(mApplication).OKInit(false);
+        }
     }
 
     /**

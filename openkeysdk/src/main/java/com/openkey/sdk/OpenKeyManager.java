@@ -18,6 +18,7 @@ import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.assa.ASSA;
 import com.openkey.sdk.drk.DRKModule;
 import com.openkey.sdk.entrava.Entrava;
+import com.openkey.sdk.enums.EnvironmentType;
 import com.openkey.sdk.enums.MANUFACTURER;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.kaba.Kaba;
@@ -162,7 +163,7 @@ public final class OpenKeyManager {
      * @param authToken
      * @param openKeyCallBack Call back for response purpose
      */
-    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack, boolean environmentType) {
+    public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack, EnvironmentType environmentType) {
 
         //Set configuration
         setConfiguration(environmentType);
@@ -175,13 +176,17 @@ public final class OpenKeyManager {
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    private void setConfiguration(boolean environmentType) {
+    private void setConfiguration(EnvironmentType environmentType) {
         if (mContext != null) {
-            Utilities.getInstance().saveValue(Constants.ENVIRONMENT_TYPE, environmentType, mContext);
-            if (environmentType)
+            Log.e("OK ENV", environmentType.name() + "");
+            Utilities.getInstance().saveValue(Constants.ENVIRONMENT_TYPE, environmentType.name(), mContext);
+            if (environmentType.equals(EnvironmentType.LIVE)) {
                 Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_LIVE, mContext);
-            else
+            } else if (environmentType.equals(EnvironmentType.STAGE)) {
+                Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_STAGE, mContext);
+            } else {
                 Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_DEV, mContext);
+            }
         }
     }
 
