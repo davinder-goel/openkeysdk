@@ -4,7 +4,6 @@ import static com.openkey.sdk.enums.MANUFACTURER.DRK;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -143,7 +142,9 @@ public final class OpenKeyManager {
      * @param context
      */
     public void init(Application context, String UUID) throws NullPointerException {
-        if (context == null) throw new NullPointerException(Response.NULL_CONTEXT);
+        if (context == null) {
+            throw new NullPointerException(Response.NULL_CONTEXT);
+        }
         Sentry.configureScope(scope -> {
             scope.setTag("uuid", UUID);
             Sentry.captureMessage("UUID->" + UUID);
@@ -153,7 +154,9 @@ public final class OpenKeyManager {
         Utilities.getInstance(mContext);
         Utilities.getInstance().saveValue(Constants.UUID, UUID, mContext);
         SessionResponse sessionResponse = Utilities.getInstance().getBookingFromLocal(mContext);
-        if (sessionResponse != null) GetBooking.getInstance().setBooking(sessionResponse);
+        if (sessionResponse != null) {
+            GetBooking.getInstance().setBooking(sessionResponse);
+        }
     }
 
 
@@ -164,10 +167,10 @@ public final class OpenKeyManager {
      * @param openKeyCallBack Call back for response purpose
      */
     public void authenticate(String authToken, OpenKeyCallBack openKeyCallBack, EnvironmentType environmentType) {
-
+        Constants.IS_SESSION_API_ALREADY_CALLED = false;
         //Set configuration
         setConfiguration(environmentType);
-
+        Log.e("Callback OKManager", openKeyCallBack + "");
         if (authToken != null && authToken.length() > 0 && mContext != null) {
             Api.getSession(mContext, authToken, openKeyCallBack);
         } else {
@@ -175,7 +178,7 @@ public final class OpenKeyManager {
         }
     }
 
-    //-----------------------------------------------------------------------------------------------------------------|
+    //- ----------------------------------------------------------------------------------------------------------------|
     private void setConfiguration(EnvironmentType environmentType) {
         if (mContext != null) {
             Log.e("OK ENV", environmentType.name() + "");
@@ -261,14 +264,15 @@ public final class OpenKeyManager {
                             break;
 
                         case DRK:
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                if (tokenStr != null && tokenStr.length() > 0) {
-                                    Api.getSession(mContext, tokenStr, null);
-                                }
-                                drkModule = new DRKModule(mContext, openKeyCallBack);
-                            } else {
-                                mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
-                            }
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                                if (tokenStr != null && tokenStr.length() > 0) {
+//                            Log.e("OK Session Api Call DRK",openKeyCallBack+"");
+                            Api.getSession(mContext, tokenStr, null); //comment because session api getting call 2 time and callback getting set as null
+//                                }
+                            drkModule = new DRKModule(mContext, openKeyCallBack);
+//                            } else {
+//                                mOpenKeyCallBack.initializationFailure("Unsupported Android version, V3 will only support API level 23 and 23+ versions.");
+//                            }
                             break;
 
                         case ENTRAVA:

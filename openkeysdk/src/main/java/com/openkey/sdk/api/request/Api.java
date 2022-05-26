@@ -46,7 +46,9 @@ public class Api {
     public static void getSession(final Context context, final String token,
                                   final OpenKeyCallBack openKeyCallBack) {
 
+        Log.e("Session Api Called 49", Constants.IS_SESSION_API_ALREADY_CALLED + "::callback::" + openKeyCallBack);
         if (context == null || token == null || Constants.IS_SESSION_API_ALREADY_CALLED) {
+            Log.e("Session Api Called 51", Constants.IS_SESSION_API_ALREADY_CALLED + "::callback::" + openKeyCallBack);
             return;
         }
         Constants.IS_SESSION_API_ALREADY_CALLED = true;
@@ -63,6 +65,8 @@ public class Api {
             public void onResponse(Call<SessionResponse> call, retrofit2.Response<SessionResponse>
                     response) {
                 Constants.IS_SESSION_API_ALREADY_CALLED = false;
+                Log.e("Session Api Response Sdk 67", response.code() + " :: " + openKeyCallBack);
+
                 if (response.isSuccessful()) {
                     Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, token, context);
                     saveData(response.body(), context);
@@ -81,6 +85,8 @@ public class Api {
             @Override
             public void onFailure(Call<SessionResponse> call, Throwable t) {
                 Constants.IS_SESSION_API_ALREADY_CALLED = false;
+                Log.e("Session Api Response Sdk 87", t.getLocalizedMessage() + " :: " + openKeyCallBack);
+
                 if (openKeyCallBack != null) {
                     openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, "");
                 }
@@ -358,7 +364,7 @@ public class Api {
 //
 //        if (!(authToken != null && authToken.length() > 0 && context != null)){
 //            return;}
-
+        Log.e("Session Api Called 362", Constants.IS_SESSION_API_ALREADY_CALLED + "");
         if (authToken == null || context == null || Constants.IS_SESSION_API_ALREADY_CALLED) {
             return;
         }
