@@ -1,5 +1,8 @@
 package com.openkey.sdk.kaba;
 
+import static android.content.Context.MODE_PRIVATE;
+import static com.openkey.sdk.kaba.util.Settings.mobileAppId;
+
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -37,9 +40,6 @@ import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.content.Context.MODE_PRIVATE;
-import static com.openkey.sdk.kaba.util.Settings.mobileAppId;
 
 public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         LegicMobileSdkRegistrationEventListener, LegicReaderEventListener,
@@ -221,12 +221,13 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     //-----------------------------------------------------------------------------------------------------------------|
     @Override
     public void backendRegistrationStartDoneEvent(LegicMobileSdkStatus status) {
+        Log.e("Kaba", "Registration status " + status);
         if (status.isSuccess()) {
-            if (kabaRegistrationToken != null && kabaRegistrationToken.length() > 0)
+            if (kabaRegistrationToken != null && kabaRegistrationToken.length() > 0) {
                 completeRegister(kabaRegistrationToken);
-            else
+            } else {
                 mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-
+            }
             Log.e("Kaba", "Registration Step 1 done with status " + status);
         } else {
             mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
