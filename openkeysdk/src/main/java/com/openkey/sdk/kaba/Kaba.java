@@ -227,10 +227,12 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                 completeRegister(kabaRegistrationToken);
             } else {
                 mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+//                mOpenKeyCallBack.initializationFailure(status.toString());
             }
             Log.e("Kaba", "Registration Step 1 done with status " + status);
         } else {
             mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+//            mOpenKeyCallBack.initializationFailure(status.toString());
         }
     }
 
@@ -496,6 +498,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
 
         deactivateAllFiles();
         if (!Constants.IS_SCANNING_STOPPED) {
+            Constants.IS_SCANNING_STOPPED = true;
             final BLEDataHandler dataHandler = new BLEDataHandler(data);
             if (dataHandler.isAccessGranted()) {
                 mOpenKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);

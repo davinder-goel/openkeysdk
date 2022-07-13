@@ -589,6 +589,7 @@ public final class OpenKeyManager {
         } else {
             Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
+                Constants.IS_SCANNING_STOPPED = true;
                 removeTimeoutHandler();
                 Sentry.configureScope(scope -> {
                     scope.setTag("stopScan", "Key Not Found");
@@ -628,6 +629,7 @@ public final class OpenKeyManager {
         } else {
             Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
+                Constants.IS_SCANNING_STOPPED = true;
                 removeTimeoutHandler();
                 Sentry.configureScope(scope -> {
                     scope.setTag("stopScan", "Key Not Found");
