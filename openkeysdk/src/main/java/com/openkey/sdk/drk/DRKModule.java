@@ -132,6 +132,10 @@ public class DRKModule implements OKDrkCallBack {
 //        DrkManager.Companion.getInstance(mApplication).open(roomTitle);
     }
 
+    public boolean haveEmptyModules(String roomTitle) {
+        return DrkManager.Companion.getInstance(mApplication).isThisEmptyModule(roomTitle);
+    }
+
     //
     public void open(String roomTitle, String subModule) {
         DrkManager.Companion.getInstance(mApplication).findSubModule(roomTitle, subModule);

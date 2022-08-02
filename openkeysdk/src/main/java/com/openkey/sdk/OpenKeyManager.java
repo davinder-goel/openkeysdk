@@ -647,6 +647,13 @@ public final class OpenKeyManager {
             handler.removeCallbacks(runnableTimeOut);
         }
     }
+
+    public boolean haveEmptyModules(String roomTitle) {
+        if (drkModule != null) {
+            return drkModule.haveEmptyModules(roomTitle);
+        }
+        return false;
+    }
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**
