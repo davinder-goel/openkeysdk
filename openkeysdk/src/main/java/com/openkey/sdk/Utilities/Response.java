@@ -50,6 +50,7 @@ public class Response {
     // if lock opened successfully
     public static final String LOCK_OPENING_FAILURE = "LOCK OPENING FAILURE";
     public static final String TIME_OUT_LOCK_NOT_FOUND = "Timeout: Lock not found.";
+    public static final String BT_PERMISSION_MISSING = "Bluetooth permission are missing";
 
 
 }

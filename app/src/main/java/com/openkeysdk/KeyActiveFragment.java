@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
+import com.openkey.sdk.enums.EnvironmentType;
 import com.openkey.sdk.okmobilekey.OKMobileKey;
 
 import java.util.ArrayList;
@@ -384,10 +385,10 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-                mEdtTextToken.setText(mToken);
+//                mEdtTextToken.setText(mToken);
                 String token = mEdtTextToken.getText().toString().trim();
                 if (token.length() > 0) {
-                    OpenKeyManager.getInstance().authenticate(token, this, false);
+                    OpenKeyManager.getInstance().authenticate(token, this, EnvironmentType.DEV);
                 } else {
                     showMessage("Please enter sdk token first.");
                 }

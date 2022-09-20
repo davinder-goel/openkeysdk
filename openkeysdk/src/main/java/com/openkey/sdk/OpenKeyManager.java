@@ -2,12 +2,16 @@ package com.openkey.sdk;
 
 import static com.openkey.sdk.enums.MANUFACTURER.DRK;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
@@ -68,7 +72,7 @@ public final class OpenKeyManager {
                     Sentry.captureMessage("timeout->" + manufacturer.toString());
                 });
                 Constants.IS_SCANNING_STOPPED = true;
-                Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
+//                Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  timeout");
                 mOpenKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
             }
         }
@@ -170,7 +174,7 @@ public final class OpenKeyManager {
         Constants.IS_SESSION_API_ALREADY_CALLED = false;
         //Set configuration
         setConfiguration(environmentType);
-        Log.e("Callback OKManager", openKeyCallBack + "");
+//        Log.e("Callback OKManager", openKeyCallBack + "");
         if (authToken != null && authToken.length() > 0 && mContext != null) {
             Api.getSession(mContext, authToken, openKeyCallBack);
         } else {
@@ -181,7 +185,7 @@ public final class OpenKeyManager {
     //- ----------------------------------------------------------------------------------------------------------------|
     private void setConfiguration(EnvironmentType environmentType) {
         if (mContext != null) {
-            Log.e("OK ENV", environmentType.name() + "");
+//            Log.e("OK ENV", environmentType.name() + "");
             Utilities.getInstance().saveValue(Constants.ENVIRONMENT_TYPE, environmentType.name(), mContext);
             if (environmentType.equals(EnvironmentType.LIVE)) {
                 Utilities.getInstance().saveValue(Constants.BASE_URL, Constants.BASE_URL_LIVE, mContext);
@@ -200,6 +204,24 @@ public final class OpenKeyManager {
         if (mContext != null && authToken != null) Api.getBooking(authToken, mContext, callback);
     }
 
+
+    private boolean hasBTPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(
+                    mContext,
+                    Manifest.permission.BLUETOOTH_SCAN)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                            mContext,
+                            Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     //-----------------------------------------------------------------------------------------------------------------|
 
     /**
@@ -212,6 +234,10 @@ public final class OpenKeyManager {
     public synchronized void initialize(@NonNull OpenKeyCallBack openKeyCallBack) {
         if (mContext == null) {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED + " Context=null");
+            return;
+        }
+        if (!hasBTPermissions()) {
+            openKeyCallBack.initializationFailure(Response.BT_PERMISSION_MISSING);
             return;
         }
         if (!Utilities.getInstance().isOnline(mContext)) {
@@ -308,7 +334,6 @@ public final class OpenKeyManager {
             return;
         }
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
-        Log.e("Create Object", manufacturer.toString() + "");
         switch (manufacturer) {
             case ASSA:
                 assa = new ASSA(mContext, openKeyCallBack);
@@ -367,7 +392,6 @@ public final class OpenKeyManager {
                 if (assa.isSetupComplete()) {
                     assa.getKey();
                 } else {
-                    Log.e("Setup for assa", "failed");
                     mOpenKeyCallBack.initializationFailure(Response.NOT_INITIALIZED);
                 }
                 break;
@@ -456,7 +480,6 @@ public final class OpenKeyManager {
         }
 
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
-        Log.e("manufacturer isKeyAvailable", manufacturer.toString() + "");
         switch (manufacturer) {
             case ASSA:
                 haveKey = assa.haveKey();
@@ -493,7 +516,6 @@ public final class OpenKeyManager {
 
             case DRK:
                 if (drkModule == null) {
-                    Log.e("drkModule", "null");
                     initialize(openKeyCallBack);
                     haveKey = false;
                 } else {
@@ -523,12 +545,12 @@ public final class OpenKeyManager {
             roomNumber) {
         manufacturer = Utilities.getInstance().getManufacturer(mContext, openKeyCallBack);
         Constants.IS_SCANNING_STOPPED = false;
-        Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
+//        Log.e("IS_SCANNING_STOPPED", Constants.IS_SCANNING_STOPPED + "  startScaning");
         if (mContext == null) {
             Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
         }
-        Log.e("OKMGR", "Start Scanning");
+//        Log.e("OKMGR", "Start Scanning");
 
         if (isKeyAvailable(openKeyCallBack)) {
             if (manufacturer.equals(DRK)) {
@@ -550,7 +572,7 @@ public final class OpenKeyManager {
                     break;
 
                 case DRK:
-                    Log.e("OKMGR", "OPENING " + roomNumber);
+//                    Log.e("OKMGR", "OPENING " + roomNumber);
                     drkModule.open(roomNumber);
                     break;
 
@@ -565,7 +587,8 @@ public final class OpenKeyManager {
                                 scope.setTag("stopScan", "ASSA endpoints not generated");
                                 Sentry.captureMessage("stopScan->ASSA endpoints not generated");
                             });
-                            openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+//                            openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+                            openKeyCallBack.stopScan(false, "ASSA end-points not generated");
                         }
                     }
                     break;
@@ -587,7 +610,7 @@ public final class OpenKeyManager {
                     break;
             }
         } else {
-            Log.e("startScanning", "key not available");
+//            Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
                 Constants.IS_SCANNING_STOPPED = true;
                 removeTimeoutHandler();
@@ -615,19 +638,19 @@ public final class OpenKeyManager {
             Log.e("Context", "null");
             openKeyCallBack.initializationFailure(Response.NULL_CONTEXT);
         }
-        Log.e("OKMGR", "Start Scanning");
+//        Log.e("OKMGR", "Start Scanning");
 
         if (isKeyAvailable(openKeyCallBack)) {
             timeOut(15);
             switch (manufacturer) {
                 case DRK:
-                    Log.e("OKMGR", "OPENING " + roomNumber);
+//                    Log.e("OKMGR", "OPENING " + roomNumber);
                     drkModule.open(roomNumber, subModule);
 //                    drkModule.open(roomNumber);
                     break;
             }
         } else {
-            Log.e("startScanning", "key not available");
+//            Log.e("startScanning", "key not available");
             if (!Constants.IS_SCANNING_STOPPED) {
                 Constants.IS_SCANNING_STOPPED = true;
                 removeTimeoutHandler();
@@ -642,7 +665,7 @@ public final class OpenKeyManager {
     }
 
     public void removeTimeoutHandler() {
-        Log.e("removeTimeoutHandler", "called");
+//        Log.e("removeTimeoutHandler", "called");
         if (handler != null) {
             handler.removeCallbacks(runnableTimeOut);
         }

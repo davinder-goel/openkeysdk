@@ -8,19 +8,23 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.legic.mobile.sdk.api.LegicMobileSdkManager;
-import com.legic.mobile.sdk.api.exception.LegicMobileSdkException;
-import com.legic.mobile.sdk.api.listener.LegicMobileSdkRegistrationEventListener;
-import com.legic.mobile.sdk.api.listener.LegicMobileSdkSynchronizeEventListener;
-import com.legic.mobile.sdk.api.listener.LegicNeonFileEventListener;
-import com.legic.mobile.sdk.api.listener.LegicReaderEventListener;
+import com.legic.mobile.sdk.api.exception.SdkException;
+import com.legic.mobile.sdk.api.listener.BackendEventListener;
+import com.legic.mobile.sdk.api.listener.LcMessageEventListener;
+import com.legic.mobile.sdk.api.listener.NeonFileEventListener;
+import com.legic.mobile.sdk.api.listener.ReaderEventListener;
+import com.legic.mobile.sdk.api.listener.SdkEventListener;
+import com.legic.mobile.sdk.api.types.AddressingMode;
+import com.legic.mobile.sdk.api.types.LcConfirmationMethod;
 import com.legic.mobile.sdk.api.types.LcMessageMode;
-import com.legic.mobile.sdk.api.types.LegicMobileSdkErrorReason;
-import com.legic.mobile.sdk.api.types.LegicMobileSdkFileAddressingMode;
-import com.legic.mobile.sdk.api.types.LegicMobileSdkPushType;
-import com.legic.mobile.sdk.api.types.LegicMobileSdkStatus;
-import com.legic.mobile.sdk.api.types.LegicNeonFile;
-import com.legic.mobile.sdk.api.types.LegicNeonFileDefaultMode;
+import com.legic.mobile.sdk.api.types.NeonFile;
+import com.legic.mobile.sdk.api.types.NeonFileState;
+import com.legic.mobile.sdk.api.types.NeonSubFile;
+import com.legic.mobile.sdk.api.types.ReaderFoundReport;
 import com.legic.mobile.sdk.api.types.RfInterface;
+import com.legic.mobile.sdk.api.types.RfInterfaceState;
+import com.legic.mobile.sdk.api.types.SdkErrorReason;
+import com.legic.mobile.sdk.api.types.SdkStatus;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Utilities;
@@ -33,17 +37,15 @@ import com.openkey.sdk.kaba.util.Settings;
 import com.openkey.sdk.kaba.util.Utils;
 import com.openkey.sdk.singleton.GetBooking;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import io.sentry.Sentry;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Kaba implements LegicMobileSdkSynchronizeEventListener,
-        LegicMobileSdkRegistrationEventListener, LegicReaderEventListener,
-        LegicNeonFileEventListener {
+public class Kaba implements BackendEventListener, ReaderEventListener, SdkEventListener, LcMessageEventListener, NeonFileEventListener {
 
     private LegicMobileSdkManager mManager;
     private Application mContext;
@@ -93,29 +95,55 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     private void setupKaba() {
         try {
 
-            if (mManager != null)
+            if (mManager != null) {
                 mManager = null;
+            }
 
             mManager = Utils.getSdkManager(mContext);
             registerListeners();
             initSdk();
             startKabaProcessing();
-        } catch (LegicMobileSdkException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    private void initSdk() throws LegicMobileSdkException {
-        if (!mManager.isStarted()) {
-            mManager.start(mobileAppId, Settings.mobileAppTechUser, Settings.mobileAppTechPassword,
-                    Settings.serverUrl);
-        }
-        mManager.setLcProjectAddressingMode(true);
-        if (mManager.isRegisteredToBackend()) {
-            if (mManager.isRfInterfaceSupported(RfInterface.BLE) && !mManager.isRfInterfaceActive(RfInterface.BLE)) {
-                mManager.activateRfInterface(RfInterface.BLE);
+    private void initSdk() {
+        try {
+            if (!mManager.isStarted()) {
+                try {
+                    Log.e("initSdk", "Start mobile SDK manager not started");
+                    mManager.start(Settings.mobileAppId, Settings.mobileAppTechUser,
+                            Settings.mobileAppTechPassword, Settings.serverUrl);
+                } catch (SdkException e) {
+                    e.printStackTrace();
+                }
             }
+            if (mManager.isStarted()) {
+                Log.e("initSdk", "Start mobile SDK manager started");
+                Log.e("initSdk", mManager.isRegisteredToBackend() + "");
+
+                if (mManager.isRegisteredToBackend()) {
+
+                    try {
+                        if (mManager.isRfInterfaceHardwareSupported(RfInterface.BLE_PERIPHERAL)) {
+                            if (!mManager.isRfInterfaceActive(RfInterface.BLE_PERIPHERAL)) {
+                                mManager.setRfInterfaceActive(RfInterface.BLE_PERIPHERAL, true);
+                            }
+                        }
+                        if (mManager.isRfInterfaceHardwareSupported(RfInterface.NFC_HCE)) {
+                            if (!mManager.isRfInterfaceActive(RfInterface.NFC_HCE)) {
+                                mManager.setRfInterfaceActive(RfInterface.NFC_HCE, true);
+                            }
+                        }
+                    } catch (SdkException e) {
+                        Log.e("init sdk 142", "Could not activate interface ", e);
+                    }
+                }
+            }
+        } catch (SdkException e) {
+            e.printStackTrace();
         }
     }
     //-----------------------------------------------------------------------------------------------------------------|
@@ -128,11 +156,12 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
             return;
         }
         try {
-            mManager.registerForSynchronizeEvents(this);
-            mManager.registerForRegistrationEvents(this);
+            mManager.registerForSdkEvents(this);
             mManager.registerForReaderEvents(this);
-            mManager.registerForFileEvents(this);
-        } catch (LegicMobileSdkException e) {
+            mManager.registerForBackendEvents(this);
+            mManager.registerForLcMessageEvents(this);
+            mManager.registerForNeonFileEvents(this);
+        } catch (SdkException e) {
             Log.e("Kaba", "Could not register listener: " + e.getLocalizedMessage());
         }
     }
@@ -143,6 +172,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
      */
     private void startKabaProcessing() {
         kabaRegistrationToken = Utilities.getInstance().getValue(Constants.KABA_REGISTRATION_TOKEN, "", mContext);
+        Log.e("Kaba Token", kabaRegistrationToken + "");
         if (kabaRegistrationToken.length() > 0) {
             startKABA();
         } else {
@@ -163,15 +193,15 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
      */
     private void startKABA() {
         // if user is not register
+
         try {
+            Log.e("startKABA", mManager.isRegisteredToBackend() + "::Called");
             if (!mManager.isRegisteredToBackend()) {
                 register();
             } else {
-
                 int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
                         0, mContext);
                 if (haveKey() && mobileKeyStatusId == 3) {
-
                     mOpenKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
                 } else {
                     if (mobileKeyStatusId == 1) {
@@ -184,7 +214,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                     }
                 }
             }
-        } catch (LegicMobileSdkException e) {
+        } catch (SdkException e) {
             e.printStackTrace();
         }
     }
@@ -197,60 +227,24 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         SharedPreferences.Editor editor = mContext.getSharedPreferences(Settings.MY_PREFS_NAME, MODE_PRIVATE).edit();
         editor.putString("DeviceID", deviceId);
         editor.apply();
-
-        List<RfInterface> interfaces = new ArrayList<>();
-        try {
-
-            boolean ble = mManager.isRfInterfaceSupported(RfInterface.BLE);
-            if (ble) {
-                interfaces.add(RfInterface.BLE);
-            }
-        } catch (LegicMobileSdkException e) {
-            Log.e("Kaba", "Exception during registration: " + e.getLocalizedMessage());
-        }
-
-
-        mManager.initiateRegistration(
+        Log.e("Device ID at the time Register", deviceId + "");
+        mManager.initiateRegistrationWithBackend(
                 deviceId,
-                interfaces,
-                Settings.lcConfirmationMethod,
-                "",
-                LegicMobileSdkPushType.GCM);
+                LcConfirmationMethod.SMS
+        );
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void backendRegistrationStartDoneEvent(LegicMobileSdkStatus status) {
-        Log.e("Kaba", "Registration status " + status);
-        if (status.isSuccess()) {
-            if (kabaRegistrationToken != null && kabaRegistrationToken.length() > 0) {
-                completeRegister(kabaRegistrationToken);
-            } else {
-                mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-//                mOpenKeyCallBack.initializationFailure(status.toString());
-            }
-            Log.e("Kaba", "Registration Step 1 done with status " + status);
-        } else {
-            mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-//            mOpenKeyCallBack.initializationFailure(status.toString());
-        }
-    }
 
     //-----------------------------------------------------------------------------------------------------------------|
     private void completeRegister(String token) {
-        mManager.register(token);
+        Log.e("completeRegister", token + "");
+
+        mManager.registerWithBackend(token);
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void backendRegistrationFinishedDoneEvent(LegicMobileSdkStatus status) {
-        if (status.isSuccess()) {
-            Api.setPeronalizationComplete(mContext, mOpenKeyCallBack);
-            Log.e("Kaba", "Registration Step 2 done with status " + status);
-        } else {
-            mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
-        }
-    }
+
 
     //-----------------------------------------------------------------------------------------------------------------|
     public void synchronise() {
@@ -260,15 +254,57 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         mManager.synchronizeWithBackend();
     }
 
-    //-----------------------------------------------------------------------------------------------------------------|
     @Override
-    public void backendSynchronizeStartEvent() {
-        Log.e("Kaba backend", "Synchronize started");
+    public void backendRegistrationInitializedEvent(SdkStatus status) {
+        Log.e("backendRegistrationInitializedEvent", "" + status);
+
+        if (status.isSuccess()) {
+            if (kabaRegistrationToken != null && kabaRegistrationToken.length() > 0) {
+                completeRegister(kabaRegistrationToken);
+            } else {
+//                mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+                mOpenKeyCallBack.initializationFailure(status.toString());
+            }
+            Log.e("Kaba", "Registration Step 1 done with status " + status);
+        } else {
+//            mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+            mOpenKeyCallBack.initializationFailure(status.toString());
+        }
+    }
+
+    @Override
+    public void backendRegistrationFinishedEvent(SdkStatus status) {
+        Log.e("backendRegistrationFinishedEvent", "" + status);
+
+        if (status.isSuccess()) {
+            Api.setPeronalizationComplete(mContext, mOpenKeyCallBack);
+            Log.e("Kaba", "Registration Step 2 done with status " + status);
+        } else {
+            mOpenKeyCallBack.initializationFailure(com.openkey.sdk.Utilities.Response.INITIALIZATION_FAILED);
+        }
+    }
+
+    @Override
+    public void backendUnregisteredEvent(SdkStatus status) {
+        Log.e("backendUnregisteredEvent", "" + status);
+
+        if (status.isSuccess()) {
+            Log.e("Kaba", "Unregister done with status " + status);
+        } else {
+            handleSdkErrors(status);
+        }
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
     @Override
-    public void backendSynchronizeDoneEvent(LegicMobileSdkStatus status) {
+    public void backendSynchronizeStartEvent() {
+        Log.e("backendSynchronizeStartEvent", "Synchronize started");
+    }
+
+    @Override
+    public void backendSynchronizeDoneEvent(SdkStatus status) {
+        Log.e("backendSynchronizeDoneEvent", "" + status);
+
         if (isSynchronizationStarted) {
             isSynchronizationStarted = false;
             if (status.isSuccess()) {
@@ -283,6 +319,9 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
             }
         }
     }
+
+    //-----------------------------------------------------------------------------------------------------------------|
+
 
     private void synchProcess() {
         Log.e("synchProcess", ":start");
@@ -303,7 +342,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
 
     //-----------------------------------------------------------------------------------------------------------------|
     private void getAllFiles() {
-        deactivateAllFiles();
+//        deactivateAllFiles();
         if (haveKey()) {
             failedCounter = 0;
             OpenKeyManager.getInstance().updateKeyStatus(haveKey());
@@ -320,16 +359,25 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     public boolean haveKey() {
         Log.e("haveKey", "called");
         try {
-            List<LegicNeonFile> files = mManager.getAllFiles();
+            List<NeonFile> files = mManager.getAllNeonFiles();
             Log.e("LegicNeonFile", ":" + files.size());
 
             if (files.size() > 0) {
                 SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
-                for (int i = 0; i < files.size(); i++) {
-                    LegicNeonFile legicNeonFile = files.get(i);
-                    String reservationnumber = "" + legicNeonFile.getMetaData().get("ReservationNumber").getStringValue();
-                    String roomNumber = "" + legicNeonFile.getMetaData().get("RoomNumber").getStringValue();
-                    logs(legicNeonFile);
+
+                for (NeonFile f : files) {
+                    String fileInfos = f.toString();
+
+                    byte[] fileId = f.getFileId();
+                    if (fileId.length > 0) {
+                        fileInfos += " and File Id: " + Utils.dataToByteString(f.getFileId());
+                    }
+                    Log.e("Neon Files", fileInfos + "");
+
+
+                    String reservationnumber = "" + f.getMetaData().get("ReservationNumber").getStringValue();
+                    String roomNumber = "" + f.getMetaData().get("RoomNumber").getStringValue();
+//                    logs(f);
                     Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
                             ? sessionResponse.getData().getParentSessionId()
                             : sessionResponse.getData().getId();
@@ -350,8 +398,6 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
 
                 }
             }
-        } catch (LegicMobileSdkException e) {
-            Log.e("Kaba", e.getLocalizedMessage());
         } catch (Exception e) {
             Log.e("Kaba null files", e.getLocalizedMessage());
         }
@@ -359,7 +405,7 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    private void logs(LegicNeonFile legicNeonFile) {
+    private void logs(NeonFile legicNeonFile) {
         String fileInfos = "Index:";
         fileInfos += "\nState: " + legicNeonFile.getFileState().toString();
         byte[] fileId = legicNeonFile.getFileId();
@@ -379,52 +425,49 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
 
     private void activateFile() {
 
-        Log.e("Kaba", "Activate file index ");
+//        Log.e("Kaba", "Activate file index ");
 
+//            initSdk();
         try {
-            initSdk();
-            try {
-                List<LegicNeonFile> files = mManager.getAllFiles();
+            List<NeonFile> files = mManager.getAllNeonFilesWithState(NeonFileState.DEPLOYED);
+            int updated = 0;
 
-                if (files != null && files.size() > 0) {
+            if (files != null && files.size() > 0) {
 
-                    for (int i = 0; i < files.size(); i++) {
+                for (NeonFile f : files) {
 
-                        LegicNeonFile legicNeonFile = files.get(i);
-                        String reservationnumber = "" + legicNeonFile.getMetaData().get("ReservationNumber").getStringValue();
-                        String roomNumber = "" + legicNeonFile.getMetaData().get("RoomNumber").getStringValue();
-                        SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
-                        Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
-                                ? sessionResponse.getData().getParentSessionId()
-                                : sessionResponse.getData().getId();
-                        if (reservationnumber.trim().length() > 0
-                                && roomNumber.trim().length() > 0) {
-                            if (Integer.parseInt(reservationnumber)
-                                    == _bookingId && roomNumber.equals(sessionResponse.getData()
-                                    .getHotelRoom().getTitle())) {
-                                try {
-                                    isLoginActionFired = true;
-                                    Log.e("legicNeonFile", ":" + legicNeonFile);
-                                    mManager.activateFile(legicNeonFile);
-                                    mManager.setDefault(legicNeonFile, LegicNeonFileDefaultMode.LC_PROJECT_DEFAULT, true);
-                                } catch (LegicMobileSdkException e) {
-                                    Log.e("Kaba", e.getLocalizedMessage());
-                                }
-                                break;
-                            } else
-                                mManager.deactivateFile(legicNeonFile);
-                        } else
-                            mManager.deactivateFile(legicNeonFile);
+                    String reservationnumber = "" + f.getMetaData().get("ReservationNumber").getStringValue();
+                    String roomNumber = "" + f.getMetaData().get("RoomNumber").getStringValue();
+                    SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
+                    Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
+                            ? sessionResponse.getData().getParentSessionId()
+                            : sessionResponse.getData().getId();
+                    if (reservationnumber.trim().length() > 0
+                            && roomNumber.trim().length() > 0) {
+                        if (Integer.parseInt(reservationnumber)
+                                == _bookingId && roomNumber.equals(sessionResponse.getData()
+                                .getHotelRoom().getTitle())) {
+                            try {
+                                isLoginActionFired = true;
+                                Log.e("legicNeonFile", ":" + f);
+                                mManager.setNeonFileActive(f, true);
+                                updated++;
+                            } catch (SdkException e) {
+                                Log.e("Kaba", e.getLocalizedMessage());
+                            }
+                            break;
+                        } else {
+                            deactivateAllFiles();
+                        }
+                    } else {
+                        deactivateAllFiles();
                     }
                 }
-            } catch (LegicMobileSdkException e) {
-                Log.e("Kaba", e.getLocalizedMessage());
-            } catch (Exception e) {
-                Log.e("Kaba null activate file", e.getLocalizedMessage());
             }
+        } catch (Exception e) {
+            Log.e("Kaba null activate file", e.getLocalizedMessage());
+            mOpenKeyCallBack.stopScan(false, "Kaba Exception::" + e.getLocalizedMessage() + "");
 
-        } catch (LegicMobileSdkException e) {
-            e.printStackTrace();
         }
     }
 
@@ -433,70 +476,68 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
         Log.e("Kaba", "Deactivate all files");
 
         try {
-            List<LegicNeonFile> files = mManager.getAllFiles();
-
-            for (LegicNeonFile f : files) {
-                try {
-                    mManager.deactivateFile(f);
-                } catch (LegicMobileSdkException e) {
-                    Log.e("Kaba", e.getLocalizedMessage());
-                }
+            if (mManager.isRfInterfaceActive(RfInterface.BLE_CENTRAL)) {
+                Log.e("", "Deactivate BLE Central");
+                mManager.setRfInterfaceActive(RfInterface.BLE_CENTRAL, false);
+            } else {
+                Log.e("", "Activate BLE Central");
             }
-        } catch (LegicMobileSdkException e) {
-            Log.e("Kaba", e.getLocalizedMessage());
+        } catch (SdkException e) {
+            e.printStackTrace();
         }
+
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void backendFileChangedEvent(LegicNeonFile legicFile) {
-        Log.e("Kaba", "File changed -> file " + legicFile);
-    }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void backendRequestAddFileDoneEvent(LegicMobileSdkStatus legicSdkStatus) {
-        if (legicSdkStatus.isSuccess()) {
-            Log.e("Kaba", "Backend Request add file done with status " + legicSdkStatus);
-        } else {
-            handleSdkErrors(legicSdkStatus);
-        }
-    }
+//    @Override
+//    public void backendRequestAddFileDoneEvent(LegicMobileSdkStatus legicSdkStatus) {
+//        if (legicSdkStatus.isSuccess()) {
+//            Log.e("Kaba", "Backend Request add file done with status " + legicSdkStatus);
+//        } else {
+//            handleSdkErrors(legicSdkStatus);
+//        }
+//    }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void backendRequestRemoveFileDoneEvent(LegicMobileSdkStatus status) {
-        if (status.isSuccess()) {
-            Log.e("Kaba", "Backend Request remove file done with status " + status);
-        } else {
-            handleSdkErrors(status);
-        }
-    }
+//    @Override
+//    public void backendRequestRemoveFileDoneEvent(LegicMobileSdkStatus status) {
+//        if (status.isSuccess()) {
+//            Log.e("Kaba", "Backend Request remove file done with status " + status);
+//        } else {
+//            handleSdkErrors(status);
+//        }
+//    }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void readerReadFileEvent(LegicNeonFile legicFile, RfInterface rfInterface) {
-        Log.e("Kaba", "Reader read Event on file  " + legicFile + " on interface " + rfInterface);
+    public void sendMessageToBackend() {
+        Log.e("sendMessageToBackend", "Send Message to backend (Destination Mobile App)");
 
-        byte[] messageData = new byte[]{0, 1, 1};
         try {
-            mManager.sendLcMessage(messageData, LcMessageMode.ENCRYPTED_MACED_FILE_KEYS, rfInterface);
-        } catch (LegicMobileSdkException e) {
+            String message = "LC Message from LEGIC Mobile SDK Quickstart App!";
+            byte[] msgData = message.getBytes();
+
+            mManager.sendLcMessageToBackendMobileApp(msgData);
+
+            int counter = mManager.getNumberOfLcMessagesToBackend();
+
+            String logText = "Number of LC Messages for backend: " + counter;
+            Log.e("sendMessageToBackend", logText + "");
+
+        } catch (SdkException e) {
+            e.printStackTrace();
         }
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    @Override
-    public void readerWriteFileEvent(LegicNeonFile legicFile, RfInterface rfInterface) {
-        Log.e("Kaba", "Reader write Event on file  " + legicFile + " on interface " + rfInterface);
-    }
 
     //-----------------------------------------------------------------------------------------------------------------|
     @Override
     public void readerLcMessageEvent(byte[] data, LcMessageMode lcMessageMode,
                                      RfInterface rfInterface) {
-
-        deactivateAllFiles();
+//        Toast.makeText(mContext, "readerLcMessageEvent 523", Toast.LENGTH_SHORT).show();
+//        deactivateAllFiles();
         if (!Constants.IS_SCANNING_STOPPED) {
             Constants.IS_SCANNING_STOPPED = true;
             final BLEDataHandler dataHandler = new BLEDataHandler(data);
@@ -516,7 +557,9 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                     Sentry.captureMessage("openingStatus->KABA Lock opening failure");
 
                 });
-                mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
+//                Toast.makeText(mContext, dataHandler.getMessageString() + "::LINE-520", Toast.LENGTH_SHORT).show();
+//                mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
+                mOpenKeyCallBack.stopScan(false, dataHandler.toString() + "");
 //            Api.logSDK(mContext, 0);
             }
         }
@@ -528,34 +571,33 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     @Override
     public void readerLcMessagePollingEvent(LcMessageMode lcMessageMode, RfInterface rfInterface) {
         Log.e("Kaba", "LC message polling event, mode: " + lcMessageMode + " on interface " + rfInterface);
-
+//        Toast.makeText(mContext, "Polling Event 558", Toast.LENGTH_SHORT).show();
     }
 
-    //-----------------------------------------------------------------------------------------------------------------|
     @Override
-    public void readerConnectEvent(long Id, LegicMobileSdkFileAddressingMode mode, int readerType,
-                                   RfInterface rfInterface) {
-        Log.e("Kaba", "Reader connect event, id : " + Id + "/" + mode
-                + " Reader Type: " + readerType + " interface:" + rfInterface);
+    public void readerAddedLcMessageEvent(int i, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Added Event 563", Toast.LENGTH_SHORT).show();
+
     }
 
-    //-----------------------------------------------------------------------------------------------------------------|
     @Override
-    public void backendUnregisterDoneEvent(LegicMobileSdkStatus status) {
-        if (status.isSuccess()) {
-            Log.e("Kaba", "Unregister done with status " + status);
-        } else {
-            handleSdkErrors(status);
-        }
+    public void readerPasswordRequestEvent(byte[] bytes, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Pasword Event 569", Toast.LENGTH_SHORT).show();
+
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    private void handleSdkErrors(LegicMobileSdkStatus status) {
+
+    //-----------------------------------------------------------------------------------------------------------------|
+
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    private void handleSdkErrors(SdkStatus status) {
         // this method logs only when status is not "OK"
         if (!status.isSuccess()) {
 
             // LegicMobileSdkErrorReason gives more insight about the cause
-            LegicMobileSdkErrorReason reason = status.getReason();
+            SdkErrorReason reason = status.getReason();
 
             Log.e("Kaba", "An action failed with the following error: " + status.getError().name());
             switch (reason.getReasonType()) {
@@ -596,9 +638,94 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
     }
 
     //-----------------------------------------------------------------------------------------------------------------|
-    public void unregister() {
-        if (mManager != null)
-            mManager.unregister();
+
+
+    @Override
+    public void backendNeonFileChangedEvent(NeonFile neonFile) {
+        Log.e("backendNeonFileChangedEvent", "" + neonFile);
+
+    }
+
+    @Override
+    public void backendRequestAddNeonFileDoneEvent(SdkStatus sdkStatus) {
+        Log.e("backendRequestAddNeonFileDoneEvent", "" + sdkStatus);
+
+    }
+
+    @Override
+    public void backendRequestRemoveNeonFileDoneEvent(SdkStatus sdkStatus) {
+        Log.e("backendRequestRemoveNeonFileDoneEvent", "" + sdkStatus);
+
+        if (sdkStatus.isSuccess()) {
+            Log.e("Remove neon", "Backend Request remove file done with status " + sdkStatus);
+        } else {
+            handleSdkErrors(sdkStatus);
+        }
+    }
+
+    @Override
+    public void readerReadNeonFileEvent(NeonFile neonFile, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Read Neon Event 644", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void readerWriteNeonFileEvent(NeonFile neonFile, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Write neon Event 649", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void readerReadNeonSubFileEvent(NeonSubFile neonSubFile, NeonFile neonFile, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Read neon sub Event 655", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void readerWriteNeonSubFileEvent(NeonSubFile neonSubFile, NeonFile neonFile, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Write Neon sub Event 660", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void readerConnectEvent(long l, AddressingMode addressingMode, int i, UUID uuid, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Connect Event 667", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void readerConnectFailedEvent(SdkStatus sdkStatus, UUID uuid, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Connect Failed Event 673", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void readerDisconnectEvent(UUID uuid, RfInterface rfInterface) {
+//        Toast.makeText(mContext, "Disconnect Event 679", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void readerReceivedReaderFoundReportEvent(ReaderFoundReport readerFoundReport) {
+//        Toast.makeText(mContext, "Found report Event 685", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void rfInterfaceActivatedEvent(long l, AddressingMode addressingMode, RfInterface rfInterface) {
+        Log.e("rfInterfaceActivatedEvent", "" + rfInterface);
+
+    }
+
+    @Override
+    public void rfInterfaceDeactivatedEvent(long l, AddressingMode addressingMode, RfInterface rfInterface) {
+        Log.e("rfInterfaceDeactivatedEvent", "" + rfInterface);
+
+    }
+
+    @Override
+    public void rfInterfaceChangeEvent(RfInterface rfInterface, RfInterfaceState rfInterfaceState) {
+        Log.e("rfInterfaceChangeEvent", "" + rfInterface);
+
     }
     //-----------------------------------------------------------------------------------------------------------------|
 

@@ -10,7 +10,6 @@ package com.openkey.sdk.salto;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
@@ -159,7 +158,8 @@ public final class Salto {
                                     Sentry.captureMessage("openingStatus->SALTO Lock opening failure");
 
                                 });
-                                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+//                                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+                                openKeyCallBack.stopScan(false, opResult + "");
 //                            Api.logSDK(mContext, 0);
                             }
                         }
@@ -176,8 +176,9 @@ public final class Salto {
                                 Sentry.captureMessage("stopScan->SALTO Timeout");
 
                             });
-                            Log.e("timeout", "salto scanning");
-                            openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+//                            Log.e("timeout", "salto scanning");
+//                            openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+                            openKeyCallBack.stopScan(false, e.getErrorCode() + "::" + e.getMessage());
 //                        Api.logSDK(mContext, 0);
 
                         }
@@ -189,7 +190,8 @@ public final class Salto {
                     Constants.IS_SCANNING_STOPPED = true;
                     OpenKeyManager.getInstance().removeTimeoutHandler();
                     Sentry.captureException(e);
-                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+//                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+                    openKeyCallBack.stopScan(false, e.getErrorCode() + "::" + e.getMessage());
                 }
                 //                Api.logSDK(mContext, 0);
                 e.printStackTrace();
@@ -204,7 +206,8 @@ public final class Salto {
                     Sentry.captureMessage("stopScan->SALTO key not correct");
 
                 });
-                openKeyCallBack.stopScan(false, Response.KEY_NOT_CORRECT);
+//                openKeyCallBack.stopScan(false, Response.KEY_NOT_CORRECT);
+                openKeyCallBack.stopScan(false, "Salto Key:-" + decryptedKey + "---Not Valid");
             }
 //            Api.logSDK(mContext, 0);
         }
