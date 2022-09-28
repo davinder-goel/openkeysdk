@@ -9,7 +9,7 @@ import android.content.Context;
 
 import com.legic.mobile.sdk.api.LegicMobileSdkManager;
 import com.legic.mobile.sdk.api.LegicMobileSdkManagerFactory;
-import com.legic.mobile.sdk.api.exception.SdkException;
+import com.legic.mobile.sdk.api.exception.LegicMobileSdkException;
 
 
 public class Utils {
@@ -42,9 +42,9 @@ public class Utils {
      *
      * @param context application context
      * @return configured SDK manager
-     * @throws SdkException if any error occurs
+     * @throws LegicMobileSdkException if any error occurs
      */
-    public static LegicMobileSdkManager getSdkManager(Context context) throws SdkException {
+    public static LegicMobileSdkManager getSdkManager(Context context) throws LegicMobileSdkException {
         LegicMobileSdkManager manager = LegicMobileSdkManagerFactory.getInstance(context);
         return manager;
     }
