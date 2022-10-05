@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
@@ -54,7 +55,13 @@ public class Entrava {
     //-----------------------------------------------------------------------------------------------------------------|
     private void initialize() {
         Intent intent = new Intent(mContext, Entrava.class);
-        mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        } else {
+            mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+
         Log.e("mPendingIntent", mPendingIntent + " ");
         IntentFilter mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(DoorLockSdk.ACTION_RESULT);

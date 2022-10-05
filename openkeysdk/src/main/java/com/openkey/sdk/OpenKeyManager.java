@@ -9,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -95,10 +94,10 @@ public final class OpenKeyManager {
         @Override
         public void onResponse(Call call, retrofit2.Response response) {
             if (response.isSuccessful()) {
-                Toast.makeText(mContext, "Fetch Key in progress", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "Fetch Key in progress", Toast.LENGTH_SHORT).show();
                 startSync();
             } else {
-                Toast.makeText(mContext, "Fetch Key Api Error", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "Fetch Key Api Error", Toast.LENGTH_SHORT).show();
                 if (mOpenKeyCallBack != null)
                     mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             }
@@ -106,7 +105,7 @@ public final class OpenKeyManager {
 
         @Override
         public void onFailure(Call call, Throwable t) {
-            Toast.makeText(mContext, "Fetch Key Api Failure::" + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "Fetch Key Api Failure::" + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 
             if (mOpenKeyCallBack != null)
                 mOpenKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
@@ -181,10 +180,10 @@ public final class OpenKeyManager {
         setConfiguration(environmentType);
 //        Log.e("Callback OKManager", openKeyCallBack + "");
         if (authToken != null && authToken.length() > 0 && mContext != null) {
-            Toast.makeText(mContext, "Authentication Called", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "Authentication Called", Toast.LENGTH_SHORT).show();
             Api.getSession(mContext, authToken, openKeyCallBack);
         } else {
-            Toast.makeText(mContext, "Session Failure", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "Session Failure", Toast.LENGTH_SHORT).show();
             openKeyCallBack.sessionFailure(Response.INVALID_AUTH_SIGNATURE, "");
         }
     }
@@ -370,7 +369,7 @@ public final class OpenKeyManager {
      */
     public synchronized void getKey(@NonNull final OpenKeyCallBack openKeyCallBack) {
         if (mContext == null && assa == null && salto == null && kaba == null && miwa == null && entrava == null && okModule == null && okMobileKey == null && okc == null && drkModule == null) {
-            Toast.makeText(mContext, "fetch failed due to null obj", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "fetch failed due to null obj", Toast.LENGTH_SHORT).show();
             openKeyCallBack.isKeyAvailable(false, Response.FETCH_KEY_FAILED);
             return;
         }
@@ -380,7 +379,7 @@ public final class OpenKeyManager {
         //if mContext null then it returned callback with null mContext description
         if (mContext == null) openKeyCallBack.isKeyAvailable(false, Response.NULL_CONTEXT);
 
-        Toast.makeText(mContext, "Fetch Key Called", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mContext, "Fetch Key Called", Toast.LENGTH_SHORT).show();
 
         //Getting key from server
         Api.getMobileKey(mContext, getKeyCallback);
@@ -407,7 +406,7 @@ public final class OpenKeyManager {
 
             case SALTO:
                 updateKeyStatus(true);
-                Toast.makeText(mContext, "SALTO KEY DOWNLOADED::", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(mContext, "SALTO KEY DOWNLOADED::", Toast.LENGTH_SHORT).show();
                 mOpenKeyCallBack.isKeyAvailable(true, Response.FETCH_KEY_SUCCESS);
                 break;
 

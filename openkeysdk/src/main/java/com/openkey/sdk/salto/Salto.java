@@ -10,7 +10,6 @@ package com.openkey.sdk.salto;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
@@ -128,7 +127,7 @@ public final class Salto {
      * Open Salto Lock
      */
     private void openLock(String decryptedKey) {
-        Toast.makeText(mContext, "SALTO opening process started", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mContext, "SALTO opening process started", Toast.LENGTH_SHORT).show();
         if (!TextUtils.isEmpty(decryptedKey)) {
             try {
                 if (api == null) {

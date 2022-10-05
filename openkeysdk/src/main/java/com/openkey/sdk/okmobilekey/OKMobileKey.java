@@ -4,7 +4,6 @@ import android.app.Application;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.openkey.okmobilekeysdk.callbackmodule.OKMobileKeyCallBack;
 import com.openkey.okmobilekeysdk.ok_manager.OKMobileKeyManager;
@@ -178,7 +177,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
             openKeyCallBack.stopScan(false, "");
         }
         else{
-            Toast.makeText(mApplication,"Network connection failed, Please check your network connection.",Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mApplication,"Network connection failed, Please check your network connection.",Toast.LENGTH_SHORT).show();
         }
 
 
@@ -203,7 +202,7 @@ public class OKMobileKey implements OKMobileKeyCallBack {
     @Override
     public void fetchKeyFailure(String msg) {
 //        openKeyCallBack.initializationFailure(msg);
-        Toast.makeText(mApplication,"Network connection failed, Please check your network connection.",Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mApplication,"Network connection failed, Please check your network connection.",Toast.LENGTH_SHORT).show();
     }
 
 
