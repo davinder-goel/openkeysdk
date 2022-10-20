@@ -316,16 +316,16 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
                         Sentry.captureMessage("openingStatus->ASSA V1 Case");
                     });
 
-//                    openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
-                    openKeyCallBack.stopScan(false, "ASSA V1 Board::" + description);
+                    openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
+//                    openKeyCallBack.stopScan(false, "ASSA V1 Board::" + description);
                 } else {
                     Sentry.configureScope(scope -> {
                         scope.setTag("openingStatus", "ASSA lock opening failure");
                         Sentry.captureMessage("openingStatus->ASSA lock opening failure");
 
                     });
-//                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-                    openKeyCallBack.stopScan(false, description);
+                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+//                    openKeyCallBack.stopScan(false, description);
                 }
             }
         }

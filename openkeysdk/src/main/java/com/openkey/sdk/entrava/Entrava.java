@@ -160,11 +160,12 @@ public class Entrava {
      * start IMGATE service for open lock when scanning animation on going
      */
     public void startImGateScanningService() {
+//        Toast.makeText(mContext, "Start Scanning", Toast.LENGTH_SHORT).show();
         isLogActionFired = true;
         isDeviceScanned = false;
         mDoorLockSdk.start(mPendingIntent);
         Handler handler = new Handler();
-        handler.postDelayed(runnable, 10 * 1000);
+        handler.postDelayed(runnable, 12 * 1000);
 
     }
     //-----------------------------------------------------------------------------------------------------------------|
@@ -208,6 +209,7 @@ public class Entrava {
                 }
             } else {
                 Log.e("Entrava Lock: ", "LOCK_OPENING_FAILURE");
+                String error = "Failed to open with Result code::" + result;
                 openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
 //                Api.logSDK(mContext, 0);
             }

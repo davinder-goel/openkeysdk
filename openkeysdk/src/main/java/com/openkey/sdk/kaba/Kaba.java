@@ -516,8 +516,8 @@ public class Kaba implements LegicMobileSdkSynchronizeEventListener,
                     Sentry.captureMessage("openingStatus->KABA Lock opening failure");
 
                 });
-//                mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
-                mOpenKeyCallBack.stopScan(false, dataHandler.toString() + "");
+                mOpenKeyCallBack.stopScan(false, com.openkey.sdk.Utilities.Response.LOCK_OPENING_FAILURE);
+//                mOpenKeyCallBack.stopScan(false, dataHandler.toString() + "");
 //            Api.logSDK(mContext, 0);
             }
         }

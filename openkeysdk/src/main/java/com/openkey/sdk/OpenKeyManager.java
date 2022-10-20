@@ -596,8 +596,8 @@ public final class OpenKeyManager {
                                 scope.setTag("stopScan", "ASSA endpoints not generated");
                                 Sentry.captureMessage("stopScan->ASSA endpoints not generated");
                             });
-//                            openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
-                            openKeyCallBack.stopScan(false, "ASSA end-points not generated");
+                            openKeyCallBack.stopScan(false, Response.NOT_INITIALIZED);
+//                            openKeyCallBack.stopScan(false, "ASSA end-points not generated");
                         }
                     }
                     break;
