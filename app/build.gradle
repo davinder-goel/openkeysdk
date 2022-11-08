@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdk 32
+    compileSdk 33
     buildToolsVersion '30.0.3'
 
     defaultConfig {
         applicationId "com.openkeysdk"
         minSdk 26
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -67,9 +67,10 @@ dependencies {
      implementation 'org.slf4j:slf4j-android:1.7.21'*/
 //    implementation 'org.bouncycastle:bcprov-jdk15on:1.58'
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
-    //implementation(name:'openkeysdk-release', ext:'aar')
-    implementation project(':openkeysdk')
+    implementation(name:'openkeysdk-release', ext:'aar')
+//    implementation project(':openkeysdk')
 
+    implementation(name: 'DoorlockApi_2_12_0', ext: 'aar')
     //
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.code.gson:gson:2.8.9'

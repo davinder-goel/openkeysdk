@@ -7,12 +7,12 @@ repositories {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
     buildToolsVersion '30.0.3'
 
     defaultConfig {
-        minSdk 23
-        targetSdk 32
+        minSdk 24
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -64,8 +64,9 @@ dependencies {
     implementation 'org.slf4j:slf4j-android:1.7.21'
     implementation files('libs/assa_v8.0.4.jar')
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
-    implementation files('libs/DoorlockApi_v2_12_0.jar')
-    implementation files('libs/DoorlockSdk_v3_4_4.jar')
+//    implementation files('libs/DoorlockApi_2.7.0.jar')
+    implementation files('libs/DoorlockSdk_3_4_4.jar')
+    implementation files('libs/DoorlockApi_2_12_0.jar')
     implementation files('libs/okmodule_v1.0.jar')
     implementation files('libs/salto_v3.1.0.jar')
     implementation(name: 'Alv2Service_v1.3.4', ext: 'aar')

@@ -18,6 +18,7 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import java.util.ArrayList;
 
+import io.sentry.Sentry;
 import kr.co.chahoo.sdk.DoorLockSdk;
 import kr.co.chahoo.sdk.IssueCallback;
 import kr.co.chahoo.sdk.ResultCode;
@@ -39,6 +40,10 @@ public class Entrava {
     private Runnable runnable = new Runnable() {
         public void run() {
             if (mDoorLockSdk != null && !isDeviceScanned) {
+                Sentry.configureScope(scope -> {
+                    scope.setTag("Entrava openingStatus", "Failed Timeout");
+                    Sentry.captureMessage("Entrava openingStatus->Failed Timeout");
+                });
                 Log.e("Stop Scan Called", "when not scanned");
                 mDoorLockSdk.stop();
                 openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
@@ -165,7 +170,7 @@ public class Entrava {
         isDeviceScanned = false;
         mDoorLockSdk.start(mPendingIntent);
         Handler handler = new Handler();
-        handler.postDelayed(runnable, 12 * 1000);
+        handler.postDelayed(runnable, 15 * 1000);
 
     }
     //-----------------------------------------------------------------------------------------------------------------|
@@ -207,9 +212,18 @@ public class Entrava {
                     isLogActionFired = false;
                     Api.logSDK(mContext, 1);
                 }
+                Sentry.configureScope(scope -> {
+                    scope.setTag("Entrava openingStatus", "LOCK_OPENED_SUCCESSFULLY");
+                    Sentry.captureMessage("Entrava openingStatus->LOCK_OPENED_SUCCESSFULLY");
+                });
             } else {
                 Log.e("Entrava Lock: ", "LOCK_OPENING_FAILURE");
                 String error = "Failed to open with Result code::" + result;
+
+                Sentry.configureScope(scope -> {
+                    scope.setTag("Entrava openingStatus", error);
+                    Sentry.captureMessage("Entrava openingStatus->" + error);
+                });
                 openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
 //                Api.logSDK(mContext, 0);
             }

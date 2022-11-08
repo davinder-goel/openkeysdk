@@ -85,9 +85,7 @@
             android:value="true" />
 
 
-        <service
-            android:name="kr.co.chahoo.doorlock.service.CookieService"
-            android:exported="false" />
+        <service android:name="kr.co.chahoo.doorlock.service.CookieService" />
 
         <!-- BLE Service -->
         <service

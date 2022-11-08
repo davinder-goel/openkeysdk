@@ -85,7 +85,8 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
 
     //ENTRAVA
-    private String mToken = "5sqpazdpnkn345lvb3xxv7qrskkgtauki7m2m77tqxhqdji5abjmpdxkhq3f3lbu";
+//    private String mToken = "p3aymvq7ljmg6gab4iu7yutdx5nytbfrfeasixvg2zqj77ciu632sso426hlgqgm";
+    private String mToken = "7xxh43mbtm3sofy3gy533upu5bn3mlg5oditbmy5zhhlnmyqluirrazjulattyc5";
 
     //MIWA
     //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
@@ -385,7 +386,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonAuthenciate:
-//                mEdtTextToken.setText(mToken);
+                mEdtTextToken.setText(mToken);
                 String token = mEdtTextToken.getText().toString().trim();
                 if (token.length() > 0) {
                     OpenKeyManager.getInstance().authenticate(token, this, EnvironmentType.DEV);

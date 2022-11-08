@@ -220,6 +220,10 @@ public final class OpenKeyManager {
                     ContextCompat.checkSelfPermission(
                             mContext,
                             Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                            mContext,
+                            Manifest.permission.BLUETOOTH_ADVERTISE
                     ) != PackageManager.PERMISSION_GRANTED
             ) {
                 return false;
@@ -242,6 +246,7 @@ public final class OpenKeyManager {
             openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED + " Context=null");
             return;
         }
+        Log.e("Initialization Start", "true");
         if (!hasBTPermissions()) {
             openKeyCallBack.initializationFailure(Response.BT_PERMISSION_MISSING);
             return;
