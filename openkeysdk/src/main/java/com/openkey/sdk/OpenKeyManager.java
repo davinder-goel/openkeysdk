@@ -362,6 +362,11 @@ public final class OpenKeyManager {
                 drkModule = new DRKModule(mContext, openKeyCallBack);
                 break;
 
+            case ENTRAVA:
+            case ENTRAVATOUCH:
+                entrava = new Entrava(mContext, openKeyCallBack);
+                break;
+
         }
     }
 
@@ -485,7 +490,7 @@ public final class OpenKeyManager {
      */
     public synchronized boolean isKeyAvailable(OpenKeyCallBack openKeyCallBack) {
         boolean haveKey = false;
-        if (assa == null && salto == null && kaba == null && drkModule == null) {
+        if (assa == null && salto == null && kaba == null && drkModule == null && entrava == null) {
             initObject(openKeyCallBack);
 //            Log.e("Started", "INITIALIZATION_FAILED");
 //            openKeyCallBack.initializationFailure(Response.INITIALIZATION_FAILED);
@@ -513,7 +518,11 @@ public final class OpenKeyManager {
 
             case ENTRAVA:
             case ENTRAVATOUCH:
-                haveKey = entrava.haveKey();
+                if (entrava == null) {
+                    haveKey = false;
+                } else {
+                    haveKey = entrava.haveKey();
+                }
                 break;
 
             case OKC:

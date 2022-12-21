@@ -15,6 +15,7 @@ import com.assaabloy.mobilekeys.api.MobileKeysApi;
 import com.assaabloy.mobilekeys.api.MobileKeysCallback;
 import com.assaabloy.mobilekeys.api.MobileKeysException;
 import com.assaabloy.mobilekeys.api.ReaderConnectionController;
+import com.assaabloy.mobilekeys.api.ble.BleSupportHelper;
 import com.assaabloy.mobilekeys.api.ble.OpeningResult;
 import com.assaabloy.mobilekeys.api.ble.OpeningStatus;
 import com.assaabloy.mobilekeys.api.ble.OpeningTrigger;
@@ -28,6 +29,7 @@ import com.assaabloy.mobilekeys.api.ble.ScanConfiguration;
 import com.assaabloy.mobilekeys.api.ble.ScanMode;
 import com.assaabloy.mobilekeys.api.ble.SeamlessOpeningTrigger;
 import com.assaabloy.mobilekeys.api.ble.TapOpeningTrigger;
+import com.assaabloy.mobilekeys.api.util.DeviceStatus;
 import com.openkey.sdk.BuildConfig;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.Utilities.Constants;
@@ -57,7 +59,7 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
     private ReaderConnectionCallback readerConnectionCallback;
     private Handler mHandlerStopScanning;
     private boolean isLoginActionFired;
-
+    private DeviceStatus deviceStatus;
     //-----------------------------------------------------------------------------------------------------------------|
     private Callback<InvitationCode> invitationCodeCallback = new Callback<InvitationCode>() {
         @Override
@@ -193,6 +195,9 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
         } catch (MobileKeysException e) {
 //            Toast.makeText(mContext, "ASSA Endpoints Exception::" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             OpenkeyLog.e("MobileKeysException" + ":" + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            OpenkeyLog.e("General Exception" + ":" + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -341,11 +346,29 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
     //-----------------------------------------------------------------------------------------------------------------|
 
+    private boolean blePermission() {
+        try {
+            if (deviceStatus == null) {
+                deviceStatus = new DeviceStatus(mContext);
+            }
+            if (BleSupportHelper.hasBlePermission(mContext) && deviceStatus.bluetoothPermitted(mContext) && deviceStatus.bluetoothReadyToGo(mContext)) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * It will start scanning service and look for the bluetooth
      * reader(Locks) and communicate with them if found one
      */
     public void startScanning() {
+        if (!blePermission()) {
+            openKeyCallBack.stopScan(false, Response.BT_PERMISSION_MISSING);
+            return;
+        }
         isLoginActionFired = true;
 //        Toast.makeText(mContext, "ASSA opening process started", Toast.LENGTH_SHORT).show();
         OpenkeyLog.d("Starting BLE service and enabling HCE");

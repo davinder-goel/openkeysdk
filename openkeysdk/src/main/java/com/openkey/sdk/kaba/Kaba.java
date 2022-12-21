@@ -17,6 +17,7 @@ import com.legic.mobile.sdk.api.listener.SdkEventListener;
 import com.legic.mobile.sdk.api.types.AddressingMode;
 import com.legic.mobile.sdk.api.types.LcMessageMode;
 import com.legic.mobile.sdk.api.types.NeonFile;
+import com.legic.mobile.sdk.api.types.NeonFileDefaultMode;
 import com.legic.mobile.sdk.api.types.NeonFileState;
 import com.legic.mobile.sdk.api.types.NeonSubFile;
 import com.legic.mobile.sdk.api.types.PushType;
@@ -88,6 +89,11 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     public Kaba(Application context, OpenKeyCallBack openKeyCallBack) {
         mOpenKeyCallBack = openKeyCallBack;
         mContext = context;
+        int mobileKeyStatus = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
+                0, mContext);
+        if (mobileKeyStatus == 1) {
+            Utilities.getInstance().clearValueOfKey(mContext, Constants.KABA_REGISTRATION_TOKEN);
+        }
         setupKaba();
     }
 
@@ -125,18 +131,19 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
                 Log.e("initSdk", mManager.isRegisteredToBackend() + "");
 
                 if (mManager.isRegisteredToBackend()) {
-
+                    mManager.setLcProjectAddressingModeActive(true);
                     try {
                         if (mManager.isRfInterfaceHardwareSupported(RfInterface.BLE_PERIPHERAL)) {
                             if (!mManager.isRfInterfaceActive(RfInterface.BLE_PERIPHERAL)) {
+                                Log.e("setRfInterfaceActive", "CALLEED");
                                 mManager.setRfInterfaceActive(RfInterface.BLE_PERIPHERAL, true);
                             }
                         }
-                        if (mManager.isRfInterfaceHardwareSupported(RfInterface.NFC_HCE)) {
-                            if (!mManager.isRfInterfaceActive(RfInterface.NFC_HCE)) {
-                                mManager.setRfInterfaceActive(RfInterface.NFC_HCE, true);
-                            }
-                        }
+//                        if (mManager.isRfInterfaceHardwareSupported(RfInterface.NFC_HCE)) {
+//                            if (!mManager.isRfInterfaceActive(RfInterface.NFC_HCE)) {
+//                                mManager.setRfInterfaceActive(RfInterface.NFC_HCE, true);
+//                            }
+//                        }
                     } catch (SdkException e) {
                         Log.e("init sdk 142", "Could not activate interface ", e);
                     }
@@ -366,7 +373,7 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     public boolean haveKey() {
         Log.e("haveKey", "called");
         try {
-            List<NeonFile> files = mManager.getAllNeonFiles();
+            List<NeonFile> files = mManager.getAllNeonFilesWithState(NeonFileState.DEPLOYED);
             Log.e("LegicNeonFile", ":" + files.size());
 
             if (files.size() > 0) {
@@ -434,7 +441,7 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
 
         Log.e("Kaba", "Activate file index ");
 
-//            initSdk();
+        initSdk();
         try {
             List<NeonFile> files = mManager.getAllNeonFilesWithState(NeonFileState.DEPLOYED);
             int updated = 0;
@@ -461,6 +468,7 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
                                 isLoginActionFired = true;
                                 Log.e("legicNeonFile", ":" + f);
                                 mManager.setNeonFileActive(f, true);
+                                mManager.setNeonFileDefaultActive(f, NeonFileDefaultMode.LC_PROJECT_DEFAULT, true);
                                 updated++;
                             } catch (SdkException e) {
                                 Log.e("Kaba", e.getLocalizedMessage());
@@ -545,10 +553,12 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     public void readerLcMessageEvent(byte[] data, LcMessageMode lcMessageMode,
                                      RfInterface rfInterface) {
 //        Toast.makeText(mContext, "readerLcMessageEvent 523", Toast.LENGTH_SHORT).show();
-//        deactivateAllFiles();
+        deactivateAllFiles();
+        final BLEDataHandler dataHandler = new BLEDataHandler(data);
+
+        Log.e("KABA DoorOpened", dataHandler.isAccessGranted() + "");
         if (!Constants.IS_SCANNING_STOPPED) {
             Constants.IS_SCANNING_STOPPED = true;
-            final BLEDataHandler dataHandler = new BLEDataHandler(data);
             if (dataHandler.isAccessGranted()) {
                 mOpenKeyCallBack.stopScan(true, com.openkey.sdk.Utilities.Response.LOCK_OPENED_SUCCESSFULLY);
                 if (isLoginActionFired) {
@@ -674,17 +684,26 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     @Override
     public void readerReadNeonFileEvent(NeonFile neonFile, RfInterface rfInterface) {
 //        Toast.makeText(mContext, "Read Neon Event 644", Toast.LENGTH_SHORT).show();
+        Log.e("readerReadNeonFileEvent", neonFile + "");
+        byte[] b = new byte[]{0x00, 0x01, 0x01};
+        try {
+            mManager.sendLcMessageToReader(b, LcMessageMode.ENCRYPTED_MACED_FILE_KEYS, rfInterface);
+        } catch (SdkException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void readerWriteNeonFileEvent(NeonFile neonFile, RfInterface rfInterface) {
 //        Toast.makeText(mContext, "Write neon Event 649", Toast.LENGTH_SHORT).show();
+        Log.e("readerWriteNeonFileEvent", neonFile + "");
 
     }
 
     @Override
     public void readerReadNeonSubFileEvent(NeonSubFile neonSubFile, NeonFile neonFile, RfInterface rfInterface) {
 //        Toast.makeText(mContext, "Read neon sub Event 655", Toast.LENGTH_SHORT).show();
+        Log.e("readerReadNeonSubFileEvent", neonFile + "");
 
     }
 
@@ -697,18 +716,20 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     @Override
     public void readerConnectEvent(long l, AddressingMode addressingMode, int i, UUID uuid, RfInterface rfInterface) {
 //        Toast.makeText(mContext, "Connect Event 667", Toast.LENGTH_SHORT).show();
-
+        Log.e("readerConnectEvent", uuid + "");
     }
 
     @Override
     public void readerConnectFailedEvent(SdkStatus sdkStatus, UUID uuid, RfInterface rfInterface) {
 //        Toast.makeText(mContext, "Connect Failed Event 673", Toast.LENGTH_SHORT).show();
+        Log.e("readerConnectFailedEvent", uuid + "");
 
     }
 
     @Override
     public void readerDisconnectEvent(UUID uuid, RfInterface rfInterface) {
 //        Toast.makeText(mContext, "Disconnect Event 679", Toast.LENGTH_SHORT).show();
+        Log.e("readerDisconnectEvent", uuid + "");
 
     }
 

@@ -42,7 +42,6 @@ import io.sentry.Sentry;
 
 public final class Salto {
 
-    private final String SECRET_KEY = "Op3nk3y4.0";
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
     //    private MasterDeviceManagerApi api;

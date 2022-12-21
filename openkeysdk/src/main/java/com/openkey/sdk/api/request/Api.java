@@ -75,6 +75,7 @@ public class Api {
                     }
                 } else {
                     Utilities.getInstance().clearValueOfKey(context, Constants.MOBILE_KEY_STATUS);
+                    Utilities.getInstance().clearValueOfKey(context, Constants.KABA_REGISTRATION_TOKEN);
                     if (openKeyCallBack != null) {
                         // get the error message from the response and return it to the callback
                         openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, response.code() + "");
