@@ -67,10 +67,10 @@ dependencies {
      implementation 'org.slf4j:slf4j-android:1.7.21'*/
 //    implementation 'org.bouncycastle:bcprov-jdk15on:1.58'
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
-    implementation(name:'openkeysdk-release', ext:'aar')
-//    implementation project(':openkeysdk')
+//    implementation(name:'openkeysdk-release', ext:'aar')
+    implementation project(':openkeysdk')
 
-    implementation(name: 'DoorlockApi_2_12_0', ext: 'aar')
+//    implementation(name: 'DoorlockApi_2_12_0', ext: 'aar')
     //
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.code.gson:gson:2.8.9'

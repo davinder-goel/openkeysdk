@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -24,7 +25,6 @@ import androidx.core.content.ContextCompat;
 import com.openkey.sdk.OpenKeyManager;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.enums.EnvironmentType;
-import com.openkey.sdk.okmobilekey.OKMobileKey;
 
 import java.util.ArrayList;
 
@@ -45,27 +45,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     private ArrayList<String> okcRoomNumbers;
     private String mOkCSelectedRoom;
 
-    private Boolean mFoundClosest = false;
-
-
-    private Long SCANNING_TIME = 30000L;
-    private Handler mHandler = null;
-    private OKMobileKey okMobileKeyModule = null;
-
-
-    /*
-     * this is fpr sample only OnMobileKey SDK
-     * */
-   /* private Runnable runnables = new Runnable(){
-
-        @Override
-        public void run() {
-            mFoundClosest=false;
-            mBtnScan.setEnabled(false);
-            mBtnScan.setAlpha(0.7f);
-            OpenKeyManager.getInstance().startOkMobileScanning();
-        } };*/
-
 
     private Runnable stopper = new Runnable() {
         @Override
@@ -77,20 +56,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     };
 
     //It should not be null
-
-    //KABA
-    // private String mToken = "cadk4grxflw55h5y7wpjclyiqcnea7jklvevtax6jh2cdjxauayrlei3ykk6edj4";
-
-    //ASSA
-    //private String mToken = "jrvvazh2pn77vzeguzonsxec6ud2hpot25wwersxy2lifyzqsgcx2ew5b24ths3t";
-
-    //ENTRAVA
-//    private String mToken = "p3aymvq7ljmg6gab4iu7yutdx5nytbfrfeasixvg2zqj77ciu632sso426hlgqgm";
-    private String mToken = "7xxh43mbtm3sofy3gy533upu5bn3mlg5oditbmy5zhhlnmyqluirrazjulattyc5";
-
-    //MIWA
-    //private String mToken = "b77cvzu6goyjz62ystd2xwbbq4lnzm4nuu4kezm3haghu4yayfms47hbkuw5mvhp";
-
+    private String mToken = "2hqeouhbvnyxiz45qqesbkhhhmqgq3yq3b7gzngm2v3xvn3zua53udgxr6lj3fl5";
 
     @Nullable
     @Override
@@ -99,7 +65,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
         View view = inflater.inflate(R.layout.dashboard, container, false);
         init(view);
         listners();
-        requestPermission();
+//        requestPermission();
         return view.getRootView();
     }
 
@@ -180,8 +146,66 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
+        hasBTPermissions();
         //OpenKeyManager.getInstance(getActivity()).getSession(mToken,this);
     }
+
+
+    private boolean hasBTPermissions() {
+        boolean hasPermission = ContextCompat.checkSelfPermission(
+                getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED;
+        if (hasPermission == false) {
+            ActivityCompat.requestPermissions(
+                    getActivity(),
+                    new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },
+                    4101
+            );
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(
+                    getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            )
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                            getActivity(),
+                            Manifest.permission.BLUETOOTH_SCAN
+                    )
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                            getActivity(),
+                            Manifest.permission.BLUETOOTH_CONNECT
+                    )
+                            != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                            getActivity(),
+                            Manifest.permission.BLUETOOTH_ADVERTISE
+                    )
+                            != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                        getActivity(),
+                        new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.BLUETOOTH_CONNECT,
+                                Manifest.permission.BLUETOOTH_ADVERTISE
+                        },
+                        4011
+                );
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return true;
+    }
+
 
     public void keyStatus() {
 
@@ -200,42 +224,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
                 break;
         }
     }
-/*
-    @Override
-    public void authenticated(boolean isAuthenticated, String description) {
-        Log.e("authenticated",":"+isAuthenticated);
-
-        if (isAuthenticated)
-            OpenKeyManager.getInstance(getActivity()).getSession(new Callback() {
-                @Override
-                public void onResponse(Call call, Response response) {
-                    hideMessage();
-                    SessionResponse sessionResponse=(SessionResponse)response.body();
-                    Log.e("sessionResponse",":"+sessionResponse.getData().getCheckOut());
-
-                    if (sessionResponse.getData() != null) {
-                        MOBILE_KEY_STATUES = sessionResponse.getData().getMobileKeyStatusId();
-                        keyStatus();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call call, Throwable t) {
-                    Log.e("onFailure",":");
-                    hideMessage();
-                    showToast("Booking not found");
-
-                }
-            });
-    }*/
-
-
-//    @Override
-//    public void sessionFailure(String errorDescription) {
-//        hideMessage();
-//        showToast("Booking not found");
-//    }
-
 
     @Override
     public void sessionResponse(SessionResponse sessionResponse) {
@@ -323,12 +311,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
             mOkCSelectedRoom = okcRoomNumbers.get(0); // for example
 
         }
-
-
-        /*
-         * this is fpr sample only OnMobileKey SDK
-         * */
-        // OpenKeyManager.getInstance().startOkMobileScanning();
     }
 
     @Override
@@ -336,22 +318,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
     }
 
-    /* @Override
-     public void closestDevice(String room) {
-
-         *//*
-     * this is fpr sample only OnMobileKey SDK
-     * *//*
-     *//* mFoundClosest=true;
-        mBtnScan.setEnabled(true);
-        mBtnScan.setAlpha(1.0f);
-        if (mHandler == null) {
-            mHandler =new Handler();
-        }
-
-        mHandler.postDelayed(runnables, SCANNING_TIME);*//*
-    }
-*/
     public void showToast(String message) {
         Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
@@ -407,14 +373,6 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
 
             case R.id.buttonOpenDoor:
                 openDoor();
-
-                /*
-                 * this is fpr sample only OnMobileKey SDK
-                 * */
-              /*  if(mFoundClosest){
-                    mHandler.removeCallbacks(runnables);
-                    OpenKeyManager.getInstance().connectOkMobileKey();
-                }*/
                 break;
         }
     }
