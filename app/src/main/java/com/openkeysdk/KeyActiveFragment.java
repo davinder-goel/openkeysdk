@@ -56,7 +56,7 @@ public class KeyActiveFragment extends BaseFragment implements View.OnClickListe
     };
 
     //It should not be null
-    private String mToken = "aqnye6wtfogotnhpgplfm4l5mgrclnhc4t6ng3rdpbuucvsmbascil3hqk3xmt4y";
+    private String mToken = "2hqeouhbvnyxiz45qqesbkhhhmqgq3yq3b7gzngm2v3xvn3zua53udgxr6lj3fl5";
 
     @Nullable
     @Override

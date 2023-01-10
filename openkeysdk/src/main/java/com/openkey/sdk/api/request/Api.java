@@ -17,6 +17,7 @@ import com.openkey.sdk.api.response.logaction.LogActionResponse;
 import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
 import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
+import com.openkey.sdk.api.response.session_cred.SessionCredResponse;
 import com.openkey.sdk.api.service.Services;
 import com.openkey.sdk.interfaces.OpenKeyCallBack;
 import com.openkey.sdk.singleton.GetBooking;
@@ -70,8 +71,14 @@ public class Api {
                 if (response.isSuccessful()) {
                     Utilities.getInstance().saveValue(Constants.AUTH_SIGNATURE, token, context);
                     saveData(response.body(), context);
-                    if (openKeyCallBack != null) {
-                        openKeyCallBack.sessionResponse(response.body());
+                    String manufacturerStr = Utilities.getInstance().getValue(Constants.MANUFACTURER, "", context);
+                    String kabaAppTechUser = Utilities.getInstance().getValue(Constants.KABA_MOBILE_TECH_USER, "", context);
+                    if (manufacturerStr.equalsIgnoreCase("KABA") && kabaAppTechUser.isEmpty()) {
+                        getSessionCredentials(context, token, openKeyCallBack);
+                    } else {
+                        if (openKeyCallBack != null) {
+                            openKeyCallBack.sessionResponse(response.body());
+                        }
                     }
                 } else {
                     Utilities.getInstance().clearValueOfKey(context, Constants.MOBILE_KEY_STATUS);
@@ -91,6 +98,38 @@ public class Api {
                 if (openKeyCallBack != null) {
                     openKeyCallBack.sessionFailure(Response.AUTHENTICATION_FAILED, "");
                 }
+            }
+        });
+    }
+
+    public static void getSessionCredentials(final Context context, final String token, final OpenKeyCallBack openKeyCallBack) {
+
+        if (context == null || token == null) {
+            return;
+        }
+        // Get the retrofit instance
+        Services services = Utilities.getInstance().getRetrofit(context).create(Services.class);
+        services.getSessionCredentials(TOKEN + token).enqueue(new Callback<SessionCredResponse>() {
+            @Override
+            public void onResponse(Call<SessionCredResponse> call, retrofit2.Response<SessionCredResponse>
+                    response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null && response.body().getData() != null && response.body().getData().getKabaSdkParams() != null) {
+                        Utilities.getInstance().saveValue(Constants.KABA_MOBILE_TECH_USER, response.body().getData().getKabaSdkParams().getKabaMobileAppTechUser(), context);
+                        Utilities.getInstance().saveValue(Constants.KABA_MOBILE_TECH_PASS, response.body().getData().getKabaSdkParams().getKabaMobileTechPassword(), context);
+                    }
+                    if (openKeyCallBack != null) {
+                        SessionResponse res = Utilities.getInstance().getBookingFromLocal(context);
+                        openKeyCallBack.sessionResponse(res);
+                    }
+                } else {
+                    Log.e("Session Cred Api Failed", "true");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SessionCredResponse> call, Throwable t) {
+                Log.e("Session Cred Response", t.getLocalizedMessage() + "");
             }
         });
     }

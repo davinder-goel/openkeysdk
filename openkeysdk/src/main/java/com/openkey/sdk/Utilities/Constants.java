@@ -13,6 +13,8 @@ public class Constants {
     public static final String UUID = "openkey_sdk_uuid";
     //    public static String UUID = "";
     public static final String MANUFACTURER = "manufacturer";
+    public static final String KABA_MOBILE_TECH_USER = "kaba_mobile_tech_user";
+    public static final String KABA_MOBILE_TECH_PASS = "kaba_mobile_tech_pass";
     public static final String AUTH_SIGNATURE = "auth_signature";
     public static final String BOOKING_ID = "booking_id";
     public final static String INVITATION_CODE = "invitation_code";

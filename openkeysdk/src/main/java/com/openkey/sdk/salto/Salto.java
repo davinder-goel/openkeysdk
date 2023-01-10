@@ -28,11 +28,6 @@ import com.saltosystems.justinmobile.sdk.model.MobileKey;
 import com.saltosystems.justinmobile.sdk.model.Result;
 
 import io.sentry.Sentry;
-//import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerApi;
-//import com.saltosystems.justinkey.sdk.ble.IMasterDeviceManagerResultAndDiscoverCallback;
-//import com.saltosystems.justinkey.sdk.ble.MasterDeviceManagerApi;
-//import com.saltosystems.justinkey.sdk.exceptions.SaltoException;
-//import com.saltosystems.justinkey.sdk.model.SaltoAccessKey;
 
 /**
  * @author OpenKey Inc.
@@ -44,7 +39,6 @@ public final class Salto {
 
     private OpenKeyCallBack openKeyCallBack;
     private Context mContext;
-    //    private MasterDeviceManagerApi api;
     private JustinBle api;
 
 
@@ -100,125 +94,9 @@ public final class Salto {
         // Get encrypted key from shared preference
         final String encryptedKey = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
         openLock(encryptedKey);
-
-//        final String encryptedKey = Utilities.getInstance().getValue(Constants.MOBILE_KEY, "", mContext);
-//        class BackgroundDecryptor extends AsyncTask<String, Void, String> {
-//
-//            @Override
-//            protected String doInBackground(String... strings) {
-//                JNCryptor cryptor = new AES256JNCryptor();
-//                final byte[] encodedKey = Base64.decode(strings[0], Base64.DEFAULT);
-//                try {
-//                    byte[] cipherText = cryptor.decryptData(encodedKey, SECRET_KEY.toCharArray());
-//                    return new String(cipherText);
-//                } catch (CryptorException e) {
-//                    e.printStackTrace();
-//                }
-//                return "";
-//            }
-//
-//            @Override
-//            protected void onPostExecute(String decryptedKey) {
-//                super.onPostExecute(decryptedKey);
-//                openLock(decryptedKey);
-//            }
-//        }
-//        new BackgroundDecryptor().execute(encryptedKey);
     }
 
-    /**
-     * Open Salto Lock
-     */
-//    private void openLock(String decryptedKey) {
-////        Toast.makeText(mContext, "SALTO opening process started", Toast.LENGTH_SHORT).show();
-//        if (!TextUtils.isEmpty(decryptedKey)) {
-//            try {
-//                if (api == null) {
-//                    api = new JustinBle(mContext);
-//                }
-//                MobileKey virtualkey = new MobileKey(decryptedKey);
-//                api.startLockOpening(virtualkey, new IJustinBleResultAndDiscoverCallback() {
-//                    @Override
-//                    public void onPeripheralFound() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(int opResult) {
-//                        if (!Constants.IS_SCANNING_STOPPED) {
-//                            OpenKeyManager.getInstance().removeTimeoutHandler();
-//                            Constants.IS_SCANNING_STOPPED = true;
-//                            if (opResult == OpResult.AUTH_SUCCESS_ACCESS_GRANTED) {
-//                                Sentry.configureScope(scope -> {
-//                                    scope.setTag("openingStatus", "SALTO Lock open success");
-//                                    Sentry.captureMessage("openingStatus->SALTO Lock open success");
-//
-//                                });
-//                                openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
-//                                Api.logSDK(mContext, 1);
-//                            } else {
-//                                Sentry.configureScope(scope -> {
-//                                    scope.setTag("openingStatus", "SALTO Lock opening failure");
-//                                    Sentry.captureMessage("openingStatus->SALTO Lock opening failure");
-//
-//                                });
-////                                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-//                                openKeyCallBack.stopScan(false, opResult + "");
-////                            Api.logSDK(mContext, 0);
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(JustinException e) {
-//                        e.printStackTrace();
-//                        if (!Constants.IS_SCANNING_STOPPED && e.getErrorCode() == 410) {
-//                            Constants.IS_SCANNING_STOPPED = true;
-//                            OpenKeyManager.getInstance().removeTimeoutHandler();
-//                            Sentry.configureScope(scope -> {
-//                                scope.setTag("stopScan", "SALTO Timeout");
-//                                Sentry.captureMessage("stopScan->SALTO Timeout");
-//
-//                            });
-////                            Log.e("timeout", "salto scanning");
-////                            openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
-//                            openKeyCallBack.stopScan(false, e.getErrorCode() + "::" + e.getMessage());
-////                        Api.logSDK(mContext, 0);
-//
-//                        }
-//                    }
-//                });
-//
-//            } catch (JustinException e) {
-//                if (!Constants.IS_SCANNING_STOPPED) {
-//                    Constants.IS_SCANNING_STOPPED = true;
-//                    OpenKeyManager.getInstance().removeTimeoutHandler();
-//                    Sentry.captureException(e);
-////                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-//                    openKeyCallBack.stopScan(false, e.getErrorCode() + "::" + e.getMessage());
-//                }
-//                //                Api.logSDK(mContext, 0);
-//                e.printStackTrace();
-//            }
-//        } else {
-//            // if key is not decrypted by any  reason then show key error
-//            if (!Constants.IS_SCANNING_STOPPED) {
-//                Constants.IS_SCANNING_STOPPED = true;
-//                OpenKeyManager.getInstance().removeTimeoutHandler();
-//                Sentry.configureScope(scope -> {
-//                    scope.setTag("stopScan", "SALTO key not correct");
-//                    Sentry.captureMessage("stopScan->SALTO key not correct");
-//
-//                });
-////                openKeyCallBack.stopScan(false, Response.KEY_NOT_CORRECT);
-//                openKeyCallBack.stopScan(false, "Salto Key:-" + decryptedKey + "---Not Valid");
-//            }
-////            Api.logSDK(mContext, 0);
-//        }
-//    }
-//}
     private void openLock(String decryptedKey) {
-//        Toast.makeText(mContext, "SALTO opening process started", Toast.LENGTH_SHORT).show();
         if (!TextUtils.isEmpty(decryptedKey)) {
             try {
                 MobileKey mobileKey = new MobileKey(decryptedKey);
@@ -255,7 +133,6 @@ public final class Salto {
 
                                         });
                                         openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-//                                        openKeyCallBack.stopScan(false, result.getOpResult() + "");
 //                            Api.logSDK(mContext, 0);
                                     }
                                 }
@@ -272,11 +149,8 @@ public final class Salto {
                                         Sentry.captureMessage("stopScan->SALTO Timeout");
 
                                     });
-//                            Log.e("timeout", "salto scanning");
                                     openKeyCallBack.stopScan(false, Response.TIME_OUT_LOCK_NOT_FOUND);
-//                                    openKeyCallBack.stopScan(false, e.getErrorCode() + "::" + e.getMessage());
 //                        Api.logSDK(mContext, 0);
-
                                 }
                             }
                         }, new LockOpeningParams.Builder()
@@ -289,7 +163,6 @@ public final class Salto {
                     OpenKeyManager.getInstance().removeTimeoutHandler();
                     Sentry.captureException(e);
                     openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
-//                    openKeyCallBack.stopScan(false, e.getErrorCode() + "::" + e.getMessage());
                 }
                 //                Api.logSDK(mContext, 0);
                 e.printStackTrace();
@@ -305,7 +178,6 @@ public final class Salto {
 
                 });
                 openKeyCallBack.stopScan(false, Response.KEY_NOT_CORRECT);
-//                openKeyCallBack.stopScan(false, "Salto Key:-" + decryptedKey + "---Not Valid");
             }
 //            Api.logSDK(mContext, 0);
         }

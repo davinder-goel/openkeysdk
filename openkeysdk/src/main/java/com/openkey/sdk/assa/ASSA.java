@@ -193,7 +193,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             OpenkeyLog.e("ASSA" + " :SetupCompleted " + getMobileKeys().isEndpointSetupComplete());
             return getMobileKeys().isEndpointSetupComplete();
         } catch (MobileKeysException e) {
-//            Toast.makeText(mContext, "ASSA Endpoints Exception::" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             OpenkeyLog.e("MobileKeysException" + ":" + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
@@ -370,7 +369,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
             return;
         }
         isLoginActionFired = true;
-//        Toast.makeText(mContext, "ASSA opening process started", Toast.LENGTH_SHORT).show();
         OpenkeyLog.d("Starting BLE service and enabling HCE");
         ReaderConnectionController controller = mobileKeysFactory.getReaderConnectionController();
         controller.enableHce();
@@ -475,7 +473,6 @@ public final class ASSA implements MobileKeysApiFactory, ReaderConnectionListene
 
             @Override
             public void handleMobileKeysTransactionFailed(MobileKeysException e) {
-//                Toast.makeText(mContext, "ASSA KEY DOWNLOAD FAILED::" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 OpenKeyManager.getInstance().updateKeyStatus(false);
                 OpenkeyLog.e("handleMobileKeysTransactionFailed" + ": " + e.getMessage());
                 openKeyCallBack.initializationFailure(Response.FETCH_KEY_FAILED);

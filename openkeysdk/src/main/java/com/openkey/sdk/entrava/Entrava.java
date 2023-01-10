@@ -167,7 +167,6 @@ public class Entrava {
      * start IMGATE service for open lock when scanning animation on going
      */
     public void startImGateScanningService() {
-//        Toast.makeText(mContext, "Start Scanning", Toast.LENGTH_SHORT).show();
         if (mPendingIntent == null) {
             Intent intent = new Intent(mContext, Entrava.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -213,7 +212,6 @@ public class Entrava {
             super.onResult(result, status, battery, issueId);
             isDeviceScanned = true;
             mDoorLockSdk.stop();
-//            Toast.makeText(mContext, "Entrava Opening Result::" + result + "::" + status, Toast.LENGTH_SHORT).show();
             Log.e(" Receiver result", ":" + result);
             Log.e(" Receiver issuedId", ":" + issueId);
             Log.e(" Receiver status", ":" + status);
