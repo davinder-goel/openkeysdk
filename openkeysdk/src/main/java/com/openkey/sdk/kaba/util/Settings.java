@@ -16,8 +16,7 @@ public class Settings {
 
     // the mobile app tech user and the according password are generated in LEGIC Connect when you add a new wallet.
     // the password is only displayed once, so make sure to save this password for later use in your mobile app.
-    public static final String mobileAppTechUser = "WalletOpenKeyTechUser";
-    public static final String mobileAppTechPassword = "cG1RT04H5xw06lUPV40U";
+
 
     // the LC Confirmation methos is for registration method, Possible values are SMS, EMAIL, NONE (custom device ID)
     public static final LcConfirmationMethod lcConfirmationMethod = LcConfirmationMethod.NONE;

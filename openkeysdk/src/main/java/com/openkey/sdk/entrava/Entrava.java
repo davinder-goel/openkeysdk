@@ -4,10 +4,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.openkey.sdk.Utilities.Constants;
 import com.openkey.sdk.Utilities.Response;
@@ -17,6 +16,8 @@ import com.openkey.sdk.interfaces.OpenKeyCallBack;
 
 import java.util.ArrayList;
 
+import io.sentry.Sentry;
+import kr.co.chahoo.doorlock.service.LocalBroadcastManagerEx;
 import kr.co.chahoo.sdk.DoorLockSdk;
 import kr.co.chahoo.sdk.IssueCallback;
 import kr.co.chahoo.sdk.ResultCode;
@@ -38,9 +39,16 @@ public class Entrava {
     private Runnable runnable = new Runnable() {
         public void run() {
             if (mDoorLockSdk != null && !isDeviceScanned) {
-                Log.e("Stop Scan Called", "when not scanned");
-                mDoorLockSdk.stop();
-                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+                if (!Constants.IS_SCANNING_STOPPED) {
+                    Constants.IS_SCANNING_STOPPED = true;
+                    Sentry.configureScope(scope -> {
+                        scope.setTag("Entrava openingStatus", "Failed Timeout");
+                        Sentry.captureMessage("Entrava openingStatus->Failed Timeout");
+                    });
+                    Log.e("Stop Scan Called", "when not scanned");
+                    mDoorLockSdk.stop();
+                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+                }
             }
         }
     };
@@ -54,7 +62,13 @@ public class Entrava {
     //-----------------------------------------------------------------------------------------------------------------|
     private void initialize() {
         Intent intent = new Intent(mContext, Entrava.class);
-        mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+
         Log.e("mPendingIntent", mPendingIntent + " ");
         IntentFilter mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(DoorLockSdk.ACTION_RESULT);
@@ -63,7 +77,7 @@ public class Entrava {
         mDoorLockSdk = DoorLockSdk.getInstance(mContext);
         mReferenceIds = mDoorLockSdk.issued();
         mServiceResultReceiver = new ServiceResult(openKeyCallBack);
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(mServiceResultReceiver, mIntentFilter);
+        LocalBroadcastManagerEx.getInstance(mContext).registerReceiver(mServiceResultReceiver, mIntentFilter);
 
         int mobileKeyStatusId = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
                 0, mContext);
@@ -153,11 +167,19 @@ public class Entrava {
      * start IMGATE service for open lock when scanning animation on going
      */
     public void startImGateScanningService() {
+        if (mPendingIntent == null) {
+            Intent intent = new Intent(mContext, Entrava.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+            } else {
+                mPendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            }
+        }
         isLogActionFired = true;
         isDeviceScanned = false;
         mDoorLockSdk.start(mPendingIntent);
         Handler handler = new Handler();
-        handler.postDelayed(runnable, 10 * 1000);
+        handler.postDelayed(runnable, 15 * 1000);
 
     }
     //-----------------------------------------------------------------------------------------------------------------|
@@ -186,23 +208,42 @@ public class Entrava {
         }
 
         @Override
-        protected void onResult(int result, int battery, String issueId) {
-            super.onResult(result, battery, issueId);
+        protected void onResult(int result, int status, int battery, String issueId) {
+            super.onResult(result, status, battery, issueId);
             isDeviceScanned = true;
             mDoorLockSdk.stop();
             Log.e(" Receiver result", ":" + result);
             Log.e(" Receiver issuedId", ":" + issueId);
+            Log.e(" Receiver status", ":" + status);
             if (result == ResultCode.SUCCESS) {
-                openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY);
-                Log.e("Entrava Lock: ", "LOCK_OPENED_SUCCESSFULLY");
-                if (isLogActionFired) {
-                    isLogActionFired = false;
-                    Api.logSDK(mContext, 1);
+                if (status == ResultCode.STATUS_OPEN) {
+                    if (!Constants.IS_SCANNING_STOPPED) {
+                        Constants.IS_SCANNING_STOPPED = true;
+                        openKeyCallBack.stopScan(true, Response.LOCK_OPENED_SUCCESSFULLY + "::" + result);
+                        Log.e("Entrava Lock: ", "LOCK_OPENED_SUCCESSFULLY");
+                        if (isLogActionFired) {
+                            isLogActionFired = false;
+                            Api.logSDK(mContext, 1);
+                        }
+                        Sentry.configureScope(scope -> {
+                            scope.setTag("Entrava openingStatus", "LOCK_OPENED_SUCCESSFULLY");
+                            Sentry.captureMessage("Entrava openingStatus->LOCK_OPENED_SUCCESSFULLY");
+                        });
+                    }
                 }
             } else {
                 Log.e("Entrava Lock: ", "LOCK_OPENING_FAILURE");
-                openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE);
+                String error = "Failed to open with Result code::" + result;
+
+                Sentry.configureScope(scope -> {
+                    scope.setTag("Entrava openingStatus", error);
+                    Sentry.captureMessage("Entrava openingStatus->" + error);
+                });
+                if (!Constants.IS_SCANNING_STOPPED) {
+                    Constants.IS_SCANNING_STOPPED = true;
+                    openKeyCallBack.stopScan(false, Response.LOCK_OPENING_FAILURE + "::" + result);
 //                Api.logSDK(mContext, 0);
+                }
             }
         }
     }

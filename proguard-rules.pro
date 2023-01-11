@@ -25,6 +25,13 @@
 -keep public class com.openkey.sdk.assa.ASSA { *;}
 
 
+# Keep native methods
+-keepclassmembers class * {
+    native <methods>;
+}
+
+-keep class kr.co.chahoo.api.KeyStoreHelper { *; }
+-keep class kr.co.chahoo.api.DoorLockApiCallback { *; }
 
 
 

@@ -10,6 +10,7 @@ import com.openkey.sdk.api.response.logaction.LogActionResponse;
 import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
 import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
 import com.openkey.sdk.api.response.session.SessionResponse;
+import com.openkey.sdk.api.response.session_cred.SessionCredResponse;
 import com.openkey.sdk.kaba.response.invitationcode.KabaToken;
 
 import retrofit2.Call;
@@ -36,6 +37,10 @@ public interface Services {
 
     @GET("sdk/v5/sessions")
     Call<SessionResponse> getSession(@Header("Authorization") String Authorization);
+
+    //-----------------------------------------------------------------------------------------------------------------|
+    @GET("sdk/v5/sessions/loadSdkParams")
+    Call<SessionCredResponse> getSessionCredentials(@Header("Authorization") String Authorization);
     //-----------------------------------------------------------------------------------------------------------------|
 
     @GET("sdk/v5/sessions/initializePersonalization.json")
