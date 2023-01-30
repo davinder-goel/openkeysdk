@@ -38,6 +38,8 @@ import com.openkey.sdk.kaba.util.Settings;
 import com.openkey.sdk.kaba.util.Utils;
 import com.openkey.sdk.singleton.GetBooking;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,6 +58,10 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     private boolean isLoginActionFired;
     // tells how many time the whole operation fails in a single active time
     private int failedCounter;
+    boolean isRoomAvailable = false;
+    ArrayList<String> activeRooms;
+    private NeonFile neonFile;
+
     //-----------------------------------------------------------------------------------------------------------------|
     private Callback<KabaToken> kabaToken = new Callback<KabaToken>() {
         @Override
@@ -89,6 +95,7 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     public Kaba(Application context, OpenKeyCallBack openKeyCallBack) {
         mOpenKeyCallBack = openKeyCallBack;
         mContext = context;
+        activeRooms = Utilities.getInstance().getRoomList(mContext);
         int mobileKeyStatus = Utilities.getInstance().getValue(Constants.MOBILE_KEY_STATUS,
                 0, mContext);
         if (mobileKeyStatus != 3) {
@@ -214,6 +221,9 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
                     mOpenKeyCallBack.isKeyAvailable(true, com.openkey.sdk.Utilities.Response.FETCH_KEY_SUCCESS);
                 } else {
                     if (mobileKeyStatusId == 1) {
+//                        if (haveKey() && neonFile != null) {
+//                            mManager.requestRemoveNeonFile(neonFile);
+//                        }
                         /**
                          * Update the status on server that Registration Complete has been completed on Kaba server
                          */
@@ -383,31 +393,43 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
 
                 for (NeonFile f : files) {
                     String fileInfos = f.toString();
-
+                    neonFile = f;
                     byte[] fileId = f.getFileId();
                     if (fileId.length > 0) {
                         fileInfos += " and File Id: " + Utils.dataToByteString(f.getFileId());
                     }
                     Log.e("Neon Files", fileInfos + "");
 
-
+                    String mainRoom = sessionResponse.getData().getHotelRoom().getTitle();
                     String reservationnumber = "" + f.getMetaData().get("ReservationNumber").getStringValue();
-                    String roomNumber = "" + f.getMetaData().get("RoomNumber").getStringValue();
+                    String roomNumber = "" + f.getMetaData().get("RoomNumber").getStringValue().trim();
 //                    logs(f);
+                    String[] rooms = null;
+                    if (roomNumber.contains(",")) {
+                        rooms = roomNumber.split(",");
+                    } else {
+                        if (roomNumber.equals(mainRoom)) {
+                            isRoomAvailable = true;
+                        }
+                    }
+
+                    if (rooms != null && rooms.length > 0 &&
+                            activeRooms != null && !activeRooms.isEmpty()) {
+                        isRoomAvailable = matchRooms(rooms, activeRooms.toArray(new String[0]));
+                    }
+                    Log.e("Rooms Available", isRoomAvailable + "");
+
                     Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
                             ? sessionResponse.getData().getParentSessionId()
                             : sessionResponse.getData().getId();
                     Log.e("reservationnumber", ":" + reservationnumber);
                     Log.e("roomNumber", ":" + roomNumber);
                     Log.e("_bookingId", ":" + _bookingId);
-                    Log.e("Title", ":" + sessionResponse.getData()
-                            .getHotelRoom().getTitle());
-
+                    Log.e("Title", ":" + mainRoom);
                     if (reservationnumber.trim().length() > 0
-                            && roomNumber.trim().length() > 0) {
+                            && roomNumber.length() > 0) {
                         if (Integer.parseInt(reservationnumber)
-                                == _bookingId && roomNumber.equals(sessionResponse.getData()
-                                .getHotelRoom().getTitle())) {
+                                == _bookingId && isRoomAvailable) {
                             return true;
                         }
                     }
@@ -439,8 +461,31 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
         activateFile();
     }
 
-    private void activateFile() {
+    private boolean matchRooms(String[] legicRooms, String[] sessionRooms) {
+        try {
+            int[] lRooms = new int[legicRooms.length];
+            int[] sRooms = new int[sessionRooms.length];
+            for (int i = 0; i < legicRooms.length; i++) {
+                lRooms[i] = Integer.parseInt(legicRooms[i].trim());
+            }
+            for (int j = 0; j < sessionRooms.length; j++) {
+                sRooms[j] = Integer.parseInt(sessionRooms[j].trim());
+            }
+            Arrays.sort(sRooms);
+            Arrays.sort(lRooms);
+            Log.e("Legic Array", legicRooms.toString());
+            Log.e("sessionRooms Array", sessionRooms.toString());
+            if (Arrays.equals(sRooms, lRooms)) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
+    private void activateFile() {
+//        deactivateAllFiles();
         Log.e("Kaba", "Activate file index ");
 
         initSdk();
@@ -452,20 +497,34 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
                 Sentry.captureMessage("kaba files " + files.size());
             });
             if (files != null && files.size() > 0) {
+                SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
+//                ArrayList<String> activeRooms = Utilities.getInstance().getRoomList(mContext);
 
                 for (NeonFile f : files) {
 
                     String reservationnumber = "" + f.getMetaData().get("ReservationNumber").getStringValue();
-                    String roomNumber = "" + f.getMetaData().get("RoomNumber").getStringValue();
-                    SessionResponse sessionResponse = GetBooking.getInstance().getBooking();
+                    String roomNumber = "" + f.getMetaData().get("RoomNumber").getStringValue().trim();
+                    String[] rooms = null;
+                    if (roomNumber.contains(",")) {
+                        rooms = roomNumber.split(",");
+                    } else {
+                        if (roomNumber.equals(sessionResponse.getData().getHotelRoom().getTitle())) {
+                            isRoomAvailable = true;
+                        }
+                    }
+
+                    if (rooms != null && rooms.length > 0 &&
+                            activeRooms != null && !activeRooms.isEmpty()) {
+                        isRoomAvailable = matchRooms(rooms, activeRooms.toArray(new String[0]));
+                    }
+                    Log.e("Rooms Available 496", isRoomAvailable + "");
                     Integer _bookingId = sessionResponse.getData().getParentSessionId() > 0
                             ? sessionResponse.getData().getParentSessionId()
                             : sessionResponse.getData().getId();
                     if (reservationnumber.trim().length() > 0
-                            && roomNumber.trim().length() > 0) {
+                            && roomNumber.length() > 0) {
                         if (Integer.parseInt(reservationnumber)
-                                == _bookingId && roomNumber.equals(sessionResponse.getData()
-                                .getHotelRoom().getTitle())) {
+                                == _bookingId && isRoomAvailable) {
                             try {
                                 isLoginActionFired = true;
                                 Log.e("legicNeonFile", ":" + f);
@@ -475,6 +534,7 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
                             } catch (SdkException e) {
                                 Log.e("Kaba", e.getLocalizedMessage());
                             }
+
                             break;
                         } else {
                             deactivateAllFiles();

@@ -24,6 +24,7 @@ public class Constants {
     // KABA requirements
     public static final String URL_KABA_BASE = "https://api.legicconnect.com";
 
+    public static final String ALL_ROOMS = "all_rooms";
     public static final String BOOKING = "booking";
     public static final String UNIQUE_NUMBER = "unique_number";
     public static final String MOBILE_KEY_STATUS = "mobile_key_status";

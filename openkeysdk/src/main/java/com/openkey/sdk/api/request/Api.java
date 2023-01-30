@@ -16,6 +16,7 @@ import com.openkey.sdk.api.response.key_status.KeyStatusResponse;
 import com.openkey.sdk.api.response.logaction.LogActionResponse;
 import com.openkey.sdk.api.response.mobile_key_response.MobileKeyResponse;
 import com.openkey.sdk.api.response.personlization.PersonlizationResponse;
+import com.openkey.sdk.api.response.session.AdditionalRoom;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.api.response.session_cred.SessionCredResponse;
 import com.openkey.sdk.api.service.Services;
@@ -24,6 +25,7 @@ import com.openkey.sdk.singleton.GetBooking;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -162,6 +164,17 @@ public class Api {
                     Sentry.captureMessage("manufacturer->" + manufacturer);
 
                 });
+
+                //For kaba multi room issue fixes
+                Utilities.getInstance().clearValueOfKey(context, Constants.ALL_ROOMS);
+                ArrayList<String> activeRooms = new ArrayList();
+                activeRooms.add(bookingResponse.getData().getHotelRoom().getTitle());
+                if (bookingResponse.getData() != null && !bookingResponse.getData().getAdditionalRooms().isEmpty()) {
+                    for (AdditionalRoom rooms : bookingResponse.getData().getAdditionalRooms()) {
+                        activeRooms.add(rooms.getTitle());
+                    }
+                }
+                Utilities.getInstance().saveRoomList(activeRooms, context);
             }
 
             if (bookingResponse.getData().getGuest() != null &&

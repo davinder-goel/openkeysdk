@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.openkey.sdk.api.response.Status;
 import com.openkey.sdk.api.response.session.SessionResponse;
 import com.openkey.sdk.cryptography.EncryptedSharedPref;
@@ -24,6 +25,8 @@ import com.openkey.sdk.singleton.GetGson;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
@@ -98,6 +101,26 @@ public class Utilities {
             Log.e("EncodingException", ":" + e.getMessage());
         }
         return new String(valueDecoded);
+    }
+
+    public void saveRoomList(ArrayList<String> data, Context context) {
+        if (context == null) return;
+
+        Gson gson = new Gson();
+        SharedPreferences.Editor saveValue = prefs.edit();
+        String jsonData = gson.toJson(data);
+        saveValue.putString(Constants.ALL_ROOMS, jsonData);
+        saveValue.apply();
+    }
+
+    public ArrayList<String> getRoomList(Context context) {
+        if (context == null) return null;
+        Gson gson = new Gson();
+        String jsonText = prefs.getString(Constants.ALL_ROOMS, null);
+        Type type = new TypeToken<ArrayList<String>>() {
+        }.getType();
+        ArrayList<String> data = gson.fromJson(jsonText, type);
+        return data;
     }
 
     /**
