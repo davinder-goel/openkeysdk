@@ -62,7 +62,6 @@ public class Kaba implements BackendEventListener, ReaderEventListener, SdkEvent
     ArrayList<String> activeRooms;
     private NeonFile neonFile;
 
-
     //-----------------------------------------------------------------------------------------------------------------|
     private Callback<KabaToken> kabaToken = new Callback<KabaToken>() {
         @Override
