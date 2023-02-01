@@ -91,6 +91,18 @@ dependencies {
 
 
 }
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = "com.openkey"
+                artifactId = "sdk"
+                version = '1.2'
+            }
+        }
+    }
+}
 repositories {
     mavenCentral()
 }
