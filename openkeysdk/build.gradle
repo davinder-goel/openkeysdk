@@ -92,13 +92,14 @@ dependencies {
 
 }
 afterEvaluate {
-    android.libraryVariants.each { variant ->
-        publishing.publications.create(variant.name, MavenPublication) {
-
-            from components.findByName(variant.name)
-            groupId = 'com.openkey'
-            artifactId = "sdk"
-            version = '1.2.1'
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.openkey'
+                artifactId = 'sdk'
+                version = '1.2.2'
+            }
 
         }
     }
